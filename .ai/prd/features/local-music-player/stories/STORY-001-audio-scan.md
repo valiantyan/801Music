@@ -171,10 +171,10 @@ data class ScanProgress(
     - *Test Case*: 测试扫描进度正确计算和更新 ✅ (测试通过)
     - *Test Case*: 测试大量文件扫描的性能 ✅ (测试通过)
 
-- [ ] **Task 6**: 实现 AudioRepository（扫描接口）
-    - *Test Case*: 测试扫描方法调用
-    - *Test Case*: 测试扫描结果的 Flow 订阅
-    - *Test Case*: 测试扫描结果缓存
+- [x] **Task 6**: 实现 AudioRepository（扫描接口） ✅
+    - *Test Case*: 测试扫描方法调用 ✅ (测试通过)
+    - *Test Case*: 测试扫描结果的 Flow 订阅 ✅ (测试通过)
+    - *Test Case*: 测试扫描结果缓存 ✅ (测试通过)
 
 - [ ] **Task 7**: 实现 ScanViewModel
     - *Test Case*: 测试扫描状态管理（开始、进行中、完成、错误）
@@ -302,6 +302,25 @@ data class ScanProgress(
   - 性能验证：
     - 100 个文件的扫描性能测试通过
     - 进度更新机制工作正常，不会过于频繁
+  - 所有测试用例已通过验证（0 failures, 0 errors）
+
+- [x] **2025-01-27**: Task 6 已完成 ✅
+  - 创建了 `AudioRepository.kt` 音频数据仓库（位于 `data/repository/AudioRepository.kt`）
+    - 封装 AudioFileScanner 的扫描逻辑，提供统一的扫描接口
+    - 管理扫描结果缓存（使用 MutableStateFlow 在内存中缓存）
+    - 暴露 Flow<List<Song>> 供其他模块订阅（通过 getAllSongs 方法）
+    - 提供 scanAudioFiles 方法，封装扫描流程并更新缓存
+    - 提供 clearCache 方法，支持清空缓存
+  - 编写了完整的单元测试：
+    - `AudioRepositoryTest.kt`: 4个测试用例全部通过
+      - 测试扫描方法调用（验证调用 AudioFileScanner）
+      - 测试扫描结果的 Flow 订阅（验证可以订阅歌曲列表）
+      - 测试扫描结果缓存（验证缓存机制）
+      - 测试获取所有歌曲（验证 Flow 订阅）
+  - 设计要点：
+    - Repository 作为单一数据源，封装数据访问逻辑
+    - 使用 StateFlow 管理缓存，支持响应式更新
+    - 扫描时自动更新缓存，其他模块可通过 getAllSongs 订阅
   - 所有测试用例已通过验证（0 failures, 0 errors）
 
 ---
