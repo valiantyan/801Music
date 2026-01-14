@@ -1,0 +1,103 @@
+---
+description: Design and implement high-quality data classes and classes in Kotlin projects to ensure code maintainability and usability
+globs: **/*.kt
+alwaysApply: false
+---
+
+# Kotlin Data and Class Design Guidelines
+
+## Context
+- When defining data models and entity classes
+- When designing class hierarchies and organization
+- When optimizing existing class structures
+
+## Requirements
+- Prefer using data classes for handling data
+- Avoid overusing primitive types, encapsulate data into composite types
+- Avoid data validation in functions, use classes with internal validation
+- Prefer immutable data
+  - Use val keyword for invariant data
+  - Use val for invariant literals
+- Follow SOLID principles when designing classes
+- Prefer composition over inheritance
+- Use interfaces to define contracts
+- Write small, single-purpose classes
+  - Less than 200 instructions
+  - Less than 10 public methods
+  - Less than 10 properties
+
+## Examples
+<example>
+// Good data class design
+// Using data class, properties mostly immutable
+data class User(
+    val id: String,
+    val username: String,
+    val email: String,
+    val createdAt: Long = System.currentTimeMillis()
+)
+
+// Class with internal validation
+class Email private constructor(val value: String) {
+    companion object {
+        fun create(email: String): Result<Email> {
+            return if (isValidEmail(email)) {
+                Result.success(Email(email))
+            } else {
+                Result.failure(IllegalArgumentException("无效的邮箱格式"))
+            }
+        }
+        
+        private fun isValidEmail(email: String): Boolean {
+            return email.matches(Regex("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}\$"))
+        }
+    }
+}
+
+// Using composition over inheritance
+class UserRepository(
+    private val apiService: UserApiService,
+    private val cacheManager: CacheManager
+) {
+    // Implementation...
+}
+</example>
+
+<example type="invalid">
+// Poor data class design
+// Mutable properties, improper encapsulation
+class User {
+    var id: String? = null
+    var name: String? = null
+    var email: String? = null
+    var age: Int = 0
+    
+    fun validate(): Boolean {
+        return !id.isNullOrEmpty() && !name.isNullOrEmpty() && 
+               !email.isNullOrEmpty() && email!!.contains("@") && age >= 18
+    }
+}
+
+// Abuse of inheritance
+class Repository {
+    fun save(data: Any) { /* ... */ }
+    fun get(id: String): Any { /* ... */ }
+    fun delete(id: String) { /* ... */ }
+}
+
+class UserRepository : Repository() {
+    fun getUserByEmail(email: String): User { /* ... */ }
+}
+
+class ProductRepository : Repository() {
+    fun getProductsByCategory(category: String): List<Product> { /* ... */ }
+}
+</example>
+
+## Critical Rules
+  - Prefer data classes for data models
+  - Prefer immutable data (val instead of var)
+  - Validate data inside classes, not in functions
+  - Follow SOLID principles when designing classes
+  - Prefer composition over inheritance
+  - Keep classes small and focused (<200 lines, <10 public methods, <10 properties) 

@@ -1,0 +1,94 @@
+---
+description: Follow basic Kotlin principles to ensure code style consistency and readability
+globs: **/*.kt
+alwaysApply: false
+---
+
+# Kotlin Basic Principles
+
+## Context
+- When writing or reviewing Kotlin code
+- When refactoring or optimizing code
+- When contributing new features to the project
+
+## Requirements
+- All code must be written in English, all comments and documentation in Chinese
+- Explicitly declare types for all variables and functions (parameters and return types)
+- Avoid using the `any` type; create specific types when necessary
+- No empty lines inside function bodies
+- Log execution progress within try blocks to track program flow and confirm successful execution of critical steps
+- Follow the Single Responsibility Principle; keep each file under 200 lines
+- Test after each meaningful change; implement core functionality before optimization
+- Parameter formatting in function calls:
+  - Use named parameters when there are 2 or more parameters
+  - When there are more than 3 parameters, each parameter must be on a separate line
+  - Always include a trailing comma after the last parameter regardless of parameter count
+
+## Examples
+<example>
+// Good practice
+fun calculateTotal(items: List<Item>): Double {
+    var total = 0.0 // 初始化总计金额
+    try {
+        Log.d(TAG, "开始计算总金额，共 ${items.size} 个商品")
+        for (item in items) {
+            total += item.price * item.quantity
+            Log.d(TAG, "添加商品: ${item.name}, 小计: ${item.price * item.quantity}")
+        }
+        Log.d(TAG, "总金额计算完成: $total")
+        return total
+    } catch (e: Exception) {
+        Log.e(TAG, "计算总金额时出错: ${e.message}")
+        throw e
+    }
+}
+
+// Using named parameters (2-3 parameters)
+val user = getUser(
+    id = "123456", 
+    includeDetails = true,
+)
+
+// Multiple parameters, one per line
+val config = createConfig(
+    name = "AppConfig",
+    version = "1.0.0",
+    debug = BuildConfig.DEBUG,
+    timeout = 30000,
+)
+</example>
+
+<example type="invalid">
+// Bad practice
+fun calculateTotal(items: List<*>): Any {
+    var total = 0.0
+
+    for (item in items) {
+        total += (item as Map<String, Any>)["price"] as Double * (item["quantity"] as Int)
+    }
+
+    return total
+}
+
+// Error: Not using named parameters
+val user = getUser("123456", true)
+
+// Error: More than 3 parameters but not on separate lines
+val config = createConfig(name = "AppConfig", version = "1.0.0", debug = BuildConfig.DEBUG, timeout = 30000)
+
+// Error: No trailing comma after the last parameter
+val settings = createSettings(
+    theme = "Dark",
+    fontSize = 14,
+    animations = true
+)
+</example>
+
+## Critical Rules
+  - All code must be in English, all comments and documentation in Chinese
+  - Explicitly declare variable and function types; avoid using `any`
+  - Write concise, focused functions and classes
+  - Log execution of critical steps
+  - Test after each change
+  - Use named parameters when 2 or more parameters; place each parameter on a separate line when more than 3 parameters
+  - Always include a trailing comma after the last parameter 

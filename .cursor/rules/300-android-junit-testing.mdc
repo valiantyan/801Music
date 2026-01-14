@@ -1,0 +1,173 @@
+---
+description: Use Robolectric and MockK when testing Android components in JUnit to ensure reliability and isolation
+globs: **/*Test.kt
+alwaysApply: false
+---
+
+# Android JUnit Testing Standards
+
+## Context
+- When testing Android components and functionalities in JUnit environment
+- When mocking Android system components
+- When handling asynchronous operations and UI events
+- When running tests without relying on actual Android devices or emulators
+- When testing coroutines and suspend functions
+
+## Requirements
+- Use `@RunWith(RobolectricTestRunner::class)` annotation on test classes
+- Use MockK framework to mock Context and other external dependencies
+- Don't manually mock Handler, Looper and other components - use Robolectric's implementations
+- Use ShadowLooper to control event loops when testing asynchronous operations
+- Ensure all mock objects are properly initialized in the `@Before` method
+- Each test method should be independent and clearly reflect its purpose
+- Use `verify` to validate expected interactions and callbacks
+- When testing complex classes requiring multiple mocks, first create a simple sanity test to verify the testing environment works correctly before adding comprehensive test cases
+- Use TestDispatcher for coroutine testing to control execution of coroutines
+- Always use `testDispatcher.scheduler` for time control in coroutine tests, not the extension functions directly
+- Implement TestRule for coroutine testing to properly manage Dispatchers.Main
+- Use TestScope for structured concurrency in tests
+
+## Examples
+<example>
+@RunWith(RobolectricTestRunner::class)
+class ExampleAndroidTest {
+
+    private lateinit var mockContext: Context
+    private lateinit var systemUnderTest: AndroidComponent
+
+    @Before
+    fun setUp() {
+        // Use MockK to mock Context
+        mockContext = mockk(relaxed = true)
+        
+        // Initialize system under test
+        systemUnderTest = AndroidComponent(mockContext)
+    }
+
+    @Test
+    fun testAsyncOperation() {
+        // Set up test data and expectations
+        val callback = mockk<ResultCallback>(relaxed = true)
+        
+        // Execute asynchronous operation
+        systemUnderTest.performAsyncOperation(callback)
+        
+        // Control asynchronous execution
+        ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
+        
+        // Verify results
+        verify { callback.onSuccess(any()) }
+    }
+    
+    // Example of a simple sanity test for complex class
+    @Test
+    fun testEnvironmentSetup() {
+        // A simple test that verifies the test environment is correctly set up
+        // Before adding more complex test cases
+        assertNotNull(systemUnderTest)
+        assertTrue(systemUnderTest.isInitialized())
+    }
+}
+
+// Example of coroutine test setup
+@OptIn(ExperimentalCoroutinesApi::class)
+class CoroutineTest {
+    @get:Rule
+    val mainCoroutineRule = MainCoroutineRule()
+    
+    private val testDispatcher = StandardTestDispatcher()
+    private val testScope = TestScope(testDispatcher)
+    
+    @Test
+    fun testSuspendFunction() = testScope.runTest {
+        // Arrange
+        val mockRepository = mockk<Repository>()
+        coEvery { mockRepository.getData() } returns "test data"
+        
+        // Act
+        val result = systemUnderTest.loadData()
+        
+        // Assert
+        assertEquals("test data", result)
+        coVerify { mockRepository.getData() }
+    }
+
+    @Test
+    fun testDelayedOperation() = runTest {
+        // Arrange
+        var operationExecuted = false
+        val delay = 1000L
+        
+        // Act
+        runDelayedOperation(delay) { operationExecuted = true }
+        
+        // Assert
+        assertTrue(operationExecuted)
+    }
+}
+</example>
+
+<example type="invalid">
+// Error: Not using RobolectricTestRunner
+class InvalidAndroidTest {
+
+    // Error: Manually mocking Handler instead of using Robolectric's implementation
+    @Before
+    fun setUp() {
+        val mockHandler = mock(Handler::class.java)
+        mockkStatic(Looper::class)
+        every { Looper.getMainLooper() } returns mockMainLooper
+    }
+    
+    @Test
+    fun testWithoutShadowLooper() {
+        // Error: Not properly handling asynchronous operations
+        component.doAsyncStuff()
+        // Directly verifying results without waiting for async completion
+        assertTrue(component.isCompleted())
+    }
+    
+    // Error: Immediately writing complex tests without validating test environment
+    @Test
+    fun testComplexFunctionality() {
+        // Directly testing complex functionality with multiple mocks
+        // without first verifying that the test environment is correctly set up
+        // This can lead to hard-to-debug failures
+    }
+    
+    // Error: Not using TestDispatcher for coroutine testing
+    @Test
+    fun testCoroutineWithoutTestDispatcher() = runBlocking {
+        // Error: Using runBlocking instead of TestScope
+        val result = systemUnderTest.suspendFunction()
+        // This might cause flaky tests or timeouts
+    }
+
+    // Error: Not using testDispatcher.scheduler for time control
+    @Test
+    fun testDelayedOperation() = runTest {
+        var operationExecuted = false
+        val delay = 1000L
+        
+        runDelayedOperation(delay) { operationExecuted = true }
+        
+        // 错误：直接使用扩展函数而不是 testDispatcher.scheduler
+        advanceTimeBy(delay)
+        advanceUntilIdle()
+        
+        assertTrue(operationExecuted)
+    }
+}
+</example>
+
+## Critical Rules
+  - Always use `@RunWith(RobolectricTestRunner::class)` for Android-related tests
+  - Use MockK's `mockk(relaxed = true)` to mock Context and other Android components
+  - Don't manually mock Handler and Looper - leverage Robolectric's implementations
+  - Use `ShadowLooper.runUiThreadTasksIncludingDelayedTasks()` or `ShadowLooper.idleMainLooper(timeInMs)` to control async tasks
+  - Each test method should focus on a single functionality point and include Arrange, Act, and Assert sections
+  - Use MockK's `verify`, `slot`, and other features to capture and check parameters when verifying asynchronous callbacks
+  - For complex classes requiring multiple mocks, create a simple sanity test first to validate the test environment before writing comprehensive test cases
+  - Always use `testDispatcher.scheduler` for time control in coroutine tests, never use extension functions directly
+  - Implement MainCoroutineRule or similar test rule to properly manage Dispatchers.Main in tests
+  - Use coEvery and coVerify for testing suspend functions 

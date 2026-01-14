@@ -1,0 +1,165 @@
+---
+description: Follow these guidelines when performing test-friendly refactoring to ensure code testability without major changes
+globs: **/*.{kt,java}
+alwaysApply: false
+---
+
+# Test-Friendly Refactoring Guidelines
+
+## Context
+- When adding unit tests to existing code
+- When making code testable without major redesign
+- When working with legacy code that lacks tests
+- When preparing code for test coverage improvement
+
+## Requirements
+- Make minimal necessary changes to enable testing
+- Clearly mark test-only code with appropriate annotations
+- Maintain existing behavior and performance characteristics
+- Document all test-related modifications
+- Follow progressive refactoring steps
+- Validate changes without relying on unit tests
+
+## Complex Object Testing Strategy
+### 1. Dependency Analysis
+- **Core Dependencies**: Key components that directly affect business logic
+- **Support Dependencies**: Non-critical functionality like logging and monitoring
+- **Infrastructure Dependencies**: Underlying services like databases and networking
+
+### 2. Testing Strategy Selection
+- **Direct Testing**: Prioritize core business logic testing
+- **Dependency Handling**:
+  ```kotlin
+  class ComplexManager(
+      private val coreService: CoreService,     // Core: Consider refactoring
+      private val logger: Logger,               // Support: Direct mock
+      private val database: Database            // Infrastructure: Test alternative
+  )
+  ```
+
+### 3. Progressive Implementation
+1. Start testing quickly with mocks
+2. Identify testing obstacles
+3. Refactor dependencies as needed
+4. Continuously improve test strategy
+
+## Coroutine-based Code Testing Strategy
+### 1. Test Dispatcher Selection
+- **TestCoroutineDispatcher**: For simple sequential testing
+- **StandardTestDispatcher**: For more realistic scheduling behavior
+- **UnconfinedTestDispatcher**: For immediate execution testing
+
+### 2. Time Control Requirements
+```kotlin
+@Test
+fun testTimeoutBehavior() = runTest {
+    val testDispatcher = StandardTestDispatcher(testScheduler)
+    // Replace production dispatchers
+    Dispatchers.setMain(testDispatcher)
+    
+    // Test parallel requests
+    launch { /* request 1 */ }
+    launch { /* request 2 */ }
+    
+    // Advance virtual time
+    advanceTimeBy(1000L)
+    
+    // Verify timeout behavior
+}
+```
+
+### 3. Concurrency Validation
+- Test with actual parallel execution using multiple dispatchers
+- Verify concurrent request limits
+- Validate state consistency under parallel execution
+- Use stress testing with repeated parallel operations
+
+### 4. State Synchronization Testing
+```kotlin
+class TestableAdManager(
+    private val dispatcher: CoroutineDispatcher,
+    private val scope: CoroutineScope
+) {
+    // Allow injection of test dispatchers while maintaining behavior
+    fun executeParallel(count: Int, block: suspend () -> Unit) {
+        scope.launch(dispatcher) {
+            // Original parallel execution logic
+        }
+    }
+}
+```
+
+## Examples
+<example>
+// Good: Minimal test-enabling changes
+class BaseManager {
+    private val dataPool = LinkedList<Data>()
+    
+    @VisibleForTesting
+    internal fun getPoolContent(): List<Data> = dataPool.toList()
+    
+    protected open fun processData() {
+        // Original implementation
+    }
+}
+
+@VisibleForTesting
+class TestManager : BaseManager {
+    public override fun processData() {
+        super.processData()
+    }
+}
+</example>
+
+<example type="invalid">
+// Bad: Excessive changes for testing
+class BaseManager {
+    // Changed from private to public for testing
+    public val dataPool = LinkedList<Data>()
+    
+    // Changed implementation for testing
+    fun processData() {
+        // Modified implementation
+    }
+}
+</example>
+
+## Test Code Classification
+### 1. Temporary Test Code
+Use `@TemporaryTest` annotation to mark code that should be removed immediately after testing:
+```kotlin
+@TemporaryTest("To be removed in v1.2.0")
+internal fun temporaryTestHelper() {
+    // Temporary test helper method
+}
+```
+
+### 2. Long-term Test Support Code
+Use `@VisibleForTesting` annotation to mark code that should be maintained for testing purposes:
+```kotlin
+@VisibleForTesting
+internal fun testSupportMethod() {
+    // Long-term test support method
+}
+```
+
+### 3. To-be-optimized Test Code
+Use `@TestRefactorTarget` annotation to mark code that needs improvement during optimization refactoring:
+```kotlin
+@TestRefactorTarget("Plan to replace with dependency injection during refactoring")
+protected fun methodForTesting() {
+    // Future optimization target method
+}
+```
+
+## Critical Rules
+  - Use @VisibleForTesting annotation for test-only code
+  - Prefer protected over public for test access
+  - Create test-specific subclasses instead of modifying original classes
+  - Document all test-related modifications with clear comments
+  - Keep original behavior unchanged
+  - Add defensive checks in test-only methods
+  - Remove temporary validation code after testing is complete
+  - Maintain clear separation between test support code and production code
+  - Never modify core business logic for testing purposes
+  - Use progressive, small-step changes with manual validation 

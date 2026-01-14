@@ -1,0 +1,116 @@
+---
+description: Write effective tests in Kotlin projects to ensure code quality and reliability
+globs: **/test/**/*.kt,**/androidTest/**/*.kt
+alwaysApply: false
+---
+
+# Kotlin Testing Guidelines
+
+## Context
+- When writing tests for new code
+- When adding test coverage for existing code
+- When refactoring tests to improve maintainability
+
+## Requirements
+- Follow the Arrange-Act-Assert test structure
+- Clearly name test variables
+  - Follow conventions: inputX, mockX, actualX, expectedX, etc.
+- Write unit tests for each public function
+  - Use Test Doubles to mock dependencies
+  - Exceptions can be made for inexpensive third-party dependencies
+- Write acceptance tests for each module
+  - Follow the Given-When-Then structure
+- Test names should be descriptive, clearly stating what is being tested
+- Each test should test only one scenario or behavior
+- Keep tests independent of each other, avoid dependency on execution order
+- Use parameterized tests to handle multiple cases
+- Use Mocks and Stubs appropriately to isolate code under test
+
+## Examples
+<example>
+// Good testing practices
+class UserRepositoryTest {
+    
+    private lateinit var userRepository: UserRepository
+    private lateinit var mockApiService: UserApiService
+    
+    @Before
+    fun setup() {
+        // Arrange - 准备测试环境
+        mockApiService = mock(UserApiService::class.java)
+        userRepository = UserRepository(mockApiService)
+    }
+    
+    @Test
+    fun fetchUserById_validUserId_returnsUser() {
+        // Arrange - 准备测试数据
+        val expectedUser = User("123", "测试用户", "test@example.com")
+        `when`(mockApiService.getUser("123")).thenReturn(expectedUser)
+        
+        // Act - 执行被测方法
+        val actualUser = userRepository.fetchUserById("123")
+        
+        // Assert - 验证结果
+        assertEquals(expectedUser.id, actualUser.id)
+        assertEquals(expectedUser.name, actualUser.name)
+        assertEquals(expectedUser.email, actualUser.email)
+        verify(mockApiService).getUser("123")
+    }
+    
+    @Test
+    fun fetchUserById_userNotFound_throwsException() {
+        // Arrange
+        `when`(mockApiService.getUser("999")).thenThrow(UserNotFoundException("用户不存在"))
+        
+        // Act & Assert
+        assertThrows<UserNotFoundException> {
+            userRepository.fetchUserById("999")
+        }
+    }
+    
+    @ParameterizedTest
+    @ValueSource(strings = ["", " ", "   "])
+    fun fetchUserById_emptyUserId_throwsIllegalArgumentException(emptyId: String) {
+        // Act & Assert
+        assertThrows<IllegalArgumentException> {
+            userRepository.fetchUserById(emptyId)
+        }
+    }
+}
+</example>
+
+<example type="invalid">
+// Poor testing practices
+class BadTestExample {
+    
+    // Error: Missing clear test structure
+    @Test
+    fun testUser() {
+        val repo = UserRepository(RealApiService())  // Error: Using real dependency instead of Mock
+        
+        // Error: Mixing multiple assertions and scenarios
+        val user = repo.fetchUserById("123")
+        assertNotNull(user)
+        assertEquals("期望的名称", user.name)
+        
+        val users = repo.getAllUsers()  // Error: Testing multiple functionalities in same test
+        assertTrue(users.isNotEmpty())
+        
+        // Error: No clear expected result
+        repo.deleteUser("123")
+    }
+    
+    // Error: Test name not descriptive
+    @Test
+    fun test2() {
+        // Test implementation...
+    }
+}
+</example>
+
+## Critical Rules
+  - Follow the Arrange-Act-Assert test structure
+  - Each test should test only one scenario or behavior
+  - Use Test Doubles to isolate code under test
+  - Use descriptive test names
+  - Keep tests independent, not dependent on execution order 

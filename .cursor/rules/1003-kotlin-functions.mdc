@@ -1,0 +1,103 @@
+---
+description: Write high-quality functions in Kotlin projects to ensure code is concise, maintainable, and testable
+globs: **/*.kt
+alwaysApply: false
+---
+
+# Kotlin Function Design Guidelines
+
+## Context
+- When writing new functions or methods
+- When refactoring existing functions
+- When reviewing function implementations to ensure best practices
+
+## Requirements
+- Functions should be concise, focused on a single purpose, and not exceed 20 instructions
+- Name functions using a verb followed by other words
+- Functions that return boolean values should use prefixes like isX, hasX, canX, etc.
+- Functions that don't return values should use action verbs like executeX, saveX, etc.
+- Avoid nested code blocks through:
+  - Early checks and returns
+  - Extraction to utility functions
+- Use higher-order functions (map, filter, reduce, etc.) to avoid function nesting
+- Use arrow functions for simple functions (fewer than 3 instructions)
+- Use named functions for non-simple functions
+- Use default parameter values instead of checking for null values
+- Use the RO-RO (Receive Object-Return Object) pattern to reduce function parameters
+  - Use objects to pass multiple parameters
+  - Use objects to return results
+  - Declare necessary types for input parameters and outputs
+- Maintain a single level of abstraction
+
+## Examples
+<example>
+// Good function design
+// Short, single purpose, using early returns
+fun validateUserInput(input: UserInput): ValidationResult {
+    // Early validation and return
+    if (input.username.isEmpty()) {
+        return ValidationResult.Error("用户名不能为空")
+    }
+    
+    if (input.password.length < 8) {
+        return ValidationResult.Error("密码长度必须至少为8位")
+    }
+    
+    // Passed all validations
+    return ValidationResult.Success
+}
+
+// Using higher-order functions
+fun filterActiveUsers(users: List<User>): List<User> = users.filter { it.isActive }
+
+// Using object parameters and returns
+fun processPayment(request: PaymentRequest): PaymentResult {
+    // Implement payment processing logic
+    return PaymentResult(
+        success = true,
+        transactionId = generateTransactionId(),
+        timestamp = System.currentTimeMillis()
+    )
+}
+</example>
+
+<example type="invalid">
+// Poor function design
+// Too long, deeply nested, multiple purposes
+fun processUserData(username: String, password: String, email: String, age: Int): Boolean {
+    var isValid = false
+    
+    if (username != null && username.length > 0) {
+        if (password != null && password.length >= 8) {
+            if (email != null && email.contains("@")) {
+                if (age >= 18) {
+                    // Save user
+                    saveUser(username, password, email, age)
+                    // Send welcome email
+                    sendWelcomeEmail(email)
+                    // Update statistics
+                    updateStats()
+                    isValid = true
+                } else {
+                    System.out.println("年龄必须大于等于18岁")
+                }
+            } else {
+                System.out.println("邮箱格式无效")
+            }
+        } else {
+            System.out.println("密码长度必须至少为8位")
+        }
+    } else {
+        System.out.println("用户名不能为空")
+    }
+    
+    return isValid
+}
+</example>
+
+## Critical Rules
+  - Functions should be short (not exceeding 20 instructions) and focused on a single purpose
+  - Use early returns instead of nested conditions
+  - Functions returning boolean values should be named with prefixes like is, has, can, etc.
+  - Use objects to pass multiple parameters, avoiding long parameter lists
+  - Explicitly declare types for input parameters and return values 

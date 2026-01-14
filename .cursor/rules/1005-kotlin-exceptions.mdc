@@ -1,0 +1,87 @@
+---
+description: Handle exceptions properly in Kotlin projects to ensure program robustness and traceability
+globs: **/*.kt
+alwaysApply: false
+---
+
+# Kotlin Exception Handling Guidelines
+
+## Context
+- When dealing with code that may encounter errors
+- When defining error handling strategies
+- When logging and tracking program execution progress
+
+## Requirements
+- Use exceptions for unexpected errors, not for expected errors
+- When catching exceptions, you should:
+  - Fix expected problems
+  - Add contextual information
+  - Or use a global handler
+- Log execution progress within try blocks to track program flow and confirm successful execution of critical steps
+- Always use try-catch blocks with descriptive logging, including informative error logs (with the error itself)
+- Avoid catching exceptions without handling them or swallowing exceptions
+- Prefer specific exception classes over the generic Exception
+- Consider using sealed classes or Result type to represent possible error states
+
+## Examples
+<example>
+// Good exception handling
+fun fetchUserData(userId: String): User {
+    try {
+        Log.d(TAG, "开始获取用户数据: userId=$userId")
+        val response = apiService.getUser(userId)
+        Log.d(TAG, "获取用户数据成功: ${response.name}")
+        return response
+    } catch (e: ApiException) {
+        Log.e(TAG, "API调用失败: ${e.message}", e)
+        throw UserDataException("无法获取用户数据", e)
+    } catch (e: NetworkException) {
+        Log.e(TAG, "网络连接失败: ${e.message}", e)
+        throw UserDataException("网络连接问题", e)
+    }
+}
+
+// Using Result type to handle possible errors
+fun validateEmail(email: String): Result<Email> {
+    return try {
+        if (email.contains("@")) {
+            Result.success(Email(email))
+        } else {
+            Result.failure(InvalidEmailException("邮箱格式无效"))
+        }
+    } catch (e: Exception) {
+        Log.e(TAG, "邮箱验证异常: ${e.message}", e)
+        Result.failure(e)
+    }
+}
+</example>
+
+<example type="invalid">
+// Poor exception handling
+fun fetchUserData(userId: String): User? {
+    try {
+        return apiService.getUser(userId)
+    } catch (e: Exception) {
+        // Error: No error information logged
+        return null  // Error: Just returning null, not conveying error reason
+    }
+}
+
+fun validateEmail(email: String): Boolean {
+    try {
+        // Some validation logic
+        return email.contains("@")
+    } catch (Exception e) {
+        // Error: Catching generic Exception
+        e.printStackTrace()  // Error: Just printing stack trace, not properly handling
+        return false  // Error: Not conveying error reason
+    }
+}
+</example>
+
+## Critical Rules
+  - Log execution progress and critical steps within try blocks
+  - Catch specific exceptions rather than generic Exception
+  - Add contextual information when catching exceptions and handle them appropriately
+  - Don't swallow exceptions, always log or rethrow them
+  - Use descriptive logging for errors, including error messages and exception objects 

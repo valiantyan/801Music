@@ -1,0 +1,63 @@
+---
+description: Use consistent naming conventions in Kotlin projects to improve code readability and maintainability
+globs: **/*.kt
+alwaysApply: false
+---
+
+# Kotlin Naming Conventions
+
+## Context
+- When creating classes, interfaces, variables, or functions
+- When reviewing code to ensure naming consistency
+- When refactoring or optimizing existing code
+
+## Requirements
+- Use PascalCase for classes and interfaces
+- Use camelCase for variables, functions, and methods
+- Use underscores_case for files and directories
+- Use UPPERCASE for environment variables and constants
+- Function names should start with a verb
+- Boolean variables should use verbs, such as isLoading, hasError, canDelete, etc.
+- Use complete words rather than abbreviations, with correct spelling
+- Make exceptions for standard abbreviations (such as API, URL, etc.) and common abbreviations (such as i, j in loops, err for errors, ctx for context, etc.)
+
+## Examples
+<example>
+// Good naming practices
+class UserRepository { // Classes use PascalCase
+    private val userApiService: UserApiService // Variables use camelCase
+    private val CACHE_TIMEOUT = 60 // Constants use UPPERCASE
+    
+    fun fetchUserProfile(userId: String): UserProfile { // Functions start with a verb
+        // Implementation...
+    }
+    
+    fun isUserLoggedIn(): Boolean { // Boolean functions use 'is' prefix
+        // Implementation...
+    }
+}
+</example>
+
+<example type="invalid">
+// Poor naming practices
+class userRepo { // Error: Classes should use PascalCase
+    private val UserAPI_Service // Error: Variables should use camelCase
+    private val timeout = 60 // Error: Constants should use UPPERCASE
+    
+    fun user_profile(uid: String): profile { // Error: Functions should use camelCase and start with a verb
+        // Implementation...
+    }
+    
+    fun logged_in(): Boolean { // Error: Boolean functions should use appropriate verb prefixes
+        // Implementation...
+    }
+}
+</example>
+
+## Critical Rules
+  - Use PascalCase for classes and interfaces
+  - Use camelCase for variables, functions, and methods
+  - Use underscores_case for files and directories
+  - Use UPPERCASE for constants
+  - Function names should start with a verb
+  - Boolean variables and functions should use appropriate verb prefixes (is, has, can, etc.) 

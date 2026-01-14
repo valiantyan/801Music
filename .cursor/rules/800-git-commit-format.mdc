@@ -1,0 +1,59 @@
+---
+description: ALWAYS use when making commits or managing git workflow to ensure consistent version control practices
+globs: **/.git/**/*,**/COMMIT_EDITMSG
+alwaysApply: true
+---
+
+# Git Commit Format
+
+## Context
+- When making Git commits
+- When managing Git workflow
+- When ensuring version control history is clear and readable
+
+## Requirements
+- Commit messages must follow the format below
+  ```
+  {type}({scope}): {subject}
+  <BLANK LINE>
+  {body}
+  ```
+- Type must be a predefined valid type
+- Scope is mandatory, must be in English, and should indicate the location of the change (file, component, or package)
+- Subject line must be in Chinese, concisely describing the change
+- Subject line must use present tense, imperative mood
+- Subject line must not start with a capital letter or end with a period
+- Subject line must not exceed 60 characters
+- Message body must be in Chinese, detailing the motivation for the change and comparisons to previous behavior
+- All lines must not exceed 80 characters in width
+
+### Scope Determination Guidelines
+  - Automatically determine from the modified file path, e.g., when modifying files under `core/log/`, the scope is `log`
+  - When modifying multiple modules, use the name of the most significant module as the scope, such as `core`, `banner`, `interstitialAd`
+  - For cross-module infrastructure changes, use `infra` or specific technology names like `build`, `ci`
+  - If the change affects the entire project, use `global` or `project`
+  - Always prioritize using existing module names as scope to maintain consistency
+
+## Examples
+<example>
+✅ `feat(log): 新增日志工具类并优化 SDK 日志输出`
+
+1. 引入 AdWeaveLogger 工具类，提供统一的日志管理
+2. 在 AdWeaveSDK 中集成日志工具，增加调试模式控制
+3. 优化 SDK 初始化、广告加载和展示上报的日志输出
+</example>
+
+<example type="invalid">
+❌ `feat: 新增日志工具` (missing scope)
+
+❌ `Updated logger and fixed some bugs` (completely fails to follow format requirements)
+
+Correct format should be: `feat(logger): 新增日志工具`
+</example>
+
+## Critical Rules
+  - Strictly follow the `{type}({scope}): {subject}` format, scope cannot be omitted
+  - Common types: feat (new feature), fix (bug fix), docs (documentation), style (formatting), refactor (refactoring), test (testing)
+  - Subject line must be in Chinese, concise and clear
+  - Message body must be in Chinese, explaining the reasons for and impact of the changes in detail
+  - Commit messages must use present tense and imperative mood

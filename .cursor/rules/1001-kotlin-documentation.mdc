@@ -1,0 +1,246 @@
+---
+description: When writing documentation and comments in Kotlin code, ensure proper referencing of classes, fields, and constants, with comprehensive annotations
+globs: **/*.kt
+alwaysApply: false
+---
+
+# Kotlin Documentation and Comment Guidelines
+
+## Context
+- When writing documentation for classes, methods, or properties
+- When adding code comments to explain complex logic
+- When generating API documentation
+- When maintaining consistent documentation style in the project
+- When adding detailed comments to critical private methods in key classes
+
+## Requirements
+- All comments and documentation must be in Chinese
+- All code (including variable names, function names, class names, etc.) must be in English
+- Comments should explain "why", not just "what"
+- Use standard KDoc format for public API documentation
+- Add detailed comments for complex algorithms or business logic
+- Documentation should include:
+  - Purpose and functionality of methods
+  - Meaning and constraints of parameters
+  - Meaning of return values
+  - Possible exceptions that may be thrown
+- Avoid meaningless or obvious comments
+- Keep comments updated to match code changes
+- When mentioning classes, methods, or fields in comments, they must be referenced using square brackets `[]`
+- Critical private methods in key classes must have detailed comments:
+  - Key class definition: Classes exceeding 200 lines of code
+  - Critical method definition: Methods exceeding 30 lines of code or calling more than 5 other methods
+  - Only add detailed comments to critical private methods in key classes, avoid over-commenting regular private methods
+
+## Constants Documentation Guidelines
+- Each constant at its definition point should have its own individual documentation comment
+- Constant documentation should be concise and include value information when relevant
+- When referencing constants in class/property documentation, use the grouped format with hyphens and square brackets
+- Constants that form a logical group should be documented appropriately based on context
+
+## Examples
+<example>
+// Good constant documentation at definition point
+/**
+ * 默认总超时时间(5000ms)
+ */
+private const val DEFAULT_GLOBAL_TIMEOUT = 5000L
+
+/**
+ * 默认广告源超时时间(1000ms)
+ */
+private const val DEFAULT_SOURCE_TIMEOUT = 1000L
+
+// Good constant references in property documentation
+/**
+ * 广告源配置，用于测试框架中定义不同类型的广告源
+ *
+ * @property id 广告源唯一标识符
+ * @property type 广告源类型
+ * - [TYPE_HB] Header Bidding广告类型("HB") 
+ * - [TYPE_WF] Waterfall广告类型("WF")
+ * - [TYPE_FILL] 兜底广告类型("FILL")
+ */
+data class AdSourceConfig(
+    val id: String,
+    val type: String,
+    ...
+)
+
+/**
+ * 用户仓库类，负责用户数据的获取和存储
+ *
+ * 该类提供了对用户数据的[CRUD]操作，并支持[CacheManager]缓存机制以提高性能
+ *
+ * @param apiService 提供远程用户数据访问
+ * @param cacheManager 管理本地用户数据缓存
+ * @see CacheManager
+ */
+class UserRepository(
+    private val apiService: UserApiService,
+    private val cacheManager: CacheManager
+) {
+    /**
+     * 根据用户ID获取用户信息
+     *
+     * 该方法首先尝试从缓存获取数据，如果缓存不存在或已过期，
+     * 则从远程API获取数据并更新缓存
+     *
+     * @param userId 要查询的用户ID，不能为空
+     * @return 用户信息对象
+     * @throws UserNotFoundException 当用户不存在时抛出
+     * @throws NetworkException 当网络连接失败时抛出
+     * @see CacheManager.getUser
+     */
+    fun fetchUserById(userId: String): User {
+        // 先检查缓存
+        cacheManager.getUser(userId)?.let { cachedUser ->
+            // 如果缓存未过期，直接返回缓存数据
+            if (!isCacheExpired(cachedUser.timestamp)) {
+                Log.d(TAG, "从缓存获取用户数据: $userId")
+                return cachedUser.data
+            }
+        }
+        
+        // 缓存不存在或已过期，从API获取
+        Log.d(TAG, "从API获取用户数据: $userId")
+        val user = apiService.getUser(userId)
+        
+        // 更新缓存
+        cacheManager.saveUser(userId, user)
+        
+        return user
+    }
+    
+    /**
+     * 处理用户数据同步逻辑
+     *
+     * 该方法是一个关键的私有方法（超过30行且调用了多个其他方法），负责在多个数据源之间同步用户数据。
+     * 执行以下步骤：
+     * 1. 从本地数据库获取用户数据
+     * 2. 从远程API获取最新用户数据
+     * 3. 比较数据版本并解决冲突
+     * 4. 合并数据并更新本地和远程存储
+     * 5. 处理同步失败的情况
+     *
+     * 该方法在网络不稳定的情况下可能失败，将通过[retryWithBackoff]策略进行重试
+     *
+     * @param userId 要同步的用户ID
+     * @param forceSync 是否强制同步，即使数据看起来是最新的
+     * @return 同步结果状态对象
+     * @throws SyncException 当同步过程中出现无法恢复的错误时抛出
+     */
+    private fun synchronizeUserData(userId: String, forceSync: Boolean = false): SyncResult {
+        // 这里是这个关键私有方法的详细实现
+        // 假设这个方法超过30行代码
+        // 或者调用了超过5个其他方法
+        
+        return SyncResult.SUCCESS
+    }
+}
+
+/**
+ * 用户账号状态
+ *
+ * 表示当前用户账号的状态，用于决定用户可进行的操作
+ *
+ * 可用值:
+ * - [AccountStatus.ACTIVE] 账号正常活跃("active")
+ * - [AccountStatus.SUSPENDED] 账号已被暂停("suspended") 
+ * - [AccountStatus.DEACTIVATED] 账号已被停用("deactivated")
+ * - [AccountStatus.PENDING] 账号待验证("pending")
+ *
+ * @see AccountService
+ */
+enum class AccountStatus(val value: String) {
+    ACTIVE("active"),
+    SUSPENDED("suspended"),
+    DEACTIVATED("deactivated"),
+    PENDING("pending")
+}
+</example>
+
+<example type="invalid">
+// Poor constant documentation
+// Incorrect: Missing individual documentation for constants
+const val TYPE_HB = "HB"
+const val TYPE_WF = "WF"
+const val TYPE_FILL = "FILL"
+
+// Incorrect: Using grouped documentation at definition point
+/**
+ * 广告类型常量:
+ * - TYPE_HB: Header Bidding广告类型
+ * - TYPE_WF: Waterfall广告类型
+ * - TYPE_FILL: 兜底广告类型
+ */
+const val TYPE_HB = "HB"
+const val TYPE_WF = "WF"
+const val TYPE_FILL = "FILL"
+
+// Incorrect: Missing square brackets when referencing constants in property documentation
+/**
+ * @property type 广告源类型，可以是TYPE_HB、TYPE_WF或TYPE_FILL
+ */
+
+// Incorrect documentation
+/**
+ * User repository
+ */
+class UserRepository(private val api: UserApi, private val cache: Cache) {
+    /**
+     * Get user
+     */
+    fun getUser(id: String): User {
+        // Check cache first
+        val cached = cache.get(id) // 获取缓存
+        if (cached != null) return cached
+        
+        // Get from API
+        val user = api.getUser(id) // 从API获取
+        cache.save(id, user) // 保存到缓存
+        return user
+    }
+    
+    // 对非关键类中的非关键私有方法过度注释
+    /**
+     * 检查缓存是否过期
+     * 
+     * 这个方法检查给定的时间戳是否已经过期
+     * 比较当前时间和传入的时间戳
+     * 如果差值大于缓存有效期则返回true
+     * 否则返回false
+     * 缓存有效期在构造函数中定义
+     * 这个方法仅被getUser方法调用
+     *
+     * @param timestamp 要检查的时间戳
+     * @return 如果缓存过期则返回true，否则返回false
+     */
+    private fun isCacheExpired(timestamp: Long): Boolean {
+        // 简单的逻辑，不需要这么详细的注释
+        return System.currentTimeMillis() - timestamp > cacheValidityPeriod
+    }
+}
+
+/**
+ * 用户状态，可以是active, suspended或deactivated
+ */
+enum class UserStatus {
+    ACTIVE,
+    SUSPENDED,
+    DEACTIVATED
+}
+</example>
+
+## Critical Rules
+  - All comments and documentation must be in Chinese, all code must be in English
+  - Public APIs must have complete KDoc documentation
+  - Comments should explain "why" not just "what"
+  - Keep comments synchronized with code updates
+  - Include complete descriptions of parameters, return values, and exceptions
+  - Document constants individually at their definition point, using a separate comment block for each constant
+  - When referencing constants in property or class documentation, use the grouped format with hyphens and square brackets
+  - Use square brackets `[]` to reference all classes, methods, and fields
+  - When listing constants or enum values in references, use the format: `- [Const.VALUE] Description("value")`
+  - Add `@see` tags to reference related classes or methods
+  - Only add detailed comments to critical private methods (>30 lines or calling >5 methods) in key classes (>200 lines) 
