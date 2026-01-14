@@ -41,6 +41,11 @@ created_date: "2025-01-27"
 - [ ] **AC8**: 列表加载时显示加载状态
 - [ ] **AC9**: 列表项支持长按操作（为未来功能预留，v1.0 可不实现具体功能）
 - [ ] **AC10**: 列表项布局符合 Material Design 3 设计规范
+- [ ] **AC11**: 配置变更场景支持：
+  - 屏幕旋转后，RecyclerView 滚动位置正确恢复
+  - 系统主题切换（深色/浅色）后，列表界面样式正确适配
+  - 分屏模式下列表布局正确显示，支持流畅滚动
+  - 配置变更后，列表数据状态正确恢复（通过 ViewModel）
 - [ ] **UI/UX**: 
   - 列表界面符合 Material Design 3 设计规范
   - 列表项触摸目标符合最小尺寸要求（48dp）
@@ -48,7 +53,11 @@ created_date: "2025-01-27"
 - [ ] **Unit Tests**: 
   - SongListAdapter 单元测试通过
   - 列表数据绑定逻辑测试通过
-- [ ] **Integration Tests**: 列表展示端到端测试通过
+- [ ] **Integration Tests**: 
+  - 列表展示端到端测试通过
+  - 配置变更测试：滚动列表后旋转屏幕，验证滚动位置恢复
+  - 配置变更测试：切换主题，验证列表 UI 适配
+  - 配置变更测试：分屏模式下验证列表布局和滚动
 - [ ] **Doc Sync**: 检查并更新了相关架构文档（如需要）
 
 ---
@@ -73,6 +82,11 @@ created_date: "2025-01-27"
    - 包含 RecyclerView 显示歌曲列表
    - 订阅 ViewModel 的状态更新
    - 处理列表项点击事件（导航到播放页面）
+   - **配置变更处理**：
+     - 使用 `LinearLayoutManager.onSaveInstanceState()` 保存滚动位置
+     - 在 `onViewStateRestored()` 中恢复滚动位置
+     - 列表数据通过 ViewModel StateFlow 自动恢复
+     - 确保主题切换、分屏模式下布局正确适配
 
 2. **SongListAdapter (列表适配器)**
    - 实现 RecyclerView.Adapter
@@ -162,6 +176,7 @@ data class SongListUiState(
 - [ ] **Task 7**: 实现 SongListFragment（基础展示）
     - *Test Case*: UI 测试 - 列表正确显示歌曲数据
     - *Test Case*: UI 测试 - 状态订阅和更新
+    - *Test Case*: 配置变更测试 - 滚动列表后旋转屏幕，验证滚动位置恢复
 
 - [ ] **Task 8**: 实现 SongListFragment（交互功能）
     - *Test Case*: UI 测试 - 列表项点击导航到播放页面
@@ -175,6 +190,7 @@ data class SongListUiState(
     - *Test Case*: 端到端测试 - 从扫描到列表展示完整流程
     - *Test Case*: 性能测试 - 大量歌曲（1000+）列表滚动流畅
     - *Test Case*: 边界测试 - 空列表、单首歌曲、特殊字符处理
+    - *Test Case*: 配置变更测试 - 主题切换、分屏模式下的完整流程
 
 ---
 
