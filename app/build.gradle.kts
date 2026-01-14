@@ -48,6 +48,9 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
     
+    // ViewModel
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    
     // Testing
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)

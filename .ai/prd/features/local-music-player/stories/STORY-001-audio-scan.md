@@ -176,10 +176,10 @@ data class ScanProgress(
     - *Test Case*: 测试扫描结果的 Flow 订阅 ✅ (测试通过)
     - *Test Case*: 测试扫描结果缓存 ✅ (测试通过)
 
-- [ ] **Task 7**: 实现 ScanViewModel
-    - *Test Case*: 测试扫描状态管理（开始、进行中、完成、错误）
-    - *Test Case*: 测试扫描进度更新到 UI 状态
-    - *Test Case*: 测试扫描取消功能
+- [x] **Task 7**: 实现 ScanViewModel ✅
+    - *Test Case*: 测试扫描状态管理（开始、进行中、完成、错误）✅ (7个测试用例全部通过)
+    - *Test Case*: 测试扫描进度更新到 UI 状态 ✅ (测试通过)
+    - *Test Case*: 测试扫描取消功能 ✅ (测试通过)
 
 - [ ] **Task 8**: 实现权限请求逻辑（MainActivity）
     - *Test Case*: 测试 Android 12 及以下权限请求
@@ -321,6 +321,35 @@ data class ScanProgress(
     - Repository 作为单一数据源，封装数据访问逻辑
     - 使用 StateFlow 管理缓存，支持响应式更新
     - 扫描时自动更新缓存，其他模块可通过 getAllSongs 订阅
+  - 所有测试用例已通过验证（0 failures, 0 errors）
+
+- [x] **2025-01-27**: Task 7 已完成 ✅
+  - 添加了 ViewModel 依赖（lifecycle-viewmodel-ktx 2.8.7）
+  - 创建了 `ScanUiState.kt` UI 状态数据类（位于 `viewmodel/ScanUiState.kt`）
+    - 包含所有必需字段：isScanning, scannedCount, totalCount, currentPath, error
+    - 提供了便捷属性：hasError, isCompleted
+  - 创建了 `ScanViewModel.kt` 扫描 ViewModel（位于 `viewmodel/ScanViewModel.kt`）
+    - 使用 StateFlow<ScanUiState> 管理 UI 状态
+    - 实现了 startScan() 方法，启动扫描并更新状态
+    - 实现了 cancelScan() 方法，支持取消扫描
+    - 实现了 clearError() 方法，清除错误状态
+    - 使用 viewModelScope 管理协程生命周期
+    - 正确处理扫描进度更新和错误处理
+    - 支持配置变更后状态恢复（通过 ViewModel 的自动保存机制）
+  - 编写了完整的单元测试：
+    - `ScanViewModelTest.kt`: 7个测试用例全部通过
+      - 测试初始状态
+      - 测试开始扫描时状态更新
+      - 测试扫描进度更新到 UI 状态
+      - 测试扫描完成时状态更新
+      - 测试扫描过程中发生错误时的错误状态更新
+      - 测试取消扫描功能
+      - 测试扫描时找到的歌曲被正确处理
+  - 设计要点：
+    - 使用 MVVM + MVI 混合模式，StateFlow 管理状态
+    - 单向数据流：UI → ViewModel → Repository → DataSource
+    - 支持配置变更后状态恢复（ViewModel 自动处理）
+    - 错误处理机制完善
   - 所有测试用例已通过验证（0 failures, 0 errors）
 
 ---
