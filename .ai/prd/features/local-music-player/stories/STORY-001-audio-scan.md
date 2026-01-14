@@ -140,9 +140,9 @@ data class ScanProgress(
     - *Test Case*: 测试 Song 对象的创建和属性访问 ✅ (3个测试用例全部通过)
     - *Test Case*: 测试 ScanProgress 对象的创建和状态更新 ✅ (5个测试用例全部通过)
 
-- [ ] **Task 2**: 实现音频文件格式识别逻辑
-    - *Test Case*: 测试 MP3、AAC、FLAC、WAV、OGG、M4A 格式识别
-    - *Test Case*: 测试非音频文件被正确过滤
+- [x] **Task 2**: 实现音频文件格式识别逻辑 ✅
+    - *Test Case*: 测试 MP3、AAC、FLAC、WAV、OGG、M4A 格式识别 ✅ (6个格式测试用例全部通过)
+    - *Test Case*: 测试非音频文件被正确过滤 ✅ (包含多种非音频格式测试)
 
 - [ ] **Task 3**: 实现 MediaMetadataExtractor
     - *Test Case*: 测试元数据提取（标题、艺术家、专辑、时长）
@@ -206,6 +206,25 @@ data class ScanProgress(
       - 测试数据类相等性比较
       - 测试扫描完成状态
       - 测试扫描进行中状态
+  - 所有测试用例已通过验证（0 failures, 0 errors）
+
+- [x] **2025-01-27**: Task 2 已完成 ✅
+  - 创建了 `AudioFormatRecognizer.kt` 工具类（位于 `data/util/AudioFormatRecognizer.kt`）
+    - 实现了 `isAudioFile()` 方法，支持识别 MP3、AAC、FLAC、WAV、OGG、M4A 格式
+    - 支持大小写不敏感的文件扩展名识别
+    - 正确处理带路径的文件名
+    - 实现了扩展名提取逻辑，避免误识别（如 .hidden 文件）
+  - 编写了完整的单元测试：
+    - `AudioFormatRecognizerTest.kt`: 9个测试用例全部通过
+      - 测试 MP3 格式识别
+      - 测试 AAC 格式识别
+      - 测试 FLAC 格式识别
+      - 测试 WAV 格式识别
+      - 测试 OGG 格式识别
+      - 测试 M4A 格式识别
+      - 测试非音频文件过滤（PDF、图片、视频、文本等）
+      - 测试大小写不敏感处理
+      - 测试带路径的文件名处理
   - 所有测试用例已通过验证（0 failures, 0 errors） 
 
 ---
