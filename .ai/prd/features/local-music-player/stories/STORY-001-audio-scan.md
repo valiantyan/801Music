@@ -181,10 +181,10 @@ data class ScanProgress(
     - *Test Case*: 测试扫描进度更新到 UI 状态 ✅ (测试通过)
     - *Test Case*: 测试扫描取消功能 ✅ (测试通过)
 
-- [ ] **Task 8**: 实现权限请求逻辑（MainActivity）
-    - *Test Case*: 测试 Android 12 及以下权限请求
-    - *Test Case*: 测试 Android 13+ 权限请求
-    - *Test Case*: 测试权限被拒绝时的处理
+- [x] **Task 8**: 实现权限请求逻辑（MainActivity） ✅
+    - *Test Case*: 测试 Android 12 及以下权限请求 ✅ (单元测试通过)
+    - *Test Case*: 测试 Android 13+ 权限请求 ✅ (单元测试通过)
+    - *Test Case*: 测试权限被拒绝时的处理 ✅ (集成测试通过)
 
 - [ ] **Task 9**: 实现 ScanProgressFragment UI
     - *Test Case*: UI 测试 - 扫描进度显示
@@ -350,6 +350,47 @@ data class ScanProgress(
     - 单向数据流：UI → ViewModel → Repository → DataSource
     - 支持配置变更后状态恢复（ViewModel 自动处理）
     - 错误处理机制完善
+  - 所有测试用例已通过验证（0 failures, 0 errors）
+
+- [x] **2025-01-27**: Task 8 已完成 ✅
+  - 在 `AndroidManifest.xml` 中添加了权限声明：
+    - `READ_EXTERNAL_STORAGE`（Android 12 及以下，maxSdkVersion="32"）
+    - `READ_MEDIA_AUDIO`（Android 13+）
+  - 创建了 `PermissionHelper.kt` 权限助手类（位于 `util/PermissionHelper.kt`）
+    - 封装权限请求逻辑，支持 Android 不同版本的权限模型
+    - 实现了 `getRequiredPermission()` 方法，根据 Android 版本返回正确的权限
+    - 实现了 `hasPermission()` 方法，检查权限是否已授予
+    - 实现了 `requestPermission()` 方法，请求权限并处理结果
+    - 实现了 `shouldShowRationale()` 方法，判断是否应该显示权限说明
+    - 使用 `ActivityResultLauncher` 处理权限请求结果
+    - 注意：必须在 Activity 的 `onCreate` 中创建 `PermissionHelper` 实例
+  - 更新了 `MainActivity.kt`，实现权限请求逻辑：
+    - 在 `onCreate` 中初始化 `PermissionHelper`
+    - 实现 `requestStoragePermission()` 方法，处理权限请求流程
+    - 实现 `showPermissionRationaleDialog()` 方法，显示权限说明对话框
+    - 实现 `handlePermissionResult()` 方法，处理权限请求结果
+    - 实现 `showPermissionDeniedDialog()` 方法，显示权限被拒绝对话框
+    - 支持 Android 12 及以下和 Android 13+ 的权限模型
+  - 创建了 `TestActivity.kt` 测试专用 Activity（位于 `util/TestActivity.kt`）
+    - 用于集成测试，在 `onCreate` 中创建 `PermissionHelper` 并暴露给测试
+    - 解决了 `ActivityResultLauncher` 必须在 `onCreate` 中注册的问题
+  - 编写了完整的测试：
+    - `PermissionHelperTest.kt` (test/): 单元测试，测试权限判断逻辑
+      - 测试根据 Android 版本返回正确的权限
+      - 注意：由于权限请求涉及 Android 系统 API，完整测试在集成测试中进行
+    - `PermissionHelperIntegrationTest.kt` (androidTest/): 集成测试，测试需要真实设备的功能
+      - 测试权限检查（hasPermission）
+      - 测试权限请求流程（requestPermission）
+      - 测试权限说明显示判断（shouldShowRationale）
+      - 测试根据 Android 版本返回正确的权限
+      - 所有集成测试用例已通过验证
+  - 添加了必要的依赖：
+    - `androidx-test-rules` 1.3.0（用于 ActivityScenarioRule）
+  - 设计要点：
+    - 权限请求必须在 Activity 的 `onCreate` 中初始化（`ActivityResultLauncher` 的要求）
+    - 支持 Android 不同版本的权限模型（READ_EXTERNAL_STORAGE vs READ_MEDIA_AUDIO）
+    - 提供友好的用户提示（权限说明对话框、权限被拒绝对话框）
+    - 测试分为单元测试（逻辑测试）和集成测试（真实设备测试）
   - 所有测试用例已通过验证（0 failures, 0 errors）
 
 ---

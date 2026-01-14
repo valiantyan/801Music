@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- 测试 manifest 会与主 manifest 合并，TestActivity 已在主 manifest 中注册 -->
+
+</manifest>
