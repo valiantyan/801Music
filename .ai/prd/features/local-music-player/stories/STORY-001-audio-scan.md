@@ -167,9 +167,9 @@ data class ScanProgress(
     - *Test Case*: 测试递归子目录扫描 ✅ (测试通过)
     - *Test Case*: 测试扫描进度 Flow 的发送 ✅ (测试通过)
 
-- [ ] **Task 5**: 实现 AudioFileScanner（进度更新）
-    - *Test Case*: 测试扫描进度正确计算和更新
-    - *Test Case*: 测试大量文件扫描的性能
+- [x] **Task 5**: 实现 AudioFileScanner（进度更新） ✅
+    - *Test Case*: 测试扫描进度正确计算和更新 ✅ (测试通过)
+    - *Test Case*: 测试大量文件扫描的性能 ✅ (测试通过)
 
 - [ ] **Task 6**: 实现 AudioRepository（扫描接口）
     - *Test Case*: 测试扫描方法调用
@@ -287,6 +287,21 @@ data class ScanProgress(
       - 测试空目录扫描
       - 测试只包含非音频文件的目录
       - 测试扫描进度包含当前路径信息
+  - 所有测试用例已通过验证（0 failures, 0 errors）
+
+- [x] **2025-01-27**: Task 5 已完成 ✅
+  - 优化了 `AudioFileScanner.kt` 的进度更新机制
+    - 确保扫描进度正确计算和更新（scannedCount 递增）
+    - 验证进度更新的准确性（开始、中间、完成状态）
+    - 完成扫描时设置 totalCount 为已扫描文件数
+  - 编写了完整的单元测试：
+    - `AudioFileScannerTest.kt`: 新增 3 个测试用例全部通过
+      - 测试扫描进度正确计算和更新（验证进度递增）
+      - 测试大量文件扫描的性能（100个文件，验证性能 < 30秒）
+      - 测试扫描进度更新频率（验证更新数量合理）
+  - 性能验证：
+    - 100 个文件的扫描性能测试通过
+    - 进度更新机制工作正常，不会过于频繁
   - 所有测试用例已通过验证（0 failures, 0 errors）
 
 ---
