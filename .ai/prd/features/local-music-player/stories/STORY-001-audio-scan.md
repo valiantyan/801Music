@@ -144,10 +144,10 @@ data class ScanProgress(
     - *Test Case*: 测试 MP3、AAC、FLAC、WAV、OGG、M4A 格式识别 ✅ (6个格式测试用例全部通过)
     - *Test Case*: 测试非音频文件被正确过滤 ✅ (包含多种非音频格式测试)
 
-- [ ] **Task 3**: 实现 MediaMetadataExtractor
-    - *Test Case*: 测试元数据提取（标题、艺术家、专辑、时长）
-    - *Test Case*: 测试元数据缺失时的默认值处理
-    - *Test Case*: 测试不同音频格式的元数据提取
+- [x] **Task 3**: 实现 MediaMetadataExtractor ✅
+    - *Test Case*: 测试元数据提取（标题、艺术家、专辑、时长）✅ (完整元数据提取测试通过)
+    - *Test Case*: 测试元数据缺失时的默认值处理 ✅ (多种缺失场景测试通过)
+    - *Test Case*: 测试不同音频格式的元数据提取 ✅ (MP3、AAC、FLAC 格式测试通过)
 
 - [ ] **Task 4**: 实现 AudioFileScanner（基础扫描功能）
     - *Test Case*: 测试单目录扫描
@@ -225,6 +225,29 @@ data class ScanProgress(
       - 测试非音频文件过滤（PDF、图片、视频、文本等）
       - 测试大小写不敏感处理
       - 测试带路径的文件名处理
+  - 所有测试用例已通过验证（0 failures, 0 errors）
+
+- [x] **2025-01-27**: Task 3 已完成 ✅
+  - 创建了 `MediaMetadataExtractor.kt` 元数据提取器（位于 `data/datasource/MediaMetadataExtractor.kt`）
+    - 使用 Android MediaMetadataRetriever 提取音频元数据
+    - 实现了 MetadataRetriever 接口抽象，便于测试和扩展
+    - 实现了 AndroidMetadataRetriever 包装类
+    - 支持提取标题、艺术家、专辑、时长等元数据
+    - 处理元数据缺失情况：使用文件名作为默认标题，使用"未知艺术家"作为默认艺术家
+    - 处理空字符串和无效数据的默认值处理
+    - 正确处理异常情况（文件不存在、无法读取等）
+  - 编写了完整的单元测试：
+    - `MediaMetadataExtractorTest.kt`: 12个测试用例全部通过
+      - 测试完整元数据提取（标题、艺术家、专辑、时长）
+      - 测试元数据缺失时的默认值处理
+      - 测试部分元数据缺失的情况
+      - 测试空字符串元数据的处理
+      - 测试不同音频格式（MP3、AAC、FLAC）的元数据提取
+      - 测试文件不存在或无法读取的情况
+      - 测试文件名包含特殊字符的情况
+      - 测试无效时长字符串的处理
+      - 测试 Song 对象的 id 字段使用文件路径
+  - 添加了 Mockito 依赖支持单元测试
   - 所有测试用例已通过验证（0 failures, 0 errors） 
 
 ---
