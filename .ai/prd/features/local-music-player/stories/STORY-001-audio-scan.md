@@ -5,7 +5,7 @@ type: Feature
 epic_id: "FEAT-001"
 feature_title: "本地音乐播放器"
 target_version: "v1.0"
-status: 草稿
+status: 已批准
 priority: High
 assignee: AI_Agent
 created_date: "2025-01-27"
@@ -136,9 +136,9 @@ data class ScanProgress(
 
 ## 5. Development Steps (开发步骤 - TDD/Task Breakdown)
 
-- [ ] **Task 1**: 创建 Song 和 ScanProgress 数据模型
-    - *Test Case*: 测试 Song 对象的创建和属性访问
-    - *Test Case*: 测试 ScanProgress 对象的创建和状态更新
+- [x] **Task 1**: 创建 Song 和 ScanProgress 数据模型 ✅
+    - *Test Case*: 测试 Song 对象的创建和属性访问 ✅ (3个测试用例全部通过)
+    - *Test Case*: 测试 ScanProgress 对象的创建和状态更新 ✅ (5个测试用例全部通过)
 
 - [ ] **Task 2**: 实现音频文件格式识别逻辑
     - *Test Case*: 测试 MP3、AAC、FLAC、WAV、OGG、M4A 格式识别
@@ -188,7 +188,25 @@ data class ScanProgress(
 ## 6. Development Notes & Log (开发笔记与日志)
 
 **(Current Log):**
-- [ ] 
+- [x] **2025-01-27**: Task 1 已完成 ✅
+  - 创建了 `Song.kt` 数据模型（位于 `domain/model/Song.kt`）
+    - 包含所有必需字段：id, title, artist, album, duration, filePath, fileSize, dateAdded, albumArtPath
+    - 符合 Story 文档中的设计规范
+  - 创建了 `ScanProgress.kt` 数据模型（位于 `domain/model/ScanProgress.kt`）
+    - 包含所有必需字段：scannedCount, totalCount, currentPath, isScanning
+    - 符合 Story 文档中的设计规范
+  - 编写了完整的单元测试：
+    - `SongTest.kt`: 3个测试用例全部通过
+      - 测试对象创建和属性访问
+      - 测试可选字段（album, albumArtPath）为 null 的情况
+      - 测试数据类相等性比较
+    - `ScanProgressTest.kt`: 5个测试用例全部通过
+      - 测试对象创建和属性访问
+      - 测试可选字段（totalCount, currentPath）为 null 的情况
+      - 测试数据类相等性比较
+      - 测试扫描完成状态
+      - 测试扫描进行中状态
+  - 所有测试用例已通过验证（0 failures, 0 errors） 
 
 ---
 
