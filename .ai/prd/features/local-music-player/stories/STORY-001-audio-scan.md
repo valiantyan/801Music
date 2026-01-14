@@ -162,10 +162,10 @@ data class ScanProgress(
     - *Test Case*: 测试元数据缺失时的默认值处理 ✅ (多种缺失场景测试通过)
     - *Test Case*: 测试不同音频格式的元数据提取 ✅ (MP3、AAC、FLAC 格式测试通过)
 
-- [ ] **Task 4**: 实现 AudioFileScanner（基础扫描功能）
-    - *Test Case*: 测试单目录扫描
-    - *Test Case*: 测试递归子目录扫描
-    - *Test Case*: 测试扫描进度 Flow 的发送
+- [x] **Task 4**: 实现 AudioFileScanner（基础扫描功能） ✅
+    - *Test Case*: 测试单目录扫描 ✅ (测试通过)
+    - *Test Case*: 测试递归子目录扫描 ✅ (测试通过)
+    - *Test Case*: 测试扫描进度 Flow 的发送 ✅ (测试通过)
 
 - [ ] **Task 5**: 实现 AudioFileScanner（进度更新）
     - *Test Case*: 测试扫描进度正确计算和更新
@@ -263,7 +263,31 @@ data class ScanProgress(
       - 测试无效时长字符串的处理
       - 测试 Song 对象的 id 字段使用文件路径
   - 添加了 Mockito 依赖支持单元测试
-  - 所有测试用例已通过验证（0 failures, 0 errors） 
+  - 所有测试用例已通过验证（0 failures, 0 errors）
+
+- [x] **2025-01-27**: Task 4 已完成 ✅
+  - 创建了 `AudioFileScanner.kt` 文件扫描器（位于 `data/datasource/AudioFileScanner.kt`）
+    - 实现了递归文件系统扫描功能
+    - 支持音频格式过滤（通过 AudioFormatRecognizer）
+    - 使用 Kotlin Coroutines 在后台线程执行（Dispatchers.IO）
+    - 通过 Flow 发送扫描进度更新（ScanProgress）
+    - 支持单目录和递归子目录扫描
+    - 跳过隐藏文件和系统文件（以 . 开头的文件）
+    - 处理扫描过程中的异常（权限问题等）
+  - 添加了必要的依赖：
+    - Kotlin Coroutines Core 1.10.2
+    - Kotlin Coroutines Android 1.10.2
+    - Kotlin Coroutines Test 1.10.2（用于测试）
+    - Turbine 1.1.0（Flow 测试工具）
+  - 编写了完整的单元测试：
+    - `AudioFileScannerTest.kt`: 6个测试用例全部通过
+      - 测试单目录扫描
+      - 测试递归子目录扫描
+      - 测试扫描进度 Flow 的发送
+      - 测试空目录扫描
+      - 测试只包含非音频文件的目录
+      - 测试扫描进度包含当前路径信息
+  - 所有测试用例已通过验证（0 failures, 0 errors）
 
 ---
 
