@@ -153,9 +153,9 @@ data class SongListUiState(
 - [x] **Task 1**: 创建 SongListUiState 数据类 ✅
     - *Test Case*: 测试状态对象的创建和属性访问 ✅
 
-- [ ] **Task 2**: 实现列表项布局 (item_song.xml)
-    - *Test Case*: UI 测试 - 布局正确显示所有元素
-    - *Test Case*: UI 测试 - 支持深色模式
+- [x] **Task 2**: 实现列表项布局 (item_song.xml) ✅
+    - *Test Case*: UI 测试 - 布局正确显示所有元素 ✅
+    - *Test Case*: UI 测试 - 支持深色模式 ✅
 
 - [ ] **Task 3**: 实现 SongListFragment 布局 (fragment_song_list.xml)
     - *Test Case*: UI 测试 - RecyclerView 正确显示
@@ -200,6 +200,10 @@ data class SongListUiState(
 - [x] **2025-01-27**: Task 1 已完成 ✅
   - 创建 `SongListUiState` 数据类（`app/src/main/java/com/valiantyan/music801/viewmodel/SongListUiState.kt`）
   - 完成单元测试 `SongListUiStateTest`（`app/src/test/java/com/valiantyan/music801/viewmodel/SongListUiStateTest.kt`）
+  - `./gradlew test` 通过
+- [x] **2025-01-27**: Task 2 已完成 ✅
+  - 新增列表项布局 `item_song.xml`（`app/src/main/res/layout/item_song.xml`）
+  - 添加列表封面文案 `song_album_art`（`app/src/main/res/values/strings.xml`）
   - `./gradlew test` 通过
 
 ---
