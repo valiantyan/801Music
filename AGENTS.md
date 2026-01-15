@@ -164,3 +164,9 @@ val type: String,)
 - **Test after each meaningful change**  
 - **Implement core functionality before optimization**  
 - **Write concise, focused functions and classes**
+
+---    
+## Recent Updates
+
+- 将 `AudioScanIntegrationTest.kt` 从 `androidTest` 移至 `test` 目录，并改为 Robolectric 运行方式
+- UT 用例名统一为 **反引号 + 中文命名**（参考 `ScanProgressTest` 风格）

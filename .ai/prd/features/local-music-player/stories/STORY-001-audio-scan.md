@@ -197,10 +197,10 @@ data class ScanProgress(
       - 注意：由于 Robolectric 与 FragmentScenario 的兼容性问题，部分测试可能需要进一步调试
       - 测试文件位置：`app/src/test/java/com/valiantyan/aidemo/ui/scan/ScanProgressFragmentTest.kt`
 
-- [ ] **Task 10**: 集成测试和性能优化
-    - *Test Case*: 端到端测试 - 完整扫描流程
-    - *Test Case*: 性能测试 - 1000 首歌曲扫描时间 < 30 秒
-    - *Test Case*: 边界测试 - 空目录、无权限、损坏文件处理
+- [x] **Task 10**: 集成测试和性能优化 ✅
+    - *Test Case*: 端到端测试 - 完整扫描流程 ✅
+    - *Test Case*: 性能测试 - 1000 首歌曲扫描时间 < 30 秒 ✅
+    - *Test Case*: 边界测试 - 空目录、无权限、损坏文件处理 ✅
 
 ---
 
@@ -439,6 +439,14 @@ data class ScanProgress(
     - 使用 Material Design 3 组件和主题系统
     - 支持深色/浅色主题自动适配
   - 编译验证通过，无 Lint 错误
+
+- [x] **2025-01-27**: Task 10 已完成 ✅
+  - 新增集成测试覆盖完整扫描流程、空目录、不可访问目录、损坏文件与性能场景
+    - 测试文件：`app/src/androidTest/java/com/valiantyan/aidemo/data/AudioScanIntegrationTest.kt`
+    - 覆盖：端到端扫描、无效路径、不可读目录、损坏文件跳过、1000 文件性能约束
+  - 扫描性能优化：
+    - `AudioFileScanner` 改为迭代扫描，降低递归开销并加入关键流程日志
+    - 异常处理补充上下文信息，便于定位权限相关问题
 
 ---
 
