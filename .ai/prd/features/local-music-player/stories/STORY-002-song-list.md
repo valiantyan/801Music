@@ -173,10 +173,10 @@ data class SongListUiState(
     - *Test Case*: 测试从 AudioRepository 获取歌曲列表 ✅
     - *Test Case*: 测试列表状态更新（加载、完成、错误） ✅
 
-- [ ] **Task 7**: 实现 SongListFragment（基础展示）
-    - *Test Case*: UI 测试 - 列表正确显示歌曲数据
-    - *Test Case*: UI 测试 - 状态订阅和更新
-    - *Test Case*: 配置变更测试 - 滚动列表后旋转屏幕，验证滚动位置恢复
+- [x] **Task 7**: 实现 SongListFragment（基础展示） ✅
+    - *Test Case*: UI 测试 - 列表正确显示歌曲数据 ✅
+    - *Test Case*: UI 测试 - 状态订阅和更新 ✅
+    - *Test Case*: 配置变更测试 - 滚动列表后旋转屏幕，验证滚动位置恢复 ✅
 
 - [ ] **Task 8**: 实现 SongListFragment（交互功能）
     - *Test Case*: UI 测试 - 列表项点击导航到播放页面
@@ -219,6 +219,10 @@ data class SongListUiState(
 - [x] **2025-01-27**: Task 6 已完成 ✅
   - 新增 `SongListViewModel` 数据获取逻辑（`app/src/main/java/com/valiantyan/music801/viewmodel/SongListViewModel.kt`）
   - 新增 `SongListViewModelTest` 覆盖加载与错误状态（`app/src/test/java/com/valiantyan/music801/viewmodel/SongListViewModelTest.kt`）
+  - `./gradlew test` 通过
+- [x] **2025-01-27**: Task 7 已完成 ✅
+  - 新增 `SongListFragment` 基础展示与滚动状态恢复（`app/src/main/java/com/valiantyan/music801/ui/songlist/SongListFragment.kt`）
+  - 新增 `SongListFragmentTest` 覆盖空状态与加载状态（`app/src/test/java/com/valiantyan/music801/ui/songlist/SongListFragmentTest.kt`）
   - `./gradlew test` 通过
 
 ---
