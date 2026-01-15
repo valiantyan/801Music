@@ -169,9 +169,9 @@ data class SongListUiState(
     - *Test Case*: 测试列表更新时的性能优化 ✅
     - *Test Case*: 测试增量更新逻辑 ✅
 
-- [ ] **Task 6**: 实现 SongListViewModel（数据获取）
-    - *Test Case*: 测试从 AudioRepository 获取歌曲列表
-    - *Test Case*: 测试列表状态更新（加载、完成、错误）
+- [x] **Task 6**: 实现 SongListViewModel（数据获取） ✅
+    - *Test Case*: 测试从 AudioRepository 获取歌曲列表 ✅
+    - *Test Case*: 测试列表状态更新（加载、完成、错误） ✅
 
 - [ ] **Task 7**: 实现 SongListFragment（基础展示）
     - *Test Case*: UI 测试 - 列表正确显示歌曲数据
@@ -215,6 +215,10 @@ data class SongListUiState(
   - `./gradlew test` 通过
 - [x] **2025-01-27**: Task 5 已完成 ✅
   - `SongListAdapter` 接入 DiffUtil 增量更新（`app/src/main/java/com/valiantyan/music801/ui/songlist/SongListAdapter.kt`）
+  - `./gradlew test` 通过
+- [x] **2025-01-27**: Task 6 已完成 ✅
+  - 新增 `SongListViewModel` 数据获取逻辑（`app/src/main/java/com/valiantyan/music801/viewmodel/SongListViewModel.kt`）
+  - 新增 `SongListViewModelTest` 覆盖加载与错误状态（`app/src/test/java/com/valiantyan/music801/viewmodel/SongListViewModelTest.kt`）
   - `./gradlew test` 通过
 
 ---
