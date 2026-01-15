@@ -2,6 +2,7 @@ package com.valiantyan.music801.ui.songlist
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.valiantyan.music801.databinding.ItemSongBinding
 import com.valiantyan.music801.domain.model.Song
@@ -42,9 +43,16 @@ class SongListAdapter(
      * @param songs 最新歌曲列表
      */
     fun submitList(songs: List<Song>) {
+        val oldItems: List<Song> = items.toList()
+        val diffResult: DiffUtil.DiffResult = DiffUtil.calculateDiff(
+            SongDiffCallback(
+                oldItems = oldItems,
+                newItems = songs,
+            ),
+        )
         items.clear()
         items.addAll(songs)
-        notifyDataSetChanged()
+        diffResult.dispatchUpdatesTo(this)
     }
 
     /**
@@ -73,6 +81,23 @@ class SongListAdapter(
             val minutes: Long = totalSeconds / 60
             val seconds: Long = totalSeconds % 60
             return String.format("%02d:%02d", minutes, seconds)
+        }
+    }
+
+    private class SongDiffCallback(
+        private val oldItems: List<Song>,
+        private val newItems: List<Song>,
+    ) : DiffUtil.Callback() {
+        override fun getOldListSize(): Int = oldItems.size
+
+        override fun getNewListSize(): Int = newItems.size
+
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldItems[oldItemPosition].id == newItems[newItemPosition].id
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldItems[oldItemPosition] == newItems[newItemPosition]
         }
     }
 }
