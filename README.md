@@ -1,8 +1,8 @@
-# 801Music - 本地音乐播放器
+# music801 - 本地音乐播放器
 
 ## 项目简介
 
-801Music 是一个基于 Android 平台的本地音乐播放器应用，专注于提供简洁、流畅的本地音频播放体验。应用采用 **单 Activity + 多 Fragment + Navigation** 架构，使用 **MVVM + MVI 混合模式**和 **Clean Architecture** 分层设计，支持扫描设备存储中的音频文件，提供直观的歌曲列表展示，并集成 Media3 ExoPlayer 1.9.0 播放引擎，实现系统级媒体通知和控制。
+music801 是一个基于 Android 平台的本地音乐播放器应用，专注于提供简洁、流畅的本地音频播放体验。应用采用 **单 Activity + 多 Fragment + Navigation** 架构，使用 **MVVM + MVI 混合模式**和 **Clean Architecture** 分层设计，支持扫描设备存储中的音频文件，提供直观的歌曲列表展示，并集成 Media3 ExoPlayer 1.9.0 播放引擎，实现系统级媒体通知和控制。
 
 **核心特性**：
 - 🎵 完全离线工作，不依赖网络
@@ -106,7 +106,7 @@
 ```
 app/
 ├── src/main/
-│   ├── java/com/valiantyan/aidemo/
+│   ├── java/com/valiantyan/music801/
 │   │   ├── ui/                      # UI 层
 │   │   │   ├── main/                # MainActivity
 │   │   │   ├── songlist/           # 歌曲列表 Fragment

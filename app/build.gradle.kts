@@ -4,13 +4,13 @@ plugins {
 }
 
 android {
-    namespace = "com.valiantyan.aidemo"
+    namespace = "com.valiantyan.music801"
     compileSdk {
         version = release(36)
     }
 
     defaultConfig {
-        applicationId = "com.valiantyan.aidemo"
+        applicationId = "com.valiantyan.music801"
         minSdk = 24
         targetSdk = 36
         versionCode = 1

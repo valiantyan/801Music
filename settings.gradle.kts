@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "AIDemo"
+rootProject.name = "music801"
 include(":app")
  

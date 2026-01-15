@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">AIDemo</string>
+    <string name="app_name">music801</string>
     
     <!-- 扫描进度界面 -->
     <string name="scanning_audio_files">正在扫描音频文件…</string>
