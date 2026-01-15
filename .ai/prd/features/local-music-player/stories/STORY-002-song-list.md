@@ -161,9 +161,9 @@ data class SongListUiState(
     - *Test Case*: UI 测试 - RecyclerView 正确显示 ✅
     - *Test Case*: UI 测试 - 空状态和加载状态显示 ✅
 
-- [ ] **Task 4**: 实现 SongListAdapter（基础功能）
-    - *Test Case*: 测试适配器的创建和数据绑定
-    - *Test Case*: 测试列表项点击事件
+- [x] **Task 4**: 实现 SongListAdapter（基础功能） ✅
+    - *Test Case*: 测试适配器的创建和数据绑定 ✅
+    - *Test Case*: 测试列表项点击事件 ⏳（后续交互联调）
 
 - [ ] **Task 5**: 实现 SongListAdapter（DiffUtil 优化）
     - *Test Case*: 测试列表更新时的性能优化
@@ -208,6 +208,10 @@ data class SongListUiState(
 - [x] **2025-01-27**: Task 3 已完成 ✅
   - 新增列表 Fragment 布局 `fragment_song_list.xml`（`app/src/main/res/layout/fragment_song_list.xml`）
   - 添加列表空状态与加载文案（`app/src/main/res/values/strings.xml`）
+  - `./gradlew test` 通过
+- [x] **2025-01-27**: Task 4 已完成 ✅
+  - 新增 `SongListAdapter` 基础实现（`app/src/main/java/com/valiantyan/music801/ui/songlist/SongListAdapter.kt`）
+  - 新增 `SongListAdapterTest` 覆盖创建与绑定（`app/src/test/java/com/valiantyan/music801/ui/songlist/SongListAdapterTest.kt`）
   - `./gradlew test` 通过
 
 ---
