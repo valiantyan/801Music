@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">AIDemo</string>
+    
+    <!-- 扫描进度界面 -->
+    <string name="scanning_audio_files">正在扫描音频文件…</string>
+    <string name="scanned_files_count">已扫描: %1$d 个文件</string>
+    <string name="current_scanning_path">当前路径: %1$s</string>
+    <string name="cancel_scan">取消扫描</string>
+    <string name="scan_completed">扫描完成</string>
+    <string name="scan_error">扫描出错: %1$s</string>
 </resources>

@@ -19,6 +19,14 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    buildFeatures {
+        viewBinding = true
+    }
+
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
+    }
+    
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -51,14 +59,26 @@ dependencies {
     // ViewModel
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     
+    // Fragment
+    implementation(libs.androidx.fragment.ktx)
+    
     // Testing
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.turbine)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.fragment.testing.manifest)
+    
+    // Fragment testing for Robolectric
+    // fragment-testing 需要作为 testImplementation（类文件）
+    // fragment-testing-manifest 需要作为 debugImplementation（manifest 合并）
+    testImplementation(libs.androidx.fragment.testing)
+    debugImplementation(libs.androidx.fragment.testing.manifest)
     
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.test.rules)
+    androidTestImplementation(libs.androidx.fragment.testing)
 }
