@@ -11,4 +11,7 @@
     
     <!-- 歌曲列表 -->
     <string name="song_album_art">歌曲封面</string>
+    <string name="song_list">歌曲列表</string>
+    <string name="song_list_loading">歌曲列表加载中</string>
+    <string name="song_list_empty">暂无歌曲</string>
 </resources>

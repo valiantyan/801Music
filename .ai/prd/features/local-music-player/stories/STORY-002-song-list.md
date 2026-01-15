@@ -157,9 +157,9 @@ data class SongListUiState(
     - *Test Case*: UI 测试 - 布局正确显示所有元素 ✅
     - *Test Case*: UI 测试 - 支持深色模式 ✅
 
-- [ ] **Task 3**: 实现 SongListFragment 布局 (fragment_song_list.xml)
-    - *Test Case*: UI 测试 - RecyclerView 正确显示
-    - *Test Case*: UI 测试 - 空状态和加载状态显示
+- [x] **Task 3**: 实现 SongListFragment 布局 (fragment_song_list.xml) ✅
+    - *Test Case*: UI 测试 - RecyclerView 正确显示 ✅
+    - *Test Case*: UI 测试 - 空状态和加载状态显示 ✅
 
 - [ ] **Task 4**: 实现 SongListAdapter（基础功能）
     - *Test Case*: 测试适配器的创建和数据绑定
@@ -204,6 +204,10 @@ data class SongListUiState(
 - [x] **2025-01-27**: Task 2 已完成 ✅
   - 新增列表项布局 `item_song.xml`（`app/src/main/res/layout/item_song.xml`）
   - 添加列表封面文案 `song_album_art`（`app/src/main/res/values/strings.xml`）
+  - `./gradlew test` 通过
+- [x] **2025-01-27**: Task 3 已完成 ✅
+  - 新增列表 Fragment 布局 `fragment_song_list.xml`（`app/src/main/res/layout/fragment_song_list.xml`）
+  - 添加列表空状态与加载文案（`app/src/main/res/values/strings.xml`）
   - `./gradlew test` 通过
 
 ---
