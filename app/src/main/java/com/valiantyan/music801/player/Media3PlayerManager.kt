@@ -2,9 +2,6 @@ package com.valiantyan.music801.player
 
 import android.content.Context
 import android.net.Uri
-import android.media.AudioFocusRequest
-import android.media.AudioManager
-import android.media.AudioAttributes as PlatformAudioAttributes
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
@@ -43,11 +40,6 @@ class Media3PlayerManager(
      */
     private val progressUpdateIntervalMs: Long = progressUpdateIntervalMs
     /**
-     * 系统音频管理器，用于请求与释放音频焦点
-     */
-    private val audioManager: AudioManager =
-        context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-    /**
      * 记录焦点变更前音量，以便恢复用户音量
      */
     private var lastVolume: Float = 1.0f
@@ -84,20 +76,14 @@ class Media3PlayerManager(
      */
     private var lastError: PlaybackException? = null
     /**
-     * AudioFocus 监听器，集中处理焦点变化
+     * 音频焦点管理器，负责系统级焦点申请与释放
      */
-    private val audioFocusChangeListener: AudioManager.OnAudioFocusChangeListener =
-        AudioManager.OnAudioFocusChangeListener { focusChange ->
+    private val audioFocusManager: AudioFocusManager = AudioFocusManager(
+        context = context,
+        onFocusChange = { focusChange ->
             handleAudioFocusChange(focusChange = focusChange)
-        }
-    /**
-     * AudioFocus 请求对象，确保与 [AudioAttributes] 保持一致
-     */
-    private val audioFocusRequest: AudioFocusRequest =
-        AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
-            .setAudioAttributes(buildPlatformAudioAttributes())
-            .setOnAudioFocusChangeListener(audioFocusChangeListener)
-            .build()
+        },
+    )
 
     init {
         // 统一监听入口，避免多处订阅造成状态不一致
@@ -112,7 +98,7 @@ class Media3PlayerManager(
      * @param uri 音频资源 [Uri]
      */
     override fun play(uri: Uri): Unit {
-        if (!requestAudioFocus()) {
+        if (!audioFocusManager.requestFocus()) {
             handlePlaybackError(
                 error = PlaybackException(
                     "audio-focus-denied",
@@ -134,7 +120,7 @@ class Media3PlayerManager(
      */
     override fun pause(): Unit {
         exoPlayer.pause()
-        abandonAudioFocus()
+        audioFocusManager.abandonFocus()
     }
 
     /**
@@ -149,7 +135,7 @@ class Media3PlayerManager(
      */
     override fun stop(): Unit {
         exoPlayer.stop()
-        abandonAudioFocus()
+        audioFocusManager.abandonFocus()
     }
 
     /**
@@ -177,7 +163,7 @@ class Media3PlayerManager(
         exoPlayer.removeListener(playerListener)
         stopProgressUpdates()
         coroutineScope.cancel()
-        abandonAudioFocus()
+        audioFocusManager.abandonFocus()
         exoPlayer.release()
     }
 
@@ -206,16 +192,6 @@ class Media3PlayerManager(
         return attributes
     }
 
-    /**
-     * 构建平台 [PlatformAudioAttributes] 以供音频焦点请求使用
-     */
-    private fun buildPlatformAudioAttributes(): PlatformAudioAttributes {
-        val attributes: PlatformAudioAttributes = PlatformAudioAttributes.Builder()
-            .setContentType(android.media.AudioAttributes.CONTENT_TYPE_MUSIC)
-            .setUsage(android.media.AudioAttributes.USAGE_MEDIA)
-            .build()
-        return attributes
-    }
 
     /**
      * 构建 [Player.Listener] 以集中处理播放器状态变化
@@ -316,7 +292,7 @@ class Media3PlayerManager(
      */
     internal fun handlePlaybackError(error: PlaybackException): Unit {
         exoPlayer.stop()
-        abandonAudioFocus()
+        audioFocusManager.abandonFocus()
         updatePlaybackState(error = error)
     }
 
@@ -327,44 +303,27 @@ class Media3PlayerManager(
      */
     internal fun handleAudioFocusChange(focusChange: Int): Unit {
         when (focusChange) {
-            AudioManager.AUDIOFOCUS_GAIN -> {
+            android.media.AudioManager.AUDIOFOCUS_GAIN -> {
                 restoreVolume()
                 if (resumeOnFocusGain) {
                     resumeOnFocusGain = false
                     exoPlayer.play()
                 }
             }
-            AudioManager.AUDIOFOCUS_LOSS -> {
+            android.media.AudioManager.AUDIOFOCUS_LOSS -> {
                 resumeOnFocusGain = false
                 exoPlayer.pause()
-                abandonAudioFocus()
+                audioFocusManager.abandonFocus()
             }
-            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
+            android.media.AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
                 resumeOnFocusGain = exoPlayer.isPlaying
                 exoPlayer.pause()
             }
-            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> {
+            android.media.AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> {
                 resumeOnFocusGain = exoPlayer.isPlaying
                 duckVolume()
             }
         }
-    }
-
-    /**
-     * 请求音频焦点，确保播放前得到系统许可
-     *
-     * @return 是否成功获取音频焦点
-     */
-    private fun requestAudioFocus(): Boolean {
-        val result: Int = audioManager.requestAudioFocus(audioFocusRequest)
-        return result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
-    }
-
-    /**
-     * 释放音频焦点，避免占用系统资源
-     */
-    private fun abandonAudioFocus(): Unit {
-        audioManager.abandonAudioFocusRequest(audioFocusRequest)
     }
 
     /**
