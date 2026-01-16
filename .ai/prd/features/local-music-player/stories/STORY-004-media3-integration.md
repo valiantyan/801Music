@@ -166,7 +166,7 @@ val exoPlayer = ExoPlayer.Builder(context)
 
 ## 5. Development Steps (开发步骤 - TDD/Task Breakdown)
 
-- [ ] **Task 1**: 添加 Media3 依赖到 build.gradle.kts
+- [x] **Task 1**: 添加 Media3 依赖到 build.gradle.kts（exoplayer/session/ui/common）
     - *Test Case*: 验证依赖正确添加，项目能够编译
 
 - [ ] **Task 2**: 创建 PlaybackState 数据模型
@@ -227,6 +227,7 @@ val exoPlayer = ExoPlayer.Builder(context)
 
 **(Current Log):**
 - [x] 2025-01-27 完成 Pre-flight Check：未发现 Media3/ExoPlayer 集成实现，仅存在播放队列与播放状态内存实现，需按 Story 启动集成。
+- [x] 2025-01-27 完成 Task 1：新增 Media3 依赖（exoplayer/session/ui/common）并通过编译验证。
 
 ---
 

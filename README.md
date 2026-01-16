@@ -197,8 +197,6 @@ Fragment (自动更新 UI)
 - `androidx.media3:media3-session:1.9.0` - 媒体会话管理
 - `androidx.media3:media3-ui:1.9.0` - UI 组件
 - `androidx.media3:media3-common:1.9.0` - 通用工具
-- `androidx.media3:media3-decoder:1.9.0` - 音频解码
-- `androidx.media3:media3-datasource:1.9.0` - 媒体数据源
 
 ### 架构组件
 - `androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.6` - ViewModel

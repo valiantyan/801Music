@@ -592,8 +592,6 @@ media3-exoplayer = "1.9.0"
 media3-session = "1.9.0"
 media3-ui = "1.9.0"
 media3-common = "1.9.0"
-media3-decoder = "1.9.0"
-media3-datasource = "1.9.0"
 ```
 
 #### 数据存储

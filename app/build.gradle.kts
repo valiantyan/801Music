@@ -85,6 +85,12 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
     testImplementation(libs.androidx.navigation.testing)
 
+    // Media3
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.session)
+    implementation(libs.androidx.media3.ui)
+    implementation(libs.androidx.media3.common)
+
     // Testing
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)
