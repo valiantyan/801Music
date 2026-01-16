@@ -2,11 +2,16 @@ package com.valiantyan.music801.player
 
 import android.app.Application
 import android.os.Build
+import app.cash.turbine.test
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
+import com.valiantyan.music801.domain.model.PlaybackState
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Test
@@ -143,6 +148,31 @@ class Media3PlayerManagerTest {
         assertLongEquals(expected = inputBuffered, actual = actualState.bufferedPosition)
         assertIntEquals(expected = inputState, actual = actualState.playbackState)
         assertEquals(inputError, actualState.error)
+        manager.release()
+    }
+
+    @Test
+    fun `播放过程中应周期更新进度`() = runBlocking {
+        // Arrange - 使用测试调度器控制时间推进
+        val context: Application = RuntimeEnvironment.getApplication()
+        val manager: Media3PlayerManager = Media3PlayerManager(
+            context = context,
+            progressUpdateIntervalMs = 10L,
+            dispatcher = Dispatchers.Default,
+        )
+        val inputUri: android.net.Uri = android.net.Uri.parse("file:///storage/emulated/0/Music/test.mp3")
+        manager.play(uri = inputUri)
+        // Act
+        manager.playbackState().test {
+            val initialState: PlaybackState = awaitItem()
+            assertNotNull(initialState)
+            val inputPosition: Long = initialState.position + 1000L
+            manager.seekTo(position = inputPosition)
+            delay(50L)
+            val updatedState: PlaybackState = awaitItem()
+            assertLongEquals(expected = inputPosition, actual = updatedState.position)
+            cancelAndIgnoreRemainingEvents()
+        }
         manager.release()
     }
 

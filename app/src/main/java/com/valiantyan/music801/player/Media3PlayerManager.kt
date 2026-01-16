@@ -9,8 +9,17 @@ import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import com.valiantyan.music801.domain.model.PlaybackState
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
 /**
  * Media3 播放器管理实现
@@ -18,10 +27,26 @@ import kotlinx.coroutines.flow.MutableStateFlow
  * 封装 [ExoPlayer] 初始化与状态监听，向上提供统一播放控制与状态流。
  *
  * @param context 用于创建 [ExoPlayer] 的应用上下文
+ * @param progressUpdateIntervalMs 播放进度更新间隔（毫秒）
+ * @param dispatcher 播放进度更新使用的协程调度器
  */
 class Media3PlayerManager(
     context: Context,
+    progressUpdateIntervalMs: Long = DEFAULT_PROGRESS_UPDATE_INTERVAL_MS,
+    dispatcher: CoroutineDispatcher = Dispatchers.Main.immediate,
 ) : MediaPlayerManager {
+    /**
+     * 播放进度更新间隔（毫秒）
+     */
+    private val progressUpdateIntervalMs: Long = progressUpdateIntervalMs
+    /**
+     * 持有更新任务的协程作用域以便统一取消
+     */
+    private val coroutineScope: CoroutineScope = CoroutineScope(SupervisorJob() + dispatcher)
+    /**
+     * 控制进度更新的任务，避免重复启动
+     */
+    private var progressJob: Job? = null
     /**
      * 复用单一 [ExoPlayer] 实例以保证状态一致性
      */
@@ -42,6 +67,7 @@ class Media3PlayerManager(
     init {
         // 统一监听入口，避免多处订阅造成状态不一致
         exoPlayer.addListener(playerListener)
+        startProgressUpdates()
         updatePlaybackState(error = null)
     }
 
@@ -85,6 +111,7 @@ class Media3PlayerManager(
      */
     override fun seekTo(position: Long): Unit {
         exoPlayer.seekTo(position)
+        updatePlaybackState(error = null)
     }
 
     /**
@@ -100,6 +127,8 @@ class Media3PlayerManager(
     override fun release(): Unit {
         // 先移除监听，避免释放后回调触发导致崩溃
         exoPlayer.removeListener(playerListener)
+        stopProgressUpdates()
+        coroutineScope.cancel()
         exoPlayer.release()
     }
 
@@ -153,6 +182,29 @@ class Media3PlayerManager(
     }
 
     /**
+     * 启动进度更新任务，确保播放或跳转后状态能及时同步
+     */
+    private fun startProgressUpdates(): Unit {
+        if (progressJob != null) {
+            return
+        }
+        progressJob = coroutineScope.launch {
+            while (isActive) {
+                updatePlaybackState(error = null)
+                delay(progressUpdateIntervalMs)
+            }
+        }
+    }
+
+    /**
+     * 停止进度更新任务，避免资源泄漏
+     */
+    private fun stopProgressUpdates(): Unit {
+        progressJob?.cancel()
+        progressJob = null
+    }
+
+    /**
      * 统一更新 [PlaybackState]，避免多处写入导致状态不一致
      */
     private fun updatePlaybackState(error: PlaybackException?): Unit {
@@ -165,6 +217,10 @@ class Media3PlayerManager(
 
     /**
      * 将 [Player] 的状态转换为领域模型 [PlaybackState]
+     *
+     * @param player 提供原始状态数据的播放器
+     * @param error 播放错误信息
+     * @return 映射后的播放状态
      */
     internal fun buildPlaybackState(
         player: Player,
@@ -178,5 +234,12 @@ class Media3PlayerManager(
             playbackState = player.playbackState,
             error = error,
         )
+    }
+
+    private companion object {
+        /**
+         * 默认进度更新间隔（500ms）
+         */
+        private const val DEFAULT_PROGRESS_UPDATE_INTERVAL_MS: Long = 500L
     }
 }
