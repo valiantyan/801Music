@@ -172,7 +172,7 @@ val exoPlayer = ExoPlayer.Builder(context)
 - [x] **Task 2**: 创建 PlaybackState 数据模型
     - *Test Case*: 测试状态对象的创建和属性访问
 
-- [ ] **Task 3**: 定义 MediaPlayerManager 接口
+- [x] **Task 3**: 定义 MediaPlayerManager 接口
     - *Test Case*: 测试接口定义的正确性
 
 - [ ] **Task 4**: 实现 ExoPlayer 初始化
@@ -229,6 +229,7 @@ val exoPlayer = ExoPlayer.Builder(context)
 - [x] 2025-01-27 完成 Pre-flight Check：未发现 Media3/ExoPlayer 集成实现，仅存在播放队列与播放状态内存实现，需按 Story 启动集成。
 - [x] 2025-01-27 完成 Task 1：新增 Media3 依赖（exoplayer/session/ui/common）并通过编译验证。
 - [x] 2025-01-27 完成 Task 2：扩展 PlaybackState 字段以覆盖播放缓冲、状态与错误信息。
+- [x] 2025-01-27 完成 Task 3：定义 MediaPlayerManager 接口以统一播放控制与状态流出口。
 
 ---
 
