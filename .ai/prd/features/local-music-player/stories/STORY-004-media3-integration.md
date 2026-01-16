@@ -184,7 +184,7 @@ val exoPlayer = ExoPlayer.Builder(context)
     - *Test Case*: 测试暂停和恢复功能
     - *Test Case*: 测试停止功能
 
-- [ ] **Task 6**: 实现进度跳转功能
+- [x] **Task 6**: 实现进度跳转功能
     - *Test Case*: 测试跳转到指定位置
     - *Test Case*: 测试边界情况（开始、结束位置）
 
@@ -232,6 +232,7 @@ val exoPlayer = ExoPlayer.Builder(context)
 - [x] 2025-01-27 完成 Task 3：定义 MediaPlayerManager 接口以统一播放控制与状态流出口。
 - [x] 2025-01-27 完成 Task 4：实现 Media3 ExoPlayer 初始化与音频属性配置并补充测试。
 - [x] 2025-01-27 完成 Task 5：补充播放控制行为测试并验证播放/暂停/停止路径。
+- [x] 2025-01-27 完成 Task 6：补充进度跳转测试并验证 seekTo 行为。
 
 ---
 

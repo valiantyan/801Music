@@ -91,6 +91,22 @@ class Media3PlayerManagerTest {
         manager.release()
     }
 
+    @Test
+    fun `跳转到指定位置后应更新播放位置`() {
+        // Arrange - 先准备播放再进行跳转
+        val context: Application = RuntimeEnvironment.getApplication()
+        val manager: Media3PlayerManager = Media3PlayerManager(context = context)
+        val inputUri: android.net.Uri = android.net.Uri.parse("file:///storage/emulated/0/Music/test.mp3")
+        val inputPosition: Long = 1234L
+        manager.play(uri = inputUri)
+        // Act
+        manager.seekTo(position = inputPosition)
+        val actualPosition: Long = manager.exoPlayer.currentPosition
+        // Assert
+        assertLongEquals(expected = inputPosition, actual = actualPosition)
+        manager.release()
+    }
+
     private fun assertIntEquals(
         expected: Int,
         actual: Int,
@@ -102,6 +118,14 @@ class Media3PlayerManagerTest {
     private fun assertBooleanEquals(
         expected: Boolean,
         actual: Boolean,
+    ): Unit {
+        // JUnit Java API 不支持命名参数，使用位置参数
+        assertEquals(expected, actual)
+    }
+
+    private fun assertLongEquals(
+        expected: Long,
+        actual: Long,
     ): Unit {
         // JUnit Java API 不支持命名参数，使用位置参数
         assertEquals(expected, actual)
