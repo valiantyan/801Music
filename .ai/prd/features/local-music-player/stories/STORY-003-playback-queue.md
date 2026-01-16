@@ -199,7 +199,7 @@ class MediaQueueManager {
     - *Test Case*: UI 测试 - 播放状态订阅和更新
     - *Test Case*: 配置变更测试 - 播放过程中旋转屏幕，验证状态恢复
 
-- [ ] **Task 9**: 实现 PlayerFragment（播放控制）
+- [x] **Task 9**: 实现 PlayerFragment（播放控制）
     - *Test Case*: UI 测试 - 播放/暂停按钮功能
     - *Test Case*: UI 测试 - 上一首/下一首按钮功能
     - *Test Case*: UI 测试 - 进度条拖拽跳转
@@ -238,6 +238,8 @@ class MediaQueueManager {
 - [x] 2025-01-27 新增播放控制布局 [fragment_player.xml] 并补充字符串资源。
 - [x] 2025-01-27 运行单元测试：`./gradlew :app:testDebugUnitTest`。
 - [x] 2025-01-27 新增 [PlayerFragment] 基础展示与 [PlayerViewModelFactory]。
+- [x] 2025-01-27 运行单元测试：`./gradlew :app:testDebugUnitTest`。
+- [x] 2025-01-27 完成播放控制交互与 [PlayerFragmentTest] 单元测试。
 - [x] 2025-01-27 运行单元测试：`./gradlew :app:testDebugUnitTest`。
 - [x] 2025-01-27 运行单元测试：`./gradlew :app:testDebugUnitTest`。
 

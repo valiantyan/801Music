@@ -107,7 +107,7 @@ class PlayerFragment : Fragment() {
             }
 
             override fun onStopTrackingTouch(slider: Slider) {
-                viewModel.seekTo(position = slider.value.toLong())
+                handleSeek(position = slider.value.toLong())
             }
         })
     }
@@ -182,6 +182,15 @@ class PlayerFragment : Fragment() {
         } else {
             viewModel.play()
         }
+    }
+
+    /**
+     * 处理拖拽进度跳转
+     *
+     * @param position 目标位置（毫秒）
+     */
+    private fun handleSeek(position: Long): Unit {
+        viewModel.seekTo(position = position)
     }
 
     /**
