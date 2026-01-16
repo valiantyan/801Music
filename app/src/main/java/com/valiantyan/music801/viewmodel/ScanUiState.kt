@@ -16,7 +16,7 @@ data class ScanUiState(
     val scannedCount: Int = 0,
     val totalCount: Int? = null,
     val currentPath: String? = null,
-    val error: String? = null
+    val error: String? = null,
 ) {
     /**
      * 是否处于错误状态

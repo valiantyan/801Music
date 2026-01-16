@@ -17,6 +17,12 @@ class ScanViewModelFactory(
     private val audioRepository: AudioRepository
 ) : ViewModelProvider.Factory {
 
+    /**
+     * 创建 [ScanViewModel] 实例
+     *
+     * @param modelClass 目标 [ViewModel] 类型
+     * @return 对应的 [ViewModel] 实例
+     */
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ScanViewModel::class.java)) {

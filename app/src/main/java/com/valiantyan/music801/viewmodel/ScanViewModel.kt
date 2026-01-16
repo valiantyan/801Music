@@ -45,20 +45,13 @@ class ScanViewModel(
      * @param rootPath 要扫描的根目录路径
      */
     fun startScan(rootPath: String) {
-        // 如果已有扫描任务在运行，先取消
         cancelScan()
-
-        // 重置状态
         _uiState.value = ScanUiState()
-
-        // 启动新的扫描任务
         scanJob = viewModelScope.launch {
             audioRepository.scanAudioFiles(rootPath) { song ->
-                // 当找到歌曲时的回调（可以用于其他用途，如通知其他模块）
-                // 当前实现中，歌曲已经通过 Repository 的 Flow 自动更新
+                // 保留扩展入口，便于后续在扫描中同步其它状态
             }
                 .catch { exception ->
-                    // 处理扫描过程中的错误
                     _uiState.update { currentState ->
                         currentState.copy(
                             isScanning = false,
@@ -67,7 +60,6 @@ class ScanViewModel(
                     }
                 }
                 .collect { progress ->
-                    // 更新 UI 状态
                     _uiState.update { currentState ->
                         currentState.copy(
                             isScanning = progress.isScanning,
@@ -87,8 +79,6 @@ class ScanViewModel(
     fun cancelScan() {
         scanJob?.cancel()
         scanJob = null
-        
-        // 更新状态为已取消（但保留当前进度）
         _uiState.update { currentState ->
             if (currentState.isScanning) {
                 currentState.copy(

@@ -12,19 +12,18 @@ import com.valiantyan.music801.R
  * 注意：此 Activity 仅用于测试目的，不会在正常应用流程中使用。
  */
 class TestActivity : ComponentActivity() {
-    
     /**
      * PermissionHelper 实例，供测试使用
      */
     lateinit var permissionHelper: PermissionHelper
         private set
 
+    /**
+     * 创建测试环境所需依赖
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // 设置一个简单的布局（避免空布局警告）
         setContentView(R.layout.activity_main)
-        
-        // 在 onCreate 中创建 PermissionHelper（这是必须的，因为 registerForActivityResult 必须在 onCreate 中调用）
         permissionHelper = PermissionHelper(this)
     }
 }

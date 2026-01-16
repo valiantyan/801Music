@@ -6,6 +6,12 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
+import com.valiantyan.music801.data.datasource.AudioFileScanner
+import com.valiantyan.music801.data.datasource.MediaMetadataExtractor
+import com.valiantyan.music801.data.repository.AudioRepository
+import com.valiantyan.music801.di.AudioRepositoryProvider
 import com.valiantyan.music801.util.PermissionHelper
 
 /**
@@ -13,13 +19,24 @@ import com.valiantyan.music801.util.PermissionHelper
  * 
  * 负责应用入口、权限请求和导航管理。
  */
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), AudioRepositoryProvider {
 
     /**
      * 权限助手
      */
     private lateinit var permissionHelper: PermissionHelper
+    /**
+     * 音频仓库
+     */
+    private lateinit var audioRepository: AudioRepository
+    /**
+     * 导航控制器
+     */
+    private lateinit var navController: NavController
 
+    /**
+     * 初始化入口页面与权限检查
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -29,17 +46,17 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
-        // 初始化权限助手
         permissionHelper = PermissionHelper(this)
         permissionHelper.onPermissionResult = { isGranted ->
-            handlePermissionResult(isGranted)
+            handlePermissionResult(isGranted = isGranted)
         }
-
-        // 检查并请求权限
+        audioRepository = createAudioRepository()
+        navController = getNavController()
         if (!permissionHelper.hasPermission()) {
             requestStoragePermission()
+            return
         }
+        setNavGraphIfNeeded()
     }
 
     /**
@@ -47,12 +64,10 @@ class MainActivity : AppCompatActivity() {
      */
     private fun requestStoragePermission() {
         if (permissionHelper.shouldShowRationale()) {
-            // 显示权限说明对话框
             showPermissionRationaleDialog {
                 permissionHelper.requestPermission()
             }
         } else {
-            // 直接请求权限
             permissionHelper.requestPermission()
         }
     }
@@ -80,10 +95,8 @@ class MainActivity : AppCompatActivity() {
      */
     private fun handlePermissionResult(isGranted: Boolean) {
         if (isGranted) {
-            // 权限已授予，可以开始扫描
-            // TODO: 触发扫描流程（将在后续 Task 中实现）
+            setNavGraphIfNeeded()
         } else {
-            // 权限被拒绝，显示提示
             showPermissionDeniedDialog()
         }
     }
@@ -100,5 +113,40 @@ class MainActivity : AppCompatActivity() {
             }
             .setNegativeButton("取消", null)
             .show()
+    }
+
+    /**
+     * 暴露统一的 [AudioRepository] 供页面共享
+     */
+    override fun provideAudioRepository(): AudioRepository {
+        return audioRepository
+    }
+
+    /**
+     * 创建音频仓库实例
+     */
+    private fun createAudioRepository(): AudioRepository {
+        val metadataExtractor: MediaMetadataExtractor = MediaMetadataExtractor()
+        val audioFileScanner: AudioFileScanner = AudioFileScanner(metadataExtractor = metadataExtractor)
+        return AudioRepository(audioFileScanner = audioFileScanner)
+    }
+
+    /**
+     * 获取导航控制器实例
+     */
+    private fun getNavController(): NavController {
+        val navHostFragment: NavHostFragment =
+            supportFragmentManager.findFragmentById(R.id.navHostFragment) as NavHostFragment
+        return navHostFragment.navController
+    }
+
+    /**
+     * 初始化导航图，避免重复设置
+     */
+    private fun setNavGraphIfNeeded() {
+        if (navController.currentDestination != null) {
+            return
+        }
+        navController.setGraph(R.navigation.nav_graph)
     }
 }

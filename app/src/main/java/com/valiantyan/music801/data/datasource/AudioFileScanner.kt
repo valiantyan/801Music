@@ -95,6 +95,13 @@ class AudioFileScanner(
         }
     }
 
+    /**
+     * 处理待扫描目录队列
+     *
+     * @param pendingDirectories 待扫描目录队列
+     * @param onSongFound 找到歌曲后的回调
+     * @param onFileScanned 单文件扫描回调
+     */
     private suspend fun processDirectoryQueue(
         pendingDirectories: ArrayDeque<File>,
         onSongFound: (Song) -> Unit,
@@ -111,6 +118,14 @@ class AudioFileScanner(
         }
     }
 
+    /**
+     * 处理单个目录中的文件与子目录
+     *
+     * @param currentDirectory 当前目录
+     * @param pendingDirectories 待扫描目录队列
+     * @param onSongFound 找到歌曲后的回调
+     * @param onFileScanned 单文件扫描回调
+     */
     private suspend fun handleDirectory(
         currentDirectory: File,
         pendingDirectories: ArrayDeque<File>,
@@ -134,14 +149,33 @@ class AudioFileScanner(
         }
     }
 
+    /**
+     * 判断目录是否可扫描
+     *
+     * @param rootDir 根目录
+     * @return 是否为有效目录
+     */
     private fun isValidDirectory(rootDir: File): Boolean {
         return rootDir.exists() && rootDir.isDirectory
     }
 
+    /**
+     * 判断是否跳过隐藏文件
+     *
+     * @param file 目标文件
+     * @return 是否需要跳过
+     */
     private fun shouldSkip(file: File): Boolean {
         return file.name.startsWith(".")
     }
 
+    /**
+     * 处理单个文件的扫描逻辑
+     *
+     * @param file 目标文件
+     * @param onSongFound 找到歌曲后的回调
+     * @param onFileScanned 单文件扫描回调
+     */
     private suspend fun processFile(
         file: File,
         onSongFound: (Song) -> Unit,
@@ -158,6 +192,12 @@ class AudioFileScanner(
         onFileScanned(file.absolutePath)
     }
 
+    /**
+     * 从文件中提取 [Song]
+     *
+     * @param file 音频文件
+     * @return 提取到的 [Song]，失败时返回 null
+     */
     private fun extractSong(file: File): Song? {
         return metadataExtractor.extractMetadata(
             filePath = file.absolutePath,
@@ -166,6 +206,12 @@ class AudioFileScanner(
         )
     }
 
+    /**
+     * 创建扫描开始进度
+     *
+     * @param rootPath 根目录路径
+     * @return 扫描进度
+     */
     private fun createStartProgress(rootPath: String): ScanProgress {
         return createProgress(
             scannedCount = 0,
@@ -175,6 +221,11 @@ class AudioFileScanner(
         )
     }
 
+    /**
+     * 创建无效目录的进度
+     *
+     * @return 扫描进度
+     */
     private fun createInvalidRootProgress(): ScanProgress {
         return createProgress(
             scannedCount = 0,
@@ -184,6 +235,15 @@ class AudioFileScanner(
         )
     }
 
+    /**
+     * 创建通用扫描进度
+     *
+     * @param scannedCount 已扫描数量
+     * @param totalCount 总数量
+     * @param currentPath 当前路径
+     * @param isScanning 是否扫描中
+     * @return 扫描进度
+     */
     private fun createProgress(
         scannedCount: Int,
         totalCount: Int?,

@@ -12,6 +12,12 @@ import com.valiantyan.music801.data.repository.AudioRepository
 class SongListViewModelFactory(
     private val audioRepository: AudioRepository,
 ) : ViewModelProvider.Factory {
+    /**
+     * 创建 [SongListViewModel] 实例
+     *
+     * @param modelClass 目标 [ViewModel] 类型
+     * @return 对应的 [ViewModel] 实例
+     */
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(SongListViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")

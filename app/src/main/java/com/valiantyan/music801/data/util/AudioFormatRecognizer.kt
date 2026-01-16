@@ -30,11 +30,7 @@ object AudioFormatRecognizer {
         if (filePath.isBlank()) {
             return false
         }
-
-        // 获取文件扩展名（不包含点号）
         val extension = extractExtension(filePath) ?: return false
-
-        // 转换为小写进行比较（大小写不敏感）
         return SUPPORTED_AUDIO_EXTENSIONS.contains(extension.lowercase())
     }
 
@@ -46,19 +42,13 @@ object AudioFormatRecognizer {
      */
     private fun extractExtension(filePath: String): String? {
         val lastDotIndex = filePath.lastIndexOf('.')
-        
-        // 检查是否有扩展名
         if (lastDotIndex == -1 || lastDotIndex == filePath.length - 1) {
             return null
         }
-
-        // 检查扩展名是否在文件名的最后（避免匹配到路径中的点号，如 .hidden 文件）
         val lastSlashIndex = filePath.lastIndexOf('/')
         if (lastSlashIndex > lastDotIndex) {
-            // 点号在最后一个斜杠之前，说明不是文件扩展名
             return null
         }
-
         return filePath.substring(lastDotIndex + 1)
     }
 

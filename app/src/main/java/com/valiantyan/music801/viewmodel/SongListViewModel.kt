@@ -67,6 +67,9 @@ class SongListViewModel(
         }
     }
 
+    /**
+     * 设置加载中状态
+     */
     private fun setLoadingState() {
         _uiState.update { currentState ->
             currentState.copy(
@@ -77,6 +80,11 @@ class SongListViewModel(
         }
     }
 
+    /**
+     * 设置歌曲列表状态
+     *
+     * @param songs 最新歌曲列表
+     */
     private fun setSongsState(songs: List<Song>) {
         _uiState.update { currentState ->
             currentState.copy(
@@ -88,6 +96,11 @@ class SongListViewModel(
         }
     }
 
+    /**
+     * 设置错误状态
+     *
+     * @param message 错误信息
+     */
     private fun setErrorState(message: String) {
         _uiState.update { currentState ->
             currentState.copy(

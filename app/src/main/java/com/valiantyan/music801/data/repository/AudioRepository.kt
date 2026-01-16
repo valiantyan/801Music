@@ -23,7 +23,6 @@ class AudioRepository(
      * 扫描结果缓存（内存中）
      */
     private val _songs = MutableStateFlow<List<Song>>(emptyList())
-    
     /**
      * 扫描结果 Flow，供其他模块订阅
      */
@@ -40,19 +39,11 @@ class AudioRepository(
         rootPath: String,
         onSongFound: (Song) -> Unit = {}
     ): Flow<ScanProgress> {
-        // 清空之前的缓存
         _songs.value = emptyList()
-        
         val foundSongs = mutableListOf<Song>()
-        
         return audioFileScanner.scanDirectory(rootPath) { song ->
-            // 添加到临时列表
             foundSongs.add(song)
-            
-            // 更新缓存
             _songs.value = foundSongs.toList()
-            
-            // 调用外部回调
             onSongFound(song)
         }
     }

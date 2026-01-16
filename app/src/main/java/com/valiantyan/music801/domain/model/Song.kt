@@ -2,7 +2,7 @@ package com.valiantyan.music801.domain.model
 
 /**
  * 歌曲领域模型
- * 
+ *
  * @param id 唯一标识符（文件路径）
  * @param title 标题
  * @param artist 艺术家
@@ -22,5 +22,5 @@ data class Song(
     val filePath: String,
     val fileSize: Long,
     val dateAdded: Long,
-    val albumArtPath: String?
+    val albumArtPath: String?,
 )

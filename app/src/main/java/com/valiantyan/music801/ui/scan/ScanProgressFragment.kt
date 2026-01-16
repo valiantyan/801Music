@@ -10,20 +10,25 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.NavController
+import androidx.navigation.NavOptions
+import androidx.navigation.fragment.findNavController
 import com.valiantyan.music801.R
 import com.valiantyan.music801.data.datasource.AudioFileScanner
 import com.valiantyan.music801.data.datasource.MediaMetadataExtractor
 import com.valiantyan.music801.data.repository.AudioRepository
 import com.valiantyan.music801.databinding.FragmentScanProgressBinding
+import com.valiantyan.music801.di.AudioRepositoryProvider
 import com.valiantyan.music801.viewmodel.ScanViewModel
 import com.valiantyan.music801.viewmodel.ScanViewModelFactory
+import com.valiantyan.music801.viewmodel.ScanUiState
 import kotlinx.coroutines.launch
 
 /**
  * 扫描进度 Fragment
  * 
  * 显示音频文件扫描进度，支持取消扫描操作。
- * 扫描完成后自动导航到歌曲列表（将在后续实现）。
+ * 扫描完成后自动导航到歌曲列表。
  * 
  * 配置变更处理：
  * - 使用 ViewModel 保存扫描进度状态（已扫描数量、当前路径）
@@ -36,7 +41,11 @@ class ScanProgressFragment : Fragment() {
      * ViewBinding
      */
     private var _binding: FragmentScanProgressBinding? = null
-    private val binding get() = _binding!!
+    /**
+     * 视图绑定访问器
+     */
+    private val binding: FragmentScanProgressBinding
+        get() = _binding!!
 
     /**
      * ViewModel
@@ -46,40 +55,58 @@ class ScanProgressFragment : Fragment() {
      * 测试用 ViewModelFactory（仅用于 Robolectric 测试注入）
      */
     internal var viewModelFactoryForTest: ViewModelProvider.Factory? = null
+    /**
+     * 导航完成标记，避免重复跳转
+     */
+    private var hasNavigated: Boolean = false
 
+    /**
+     * 创建扫描进度视图
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
-        _binding = FragmentScanProgressBinding.inflate(inflater, container, false)
+        _binding = inflateBinding(
+            inflater = inflater,
+            parent = container,
+            attachToParent = false,
+        )
         return binding.root
     }
 
+    /**
+     * 初始化 [ScanViewModel] 依赖
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // 创建依赖（手动依赖注入，v1.0）
-        val metadataExtractor = MediaMetadataExtractor()
-        val audioFileScanner = AudioFileScanner(metadataExtractor)
-        val audioRepository = AudioRepository(audioFileScanner)
-        // 创建 ViewModel
-        val factory = viewModelFactoryForTest ?: ScanViewModelFactory(audioRepository)
+        val factory: ViewModelProvider.Factory = viewModelFactoryForTest ?: run {
+            val repositoryProvider: AudioRepositoryProvider? = activity as? AudioRepositoryProvider
+            val audioRepository: AudioRepository = repositoryProvider?.provideAudioRepository() ?: run {
+                val metadataExtractor: MediaMetadataExtractor = MediaMetadataExtractor()
+                val audioFileScanner: AudioFileScanner = AudioFileScanner(metadataExtractor = metadataExtractor)
+                AudioRepository(audioFileScanner = audioFileScanner)
+            }
+            ScanViewModelFactory(audioRepository = audioRepository)
+        }
         viewModel = ViewModelProvider(this, factory)[ScanViewModel::class.java]
     }
 
+    /**
+     * 绑定 UI 并启动扫描监听
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setupUI()
         observeViewModel()
-        
         // 如果 ViewModel 中没有扫描任务，且没有错误，则开始扫描
         // 注意：实际扫描路径应该从外部传入或从配置中读取
         // 这里暂时使用默认路径，后续会完善
         // 配置变更后，ViewModel 会保持状态，所以这里只在首次创建时启动扫描
         if (savedInstanceState == null) {
-            if (!viewModel.uiState.value.isScanning && 
-                !viewModel.uiState.value.isCompleted && 
+            if (!viewModel.uiState.value.isScanning &&
+                !viewModel.uiState.value.isCompleted &&
                 viewModel.uiState.value.error == null) {
                 startScan()
             }
@@ -104,7 +131,7 @@ class ScanProgressFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { state ->
-                    updateUI(state)
+                    updateUI(state = state)
                 }
             }
         }
@@ -113,46 +140,32 @@ class ScanProgressFragment : Fragment() {
     /**
      * 更新 UI
      */
-    private fun updateUI(state: com.valiantyan.music801.viewmodel.ScanUiState) {
-        // 更新进度条
+    private fun updateUI(state: ScanUiState) {
         if (state.totalCount != null && state.totalCount > 0) {
-            val progress = (state.scannedCount * 100 / state.totalCount).coerceIn(0, 100)
+            val progress: Int =
+                (state.scannedCount * 100 / state.totalCount).coerceIn(0, 100)
             binding.progressBar.progress = progress
             binding.progressBar.isIndeterminate = false
         } else {
-            // 未知总数时显示不确定进度
             binding.progressBar.isIndeterminate = true
         }
-
-        // 更新已扫描文件数
-        binding.scannedCountText.text = 
+        binding.scannedCountText.text =
             getString(R.string.scanned_files_count, state.scannedCount)
-
-        // 更新当前扫描路径
         if (state.currentPath != null) {
-            binding.currentPathText.text = 
+            binding.currentPathText.text =
                 getString(R.string.current_scanning_path, state.currentPath)
             binding.currentPathText.visibility = View.VISIBLE
         } else {
             binding.currentPathText.visibility = View.GONE
         }
-
-        // 更新错误信息
         if (state.hasError) {
             binding.errorText.text = getString(R.string.scan_error, state.error ?: "")
             binding.errorText.visibility = View.VISIBLE
         } else {
             binding.errorText.visibility = View.GONE
         }
-
-        // 更新取消按钮状态
         binding.cancelButton.isEnabled = state.isScanning
-
-        // 扫描完成后的处理（将在后续 Task 中实现导航）
-        if (state.isCompleted) {
-            // TODO: 导航到歌曲列表（将在后续 Task 中实现）
-            // navigateToSongList()
-        }
+        handleCompletion(state = state)
     }
 
     /**
@@ -162,21 +175,61 @@ class ScanProgressFragment : Fragment() {
      * 这里暂时使用默认路径，后续会完善。
      */
     private fun startScan() {
-        // 获取外部存储根目录
-        // 注意：实际应用中应该使用 Environment.getExternalStorageDirectory()
-        // 或从 SharedPreferences 中读取用户选择的路径
-        val rootPath = try {
-            Environment.getExternalStorageDirectory().absolutePath
-        } catch (e: Exception) {
-            // 如果无法获取，使用备用路径
+        val defaultPath: String = Environment.getExternalStorageDirectory().absolutePath
+        val rootPath: String = if (defaultPath.isNotBlank()) {
+            defaultPath
+        } else {
             "/storage/emulated/0"
         }
-        
-        viewModel.startScan(rootPath)
+        viewModel.startScan(rootPath = rootPath)
     }
 
+    /**
+     * 清理视图绑定引用
+     */
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    /**
+     * 扫描完成后触发导航
+     */
+    private fun handleCompletion(state: ScanUiState) {
+        if (!state.isCompleted || hasNavigated) {
+            return
+        }
+        val navController: NavController = findNavController()
+        if (navController.currentDestination?.id != R.id.scanProgressFragment) {
+            return
+        }
+        // 清除扫描页返回栈，避免返回键回到扫描页
+        val navOptions: NavOptions = NavOptions.Builder()
+            .setPopUpTo(
+                destinationId = R.id.scanProgressFragment,
+                inclusive = true,
+            )
+            .build()
+        hasNavigated = true
+        navController.navigate(
+            resId = R.id.action_scanProgressFragment_to_songListFragment,
+            args = null,
+            navOptions = navOptions,
+        )
+    }
+
+    /**
+     * 统一创建视图绑定
+     */
+    private fun inflateBinding(
+        inflater: LayoutInflater,
+        parent: ViewGroup?,
+        attachToParent: Boolean,
+    ): FragmentScanProgressBinding {
+        return FragmentScanProgressBinding.inflate(
+            inflater,
+            parent,
+            attachToParent,
+        )
     }
 }

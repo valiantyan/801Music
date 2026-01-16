@@ -62,6 +62,10 @@ dependencies {
     // Fragment
     implementation(libs.androidx.fragment.ktx)
     
+    // Navigation
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.androidx.navigation.ui.ktx)
+    
     // Testing
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)

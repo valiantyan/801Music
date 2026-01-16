@@ -268,6 +268,9 @@ data class SongListUiState(
     - 文档已同步更新（Story 状态标记为已完成）
   - 归档说明：
     - 后续需求按新 Story 进入流程
+- [x] **2025-01-27**: 集成入口与导航衔接 ✅
+  - MainActivity 接入扫描进度与列表展示入口（`app/src/main/java/com/valiantyan/music801/MainActivity.kt`）
+  - 扫描完成后导航到列表（`app/src/main/java/com/valiantyan/music801/ui/scan/ScanProgressFragment.kt`）
 
 ---
 

@@ -215,7 +215,7 @@ data class ScanProgress(
 - [x] **Task 9**: 实现 ScanProgressFragment UI ✅
     - *Test Case*: UI 测试 - 扫描进度显示 ✅ (实现完成，Robolectric UT 测试已创建)
     - *Test Case*: UI 测试 - 取消按钮功能 ✅ (实现完成，Robolectric UT 测试已创建)
-    - *Test Case*: UI 测试 - 扫描完成后的导航 ⏳ (UI 已实现，导航功能将在后续 Task 中完成)
+    - *Test Case*: UI 测试 - 扫描完成后的导航 ✅ (已接入导航流程)
     - *Test Case*: 配置变更测试 - 扫描过程中旋转屏幕，验证进度状态恢复 ✅ (通过 ViewModel 自动处理)
     - *Test Case*: 配置变更测试 - 扫描过程中切换主题，验证 UI 适配 ✅ (使用 Material Design 3 主题系统)
     - *Test Case*: Robolectric UT 测试 ✅ (已创建测试文件，使用 Robolectric + FragmentScenario)
@@ -436,7 +436,7 @@ data class ScanProgress(
     - 实现扫描进度显示（进度条、已扫描文件数、当前路径）
     - 实现取消扫描功能
     - 实现错误信息显示
-    - 扫描完成后预留导航接口（将在后续 Task 中实现）
+    - 扫描完成后自动导航到歌曲列表
   - 创建了 `ScanViewModelFactory.kt` ViewModel 工厂类（位于 `viewmodel/ScanViewModelFactory.kt`）
     - 用于创建 ScanViewModel 实例，提供必要的依赖（AudioRepository）
     - 支持手动依赖注入（v1.0）
@@ -481,6 +481,10 @@ data class ScanProgress(
     - 文档已同步更新（Story 状态标记为已完成）
   - 归档说明：
     - 后续若有新增需求，按新 Story 进入流程
+
+- [x] **2025-01-27**: 扫描完成后导航已接入 ✅
+  - 扫描完成后自动切换到歌曲列表（`app/src/main/java/com/valiantyan/music801/ui/scan/ScanProgressFragment.kt`）
+  - 主入口接入扫描进度展示（`app/src/main/java/com/valiantyan/music801/MainActivity.kt`）
 
 ---
 

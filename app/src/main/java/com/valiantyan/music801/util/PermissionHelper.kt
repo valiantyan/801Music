@@ -25,7 +25,7 @@ class PermissionHelper(
 
     /**
      * 权限请求启动器
-     * 
+     *
      * 注意：必须在 Activity 的 onCreate 中创建 PermissionHelper 实例，
      * 因为 registerForActivityResult 必须在 onCreate 中调用。
      */
@@ -41,10 +41,8 @@ class PermissionHelper(
      */
     fun getRequiredPermission(): String {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            // Android 13+ (API 33+)
             Manifest.permission.READ_MEDIA_AUDIO
         } else {
-            // Android 12 及以下 (API < 33)
             Manifest.permission.READ_EXTERNAL_STORAGE
         }
     }
@@ -72,11 +70,9 @@ class PermissionHelper(
      */
     fun requestPermission(): Boolean {
         return if (hasPermission()) {
-            // 权限已授予，直接调用回调
             onPermissionResult?.invoke(true)
             true
         } else {
-            // 请求权限
             permissionLauncher.launch(getRequiredPermission())
             false
         }

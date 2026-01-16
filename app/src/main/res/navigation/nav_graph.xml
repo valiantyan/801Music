@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/scanProgressFragment">
+
+    <fragment
+        android:id="@+id/scanProgressFragment"
+        android:name="com.valiantyan.music801.ui.scan.ScanProgressFragment"
+        android:label="scan_progress">
+        <action
+            android:id="@+id/action_scanProgressFragment_to_songListFragment"
+            app:destination="@id/songListFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/songListFragment"
+        android:name="com.valiantyan.music801.ui.songlist.SongListFragment"
+        android:label="song_list" />
+</navigation>
