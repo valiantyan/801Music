@@ -2,6 +2,7 @@ package com.valiantyan.music801.ui.songlist
 
 import android.content.Context
 import android.view.ContextThemeWrapper
+import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.test.core.app.ApplicationProvider
@@ -177,6 +178,36 @@ class SongListAdapterTest {
         val titleText: TextView = viewHolder.itemView.findViewById(R.id.songTitleText)
         // Assert
         assertEquals("Song#5 - 特殊字符", titleText.text.toString())
+    }
+
+    @Test
+    fun `播放中当前歌曲显示播放标识`() {
+        // Arrange
+        val adapter: SongListAdapter = createAdapter()
+        val song: Song = createSong(
+            id = "/storage/music/song6.mp3",
+            title = "Song 6",
+            artist = "Artist 6",
+            durationMs = 60000L,
+        )
+        val songs: List<Song> = listOf(song)
+        val baseContext: Context = ApplicationProvider.getApplicationContext()
+        val themedContext: Context = createThemedContext(baseContext = baseContext)
+        val parent: FrameLayout = FrameLayout(themedContext)
+        // Act
+        adapter.submitList(songs = songs)
+        adapter.updatePlaybackState(currentSongId = song.id, isPlaying = true)
+        val viewHolder: SongListAdapter.SongViewHolder = adapter.onCreateViewHolder(
+            parent = parent,
+            viewType = 0,
+        )
+        adapter.onBindViewHolder(
+            holder = viewHolder,
+            position = 0,
+        )
+        val indicator: View = viewHolder.itemView.findViewById(R.id.songPlayingIndicator)
+        // Assert
+        assertEquals(View.VISIBLE, indicator.visibility)
     }
 
     private fun createAdapter(

@@ -61,5 +61,17 @@
             android:textAppearance="?attr/textAppearanceBodyMedium"
             app:layout_constraintBaseline_toBaselineOf="@id/songTitleText"
             app:layout_constraintEnd_toEndOf="parent" />
+
+        <ImageView
+            android:id="@+id/songPlayingIndicator"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:contentDescription="@string/song_playing_indicator"
+            android:src="@android:drawable/ic_media_play"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/songDurationText"
+            app:layout_constraintEnd_toStartOf="@id/songDurationText"
+            app:layout_constraintTop_toTopOf="@id/songDurationText"
+            android:layout_marginEnd="8dp" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

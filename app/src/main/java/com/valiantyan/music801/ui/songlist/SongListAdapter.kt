@@ -1,6 +1,7 @@
 package com.valiantyan.music801.ui.songlist
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -24,6 +25,16 @@ class SongListAdapter(
     private val items: MutableList<Song> = mutableListOf()
 
     /**
+     * 当前播放歌曲标识
+     */
+    private var currentSongId: String? = null
+
+    /**
+     * 当前播放状态
+     */
+    private var isPlaying: Boolean = false
+
+    /**
      * 创建列表项的 [SongViewHolder]
      */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SongViewHolder {
@@ -41,6 +52,8 @@ class SongListAdapter(
             song = song,
             onItemClick = onItemClick,
             onItemLongClick = onItemLongClick,
+            currentSongId = currentSongId,
+            isPlaying = isPlaying,
         )
     }
 
@@ -68,6 +81,24 @@ class SongListAdapter(
     }
 
     /**
+     * 更新播放状态
+     *
+     * @param currentSongId 当前播放歌曲 ID
+     * @param isPlaying 是否正在播放
+     */
+    fun updatePlaybackState(
+        currentSongId: String?,
+        isPlaying: Boolean,
+    ) {
+        if (this.currentSongId == currentSongId && this.isPlaying == isPlaying) {
+            return
+        }
+        this.currentSongId = currentSongId
+        this.isPlaying = isPlaying
+        notifyDataSetChanged()
+    }
+
+    /**
      * 列表项 ViewHolder
      */
     class SongViewHolder(
@@ -84,10 +115,18 @@ class SongListAdapter(
             song: Song,
             onItemClick: (Song) -> Unit,
             onItemLongClick: (Song) -> Unit,
+            currentSongId: String?,
+            isPlaying: Boolean,
         ) {
             binding.songTitleText.text = song.title
             binding.songArtistText.text = song.artist
             binding.songDurationText.text = formatDuration(durationMs = song.duration)
+            val isCurrentSong: Boolean = currentSongId != null && currentSongId == song.id
+            binding.songPlayingIndicator.visibility = if (isCurrentSong && isPlaying) {
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
             binding.root.setOnClickListener { onItemClick(song) }
             binding.root.setOnLongClickListener {
                 onItemLongClick(song)

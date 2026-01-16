@@ -15,6 +15,7 @@
     <string name="song_list">歌曲列表</string>
     <string name="song_list_loading">歌曲列表加载中</string>
     <string name="song_list_empty">暂无歌曲</string>
+    <string name="song_playing_indicator">正在播放</string>
 
     <!-- 播放控制界面 -->
     <string name="player_album_art">歌曲封面</string>

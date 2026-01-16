@@ -74,6 +74,11 @@ class SongListFragment : Fragment() {
     private var lastBackPressedTime: Long = 0L
 
     /**
+     * 播放器仓库
+     */
+    private lateinit var playerRepository: PlayerRepository
+
+    /**
      * 初始化 [SongListViewModel] 依赖
      */
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -88,6 +93,7 @@ class SongListFragment : Fragment() {
             SongListViewModelFactory(audioRepository = audioRepository)
         }
         viewModel = ViewModelProvider(owner = this, factory = factory)[SongListViewModel::class.java]
+        playerRepository = resolvePlayerRepository()
     }
 
     /**
@@ -113,6 +119,7 @@ class SongListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
         observeViewModel()
+        observePlaybackState()
         setupBackPressHandler()
     }
 
@@ -188,7 +195,6 @@ class SongListFragment : Fragment() {
         if (startIndex < 0) {
             return
         }
-        val playerRepository: PlayerRepository = resolvePlayerRepository()
         playerRepository.setQueue(
             songs = songs,
             startIndex = startIndex,
@@ -198,6 +204,22 @@ class SongListFragment : Fragment() {
             resId = R.id.action_songListFragment_to_playerFragment,
             args = null,
         )
+    }
+
+    /**
+     * 观察播放状态变化
+     */
+    private fun observePlaybackState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                playerRepository.playbackState.collect { state ->
+                    adapter.updatePlaybackState(
+                        currentSongId = state.currentSong?.id,
+                        isPlaying = state.isPlaying,
+                    )
+                }
+            }
+        }
     }
 
     /**
