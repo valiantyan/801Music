@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.valiantyan.music801.data.repository.PlayerRepository
 import com.valiantyan.music801.domain.model.PlaybackState
+import com.valiantyan.music801.domain.model.Song
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -52,6 +53,19 @@ class PlayerViewModel(
      */
     fun pause(): Unit {
         playerRepository.pause()
+    }
+
+    /**
+     * 设置播放队列
+     *
+     * @param songs 播放队列
+     * @param startIndex 起始索引
+     */
+    fun setQueue(
+        songs: List<Song>,
+        startIndex: Int,
+    ): Unit {
+        playerRepository.setQueue(songs = songs, startIndex = startIndex)
     }
 
     /**

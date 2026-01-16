@@ -72,18 +72,50 @@ class PlayerViewModelTest {
         whenever(repository.playbackState).thenReturn(inputStateFlow)
         viewModel = PlayerViewModel(repository)
         // Act
+        viewModel.setQueue(
+            songs = listOf(createSong(id = "/storage/music/song1.mp3", title = "Song 1")),
+            startIndex = 0,
+        )
         viewModel.play()
         viewModel.seekTo(position = 1000L)
         viewModel.pause()
         viewModel.skipToNext()
         viewModel.skipToPrevious()
         // Assert
+        verify(repository).setQueue(
+            songs = listOf(createSong(id = "/storage/music/song1.mp3", title = "Song 1")),
+            startIndex = 0,
+        )
         verify(repository).play()
         verify(repository).seekTo(position = 1000L)
         verify(repository).pause()
         verify(repository).skipToNext()
         verify(repository).skipToPrevious()
         assertFalse(viewModel.uiState.value.isLoading)
+    }
+
+    @Test
+    fun `设置队列后应同步当前歌曲信息`() : Unit = runTest {
+        // Arrange
+        val inputSong: Song = createSong(id = "/storage/music/song1.mp3", title = "Song 1")
+        val inputStateFlow: MutableStateFlow<PlaybackState> = MutableStateFlow(PlaybackState())
+        whenever(repository.playbackState).thenReturn(inputStateFlow)
+        viewModel = PlayerViewModel(repository)
+        // Act
+        inputStateFlow.value = PlaybackState(
+            currentSong = inputSong,
+            isPlaying = false,
+            position = 0L,
+            duration = 180000L,
+            queue = listOf(inputSong),
+            currentIndex = 0,
+        )
+        advanceUntilIdle()
+        val actualState: PlayerUiState = viewModel.uiState.value
+        // Assert
+        assertEquals(inputSong, actualState.currentSong)
+        assertEquals(0, actualState.currentIndex)
+        assertEquals(1, actualState.queue.size)
     }
 
     private fun createSong(
