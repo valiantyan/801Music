@@ -14,8 +14,13 @@ import androidx.fragment.app.add
 import androidx.fragment.app.commitNow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.Navigation
+import androidx.navigation.testing.TestNavHostController
+import androidx.recyclerview.widget.RecyclerView
 import com.valiantyan.music801.R
 import com.valiantyan.music801.data.repository.AudioRepository
+import com.valiantyan.music801.data.repository.PlayerRepository
+import com.valiantyan.music801.di.PlayerRepositoryProvider
 import com.valiantyan.music801.domain.model.Song
 import com.valiantyan.music801.viewmodel.SongListUiState
 import com.valiantyan.music801.viewmodel.SongListViewModel
@@ -26,6 +31,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
@@ -37,10 +43,12 @@ import org.robolectric.annotation.Config
 class SongListFragmentTest {
     private lateinit var repository: AudioRepository
     private lateinit var viewModelFactory: ViewModelProvider.Factory
+    private lateinit var playerRepository: PlayerRepository
 
     @Before
     fun setup() {
         repository = mock()
+        playerRepository = mock()
         whenever(repository.getAllSongs()).thenReturn(flowOf(emptyList()))
         viewModelFactory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
@@ -117,8 +125,36 @@ class SongListFragmentTest {
         assertTrue(listState != null)
     }
 
+    @Test
+    fun `点击歌曲后应设置队列并导航到播放页`() {
+        val songs: List<Song> = createSongs(count = 2)
+        whenever(repository.getAllSongs()).thenReturn(flowOf(songs))
+        val fragment: SongListFragment = launchFragment()
+        val navController: TestNavHostController = createNavController(fragment = fragment)
+        Navigation.setViewNavController(fragment.requireView(), navController)
+        idleMainLooper()
+        val recyclerView: RecyclerView = fragment.requireView().findViewById(R.id.songListRecyclerView)
+        val adapter: SongListAdapter = recyclerView.adapter as SongListAdapter
+        val context = fragment.requireContext()
+        val viewHolder: SongListAdapter.SongViewHolder = adapter.onCreateViewHolder(
+            parent = FrameLayout(context),
+            viewType = 0,
+        )
+        adapter.onBindViewHolder(
+            holder = viewHolder,
+            position = 0,
+        )
+        viewHolder.itemView.performClick()
+        verify(playerRepository).setQueue(
+            songs = songs,
+            startIndex = 0,
+        )
+        assertEquals(R.id.playerFragment, navController.currentDestination?.id)
+    }
+
     private fun launchFragment(): SongListFragment {
-        val activityController = Robolectric.buildActivity(FragmentActivity::class.java)
+        TestPlayerActivity.playerRepository = playerRepository
+        val activityController = Robolectric.buildActivity(TestPlayerActivity::class.java)
         activityController.setup()
         val activity: FragmentActivity = activityController.get()
         activity.setTheme(R.style.Theme_music801)
@@ -139,6 +175,13 @@ class SongListFragmentTest {
 
     private fun idleMainLooper() {
         Shadows.shadowOf(Looper.getMainLooper()).idle()
+    }
+
+    private fun createNavController(fragment: SongListFragment): TestNavHostController {
+        val navController = TestNavHostController(fragment.requireContext())
+        navController.setGraph(R.navigation.nav_graph)
+        navController.setCurrentDestination(R.id.songListFragment)
+        return navController
     }
 
     private fun invokeUpdateUi(fragment: SongListFragment, state: SongListUiState) {
@@ -180,5 +223,15 @@ private class TestFragmentFactory(
             fragment.viewModelFactoryForTest = viewModelFactory
         }
         return fragment
+    }
+}
+
+private class TestPlayerActivity : FragmentActivity(), PlayerRepositoryProvider {
+    override fun providePlayerRepository(): PlayerRepository {
+        return playerRepository
+    }
+
+    companion object {
+        lateinit var playerRepository: PlayerRepository
     }
 }

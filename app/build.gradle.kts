@@ -83,6 +83,7 @@ dependencies {
     // Navigation
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
+    testImplementation(libs.androidx.navigation.testing)
 
     // Testing
     testImplementation(libs.junit)

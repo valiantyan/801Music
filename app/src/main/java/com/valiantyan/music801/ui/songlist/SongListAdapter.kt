@@ -93,9 +93,20 @@ class SongListAdapter(
         if (this.currentSongId == currentSongId && this.isPlaying == isPlaying) {
             return
         }
+        val previousSongId: String? = this.currentSongId
         this.currentSongId = currentSongId
         this.isPlaying = isPlaying
-        notifyDataSetChanged()
+        val previousIndex: Int = findIndexById(songId = previousSongId)
+        val currentIndex: Int = findIndexById(songId = currentSongId)
+        if (previousIndex >= 0) {
+            notifyItemChanged(previousIndex)
+        }
+        if (currentIndex >= 0 && currentIndex != previousIndex) {
+            notifyItemChanged(currentIndex)
+        }
+        if (previousIndex < 0 && currentIndex < 0) {
+            notifyDataSetChanged()
+        }
     }
 
     /**
@@ -178,5 +189,18 @@ class SongListAdapter(
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
             return oldItems[oldItemPosition] == newItems[newItemPosition]
         }
+    }
+
+    /**
+     * 根据歌曲 ID 定位索引
+     *
+     * @param songId 歌曲 ID
+     * @return 对应索引，未找到返回 -1
+     */
+    private fun findIndexById(songId: String?): Int {
+        if (songId == null) {
+            return -1
+        }
+        return items.indexOfFirst { song -> song.id == songId }
     }
 }

@@ -212,7 +212,7 @@ class MediaQueueManager {
     - *Test Case*: UI 测试 - 当前播放歌曲高亮显示
     - *Test Case*: UI 测试 - 播放状态实时同步
 
-- [ ] **Task 12**: 集成测试和性能优化
+- [x] **Task 12**: 集成测试和性能优化
     - *Test Case*: 端到端测试 - 完整播放流程
     - *Test Case*: 性能测试 - 播放启动延迟 < 500ms
     - *Test Case*: 边界测试 - 单首歌曲、空队列、队列切换
@@ -248,6 +248,8 @@ class MediaQueueManager {
 - [x] 2025-01-27 修复播放页使用共享 [PlayerRepository]，保证歌曲信息正确显示。
 - [x] 2025-01-27 运行单元测试：`./gradlew :app:testDebugUnitTest`。
 - [x] 2025-01-27 列表增加播放标识并同步播放状态，补充 [SongListAdapterTest]。
+- [x] 2025-01-27 运行单元测试：`./gradlew :app:testDebugUnitTest`。
+- [x] 2025-01-27 增加列表到播放的集成测试并优化播放标识更新性能。
 - [x] 2025-01-27 运行单元测试：`./gradlew :app:testDebugUnitTest`。
 - [x] 2025-01-27 Bug 描述：播放页标题/艺术家为空。
   问题原因：[SongListFragment] 使用共享 [PlayerRepository] 设置队列，但 [PlayerFragment] 仍新建仓库导致状态不一致。
