@@ -201,7 +201,7 @@ val exoPlayer = ExoPlayer.Builder(context)
     - *Test Case*: 测试格式不支持错误处理
     - *Test Case*: 测试错误恢复逻辑
 
-- [ ] **Task 10**: 实现音频焦点管理
+- [x] **Task 10**: 实现音频焦点管理
     - *Test Case*: 测试音频焦点请求
     - *Test Case*: 测试音频焦点丢失处理
     - *Test Case*: 测试音频焦点恢复处理
@@ -236,6 +236,7 @@ val exoPlayer = ExoPlayer.Builder(context)
 - [x] 2025-01-27 完成 Task 7：监听播放器状态并转换为 PlaybackState，补充映射测试。
 - [x] 2025-01-27 完成 Task 8：实现进度更新任务并补充周期更新测试。
 - [x] 2025-01-27 完成 Task 9：补充错误处理逻辑并验证错误状态更新。
+- [x] 2025-01-27 完成 Task 10：接入音频焦点管理并补充失焦测试。
 
 ---
 

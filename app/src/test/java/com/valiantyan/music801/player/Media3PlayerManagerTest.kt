@@ -202,6 +202,21 @@ class Media3PlayerManagerTest {
         manager.release()
     }
 
+    @Test
+    fun `失去音频焦点后应暂停播放`() {
+        // Arrange - 先触发播放再模拟失去焦点
+        val context: Application = RuntimeEnvironment.getApplication()
+        val manager: Media3PlayerManager = Media3PlayerManager(context = context)
+        val inputUri: android.net.Uri = android.net.Uri.parse("file:///storage/emulated/0/Music/test.mp3")
+        manager.play(uri = inputUri)
+        // Act
+        manager.handleAudioFocusChange(focusChange = android.media.AudioManager.AUDIOFOCUS_LOSS)
+        val actualPlayWhenReady: Boolean = manager.exoPlayer.playWhenReady
+        // Assert
+        assertBooleanEquals(expected = false, actual = actualPlayWhenReady)
+        manager.release()
+    }
+
     private fun assertIntEquals(
         expected: Int,
         actual: Int,
