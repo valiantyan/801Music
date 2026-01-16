@@ -4,6 +4,7 @@ import android.app.Application
 import android.os.Build
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
+import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -20,7 +21,7 @@ import org.robolectric.RuntimeEnvironment
 @Config(sdk = [Build.VERSION_CODES.TIRAMISU])
 class Media3PlayerManagerTest {
     @Test
-    fun init_createsExoPlayerInstance() {
+    fun `初始化后应创建ExoPlayer实例`() {
         // Arrange - 创建管理器用于验证播放器实例
         val context: Application = RuntimeEnvironment.getApplication()
         // Act
@@ -32,7 +33,7 @@ class Media3PlayerManagerTest {
     }
 
     @Test
-    fun init_configuresAudioAttributes() {
+    fun `初始化后应配置音频属性`() {
         // Arrange - 创建管理器用于验证音频属性
         val context: Application = RuntimeEnvironment.getApplication()
         val manager: Media3PlayerManager = Media3PlayerManager(context = context)
@@ -44,9 +45,63 @@ class Media3PlayerManagerTest {
         manager.release()
     }
 
+    @Test
+    fun `调用播放后应设置媒体项并准备播放`() {
+        // Arrange - 创建管理器与音频 Uri
+        val context: Application = RuntimeEnvironment.getApplication()
+        val manager: Media3PlayerManager = Media3PlayerManager(context = context)
+        val inputUri: android.net.Uri = android.net.Uri.parse("file:///storage/emulated/0/Music/test.mp3")
+        // Act
+        manager.play(uri = inputUri)
+        val actualUri: android.net.Uri? = manager.exoPlayer.currentMediaItem?.localConfiguration?.uri
+        val actualPlayWhenReady: Boolean = manager.exoPlayer.playWhenReady
+        // Assert
+        assertNotNull(actualUri)
+        assertBooleanEquals(expected = true, actual = actualPlayWhenReady)
+        manager.release()
+    }
+
+    @Test
+    fun `调用暂停后应停止播放`() {
+        // Arrange - 先触发播放再验证暂停
+        val context: Application = RuntimeEnvironment.getApplication()
+        val manager: Media3PlayerManager = Media3PlayerManager(context = context)
+        val inputUri: android.net.Uri = android.net.Uri.parse("file:///storage/emulated/0/Music/test.mp3")
+        manager.play(uri = inputUri)
+        // Act
+        manager.pause()
+        val actualPlayWhenReady: Boolean = manager.exoPlayer.playWhenReady
+        // Assert
+        assertBooleanEquals(expected = false, actual = actualPlayWhenReady)
+        manager.release()
+    }
+
+    @Test
+    fun `调用停止后应回到空闲状态`() {
+        // Arrange - 先触发播放再验证停止状态
+        val context: Application = RuntimeEnvironment.getApplication()
+        val manager: Media3PlayerManager = Media3PlayerManager(context = context)
+        val inputUri: android.net.Uri = android.net.Uri.parse("file:///storage/emulated/0/Music/test.mp3")
+        manager.play(uri = inputUri)
+        // Act
+        manager.stop()
+        val actualState: Int = manager.exoPlayer.playbackState
+        // Assert
+        assertIntEquals(expected = Player.STATE_IDLE, actual = actualState)
+        manager.release()
+    }
+
     private fun assertIntEquals(
         expected: Int,
         actual: Int,
+    ): Unit {
+        // JUnit Java API 不支持命名参数，使用位置参数
+        assertEquals(expected, actual)
+    }
+
+    private fun assertBooleanEquals(
+        expected: Boolean,
+        actual: Boolean,
     ): Unit {
         // JUnit Java API 不支持命名参数，使用位置参数
         assertEquals(expected, actual)

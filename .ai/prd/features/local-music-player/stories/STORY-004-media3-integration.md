@@ -179,7 +179,7 @@ val exoPlayer = ExoPlayer.Builder(context)
     - *Test Case*: 测试 ExoPlayer 实例创建
     - *Test Case*: 测试音频属性配置
 
-- [ ] **Task 5**: 实现播放控制（播放、暂停、停止）
+- [x] **Task 5**: 实现播放控制（播放、暂停、停止）
     - *Test Case*: 测试播放本地音频文件
     - *Test Case*: 测试暂停和恢复功能
     - *Test Case*: 测试停止功能
@@ -231,6 +231,7 @@ val exoPlayer = ExoPlayer.Builder(context)
 - [x] 2025-01-27 完成 Task 2：扩展 PlaybackState 字段以覆盖播放缓冲、状态与错误信息。
 - [x] 2025-01-27 完成 Task 3：定义 MediaPlayerManager 接口以统一播放控制与状态流出口。
 - [x] 2025-01-27 完成 Task 4：实现 Media3 ExoPlayer 初始化与音频属性配置并补充测试。
+- [x] 2025-01-27 完成 Task 5：补充播放控制行为测试并验证播放/暂停/停止路径。
 
 ---
 
