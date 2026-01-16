@@ -5,7 +5,7 @@ type: Feature
 epic_id: "FEAT-001"
 feature_title: "本地音乐播放器"
 target_version: "v1.0"
-status: 草稿
+status: 进行中
 priority: High
 assignee: AI_Agent
 created_date: "2025-01-27"
@@ -226,7 +226,7 @@ val exoPlayer = ExoPlayer.Builder(context)
 ## 6. Development Notes & Log (开发笔记与日志)
 
 **(Current Log):**
-- [ ] 
+- [x] 2025-01-27 完成 Pre-flight Check：未发现 Media3/ExoPlayer 集成实现，仅存在播放队列与播放状态内存实现，需按 Story 启动集成。
 
 ---
 
