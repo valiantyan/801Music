@@ -20,7 +20,7 @@ import com.valiantyan.music801.data.datasource.AudioFileScanner
 import com.valiantyan.music801.data.datasource.MediaMetadataExtractor
 import com.valiantyan.music801.data.repository.AudioRepository
 import com.valiantyan.music801.data.repository.PlayerRepository
-import com.valiantyan.music801.data.repository.PlayerRepositoryImpl
+import com.valiantyan.music801.di.PlayerRepositoryHolder
 import com.valiantyan.music801.databinding.FragmentSongListBinding
 import com.valiantyan.music801.di.AudioRepositoryProvider
 import com.valiantyan.music801.di.PlayerRepositoryProvider
@@ -297,12 +297,7 @@ class SongListFragment : Fragment() {
         if (provider != null) {
             return provider.providePlayerRepository()
         }
-        val mediaPlayerManager: com.valiantyan.music801.player.MediaPlayerManager =
-            com.valiantyan.music801.player.Media3PlayerManager(context = requireContext())
-        return PlayerRepositoryImpl(
-            mediaQueueManager = MediaQueueManager(),
-            mediaPlayerManager = mediaPlayerManager,
-        )
+        return PlayerRepositoryHolder.getOrCreate(context = requireContext())
     }
 
     /**

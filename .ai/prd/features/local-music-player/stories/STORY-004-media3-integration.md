@@ -240,6 +240,7 @@ val exoPlayer = ExoPlayer.Builder(context)
 - [x] 2025-01-27 优化 Task 10：拆分音频焦点管理为独立组件以符合职责划分。
 - [x] 2025-01-27 完成 Task 11：在 Activity 销毁时释放播放器资源并补充仓库释放接口。
 - [x] 2025-01-27 完成 Task 12：接入 MediaPlayerManager 并补充仓库集成测试。
+- [x] 2025-01-27 完成 Task 13：补充单例复用与启动耗时性能测试。
 
 ---
 

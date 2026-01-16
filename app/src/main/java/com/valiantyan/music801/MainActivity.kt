@@ -14,6 +14,7 @@ import com.valiantyan.music801.data.repository.AudioRepository
 import com.valiantyan.music801.data.repository.PlayerRepository
 import com.valiantyan.music801.data.repository.PlayerRepositoryImpl
 import com.valiantyan.music801.di.AudioRepositoryProvider
+import com.valiantyan.music801.di.PlayerRepositoryHolder
 import com.valiantyan.music801.di.PlayerRepositoryProvider
 import com.valiantyan.music801.player.MediaQueueManager
 import com.valiantyan.music801.util.PermissionHelper
@@ -154,13 +155,7 @@ class MainActivity : AppCompatActivity(), AudioRepositoryProvider, PlayerReposit
      * 创建播放器仓库实例
      */
     private fun createPlayerRepository(): PlayerRepository {
-        val queueManager: MediaQueueManager = MediaQueueManager()
-        val mediaPlayerManager: com.valiantyan.music801.player.MediaPlayerManager =
-            com.valiantyan.music801.player.Media3PlayerManager(context = this)
-        return PlayerRepositoryImpl(
-            mediaQueueManager = queueManager,
-            mediaPlayerManager = mediaPlayerManager,
-        )
+        return PlayerRepositoryHolder.getOrCreate(context = this)
     }
 
     /**
@@ -188,7 +183,7 @@ class MainActivity : AppCompatActivity(), AudioRepositoryProvider, PlayerReposit
     override fun onDestroy() {
         super.onDestroy()
         if (isFinishing) {
-            playerRepository.release()
+            PlayerRepositoryHolder.clear()
         }
     }
 }
