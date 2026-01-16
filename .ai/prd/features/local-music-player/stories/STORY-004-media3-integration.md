@@ -241,6 +241,10 @@ val exoPlayer = ExoPlayer.Builder(context)
 - [x] 2025-01-27 完成 Task 11：在 Activity 销毁时释放播放器资源并补充仓库释放接口。
 - [x] 2025-01-27 完成 Task 12：接入 MediaPlayerManager 并补充仓库集成测试。
 - [x] 2025-01-27 完成 Task 13：补充单例复用与启动耗时性能测试。
+- Bug 描述：点击歌曲列表项或播放页“播放”按钮后，仅触发播放请求但无任何声音输出，日志显示进入 [PlayerRepositoryImpl.play] 与 [Media3PlayerManager.play]，随后迅速出现音频焦点丢失并停止播放。
+问题原因：播放流程改为手动管理音频焦点，同时在 [ExoPlayer] 侧关闭自动焦点；系统在播放启动后立即回调 `AUDIOFOCUS_LOSS(-1)`，导致我们主动暂停并释放焦点，播放被打断。另一个问题是播放路径使用文件路径构建 Uri，部分机型对裸路径解析不稳定，导致文件路径与实际播放源不一致。
+解决方案：恢复 [ExoPlayer] 自动音频焦点管理（`setAudioAttributes(..., true)`），移除手动焦点处理逻辑；播放时使用 [Uri.fromFile] 生成文件 Uri；列表点击后显式调用 [PlayerRepository.play] 以保证立刻开始播放；同时补充日志与测试用临时文件避免误判。
+影响范围：播放启动流程、音频焦点管理策略、列表点击行为与播放器测试用例。
 
 ---
 

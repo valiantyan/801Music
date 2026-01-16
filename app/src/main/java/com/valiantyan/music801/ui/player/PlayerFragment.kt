@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -27,6 +28,12 @@ import kotlinx.coroutines.launch
  * 负责展示播放信息与基础控制，订阅 [PlayerViewModel] 状态更新。
  */
 class PlayerFragment : Fragment() {
+    /**
+     * 日志标签
+     */
+    private companion object {
+        private const val TAG: String = "PlayerFragment"
+    }
     /**
      * ViewBinding
      */
@@ -174,6 +181,7 @@ class PlayerFragment : Fragment() {
      */
     private fun handlePlayPause(): Unit {
         val isPlaying: Boolean = viewModel.uiState.value.isPlaying
+        Log.d(TAG, "playPause click: isPlaying=$isPlaying")
         if (isPlaying) {
             viewModel.pause()
         } else {

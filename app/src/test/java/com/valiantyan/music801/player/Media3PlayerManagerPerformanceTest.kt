@@ -21,7 +21,7 @@ class Media3PlayerManagerPerformanceTest {
         // Arrange - 创建播放器与测试 Uri
         val context: Application = RuntimeEnvironment.getApplication()
         val manager: Media3PlayerManager = Media3PlayerManager(context = context)
-        val inputUri: android.net.Uri = android.net.Uri.parse("file:///storage/emulated/0/Music/test.mp3")
+        val inputUri: android.net.Uri = buildTempAudioUri(context = context)
         // Act
         val startTimeMs: Long = SystemClock.elapsedRealtime()
         manager.play(uri = inputUri)
@@ -29,5 +29,16 @@ class Media3PlayerManagerPerformanceTest {
         // Assert
         assertTrue(elapsedMs < 500L)
         manager.release()
+    }
+
+    /**
+     * 创建用于测试的临时音频文件 Uri
+     */
+    private fun buildTempAudioUri(context: Application): android.net.Uri {
+        val file: java.io.File = java.io.File(context.cacheDir, "test-audio.mp3")
+        if (!file.exists()) {
+            file.writeBytes(byteArrayOf(0x00))
+        }
+        return android.net.Uri.fromFile(file)
     }
 }

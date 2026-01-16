@@ -2,6 +2,7 @@ package com.valiantyan.music801.player
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
@@ -9,6 +10,7 @@ import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import com.valiantyan.music801.domain.model.PlaybackState
+import java.io.File
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -40,14 +42,6 @@ class Media3PlayerManager(
      */
     private val progressUpdateIntervalMs: Long = progressUpdateIntervalMs
     /**
-     * 记录焦点变更前音量，以便恢复用户音量
-     */
-    private var lastVolume: Float = 1.0f
-    /**
-     * 标记焦点恢复后是否需要自动恢复播放
-     */
-    private var resumeOnFocusGain: Boolean = false
-    /**
      * 持有更新任务的协程作用域以便统一取消
      */
     private val coroutineScope: CoroutineScope = CoroutineScope(SupervisorJob() + dispatcher)
@@ -75,15 +69,6 @@ class Media3PlayerManager(
      * 记录最近一次播放错误，避免被进度刷新覆盖
      */
     private var lastError: PlaybackException? = null
-    /**
-     * 音频焦点管理器，负责系统级焦点申请与释放
-     */
-    private val audioFocusManager: AudioFocusManager = AudioFocusManager(
-        context = context,
-        onFocusChange = { focusChange ->
-            handleAudioFocusChange(focusChange = focusChange)
-        },
-    )
 
     init {
         // 统一监听入口，避免多处订阅造成状态不一致
@@ -98,12 +83,15 @@ class Media3PlayerManager(
      * @param uri 音频资源 [Uri]
      */
     override fun play(uri: Uri): Unit {
-        if (!audioFocusManager.requestFocus()) {
+        Log.d(TAG, "play request: $uri")
+        val file: File? = uri.path?.let { path -> File(path) }
+        if (file != null && !file.exists()) {
+            Log.e(TAG, "play file not found: ${file.absolutePath}")
             handlePlaybackError(
                 error = PlaybackException(
-                    "audio-focus-denied",
+                    "file-not-found",
                     null,
-                    PlaybackException.ERROR_CODE_FAILED_RUNTIME_CHECK,
+                    PlaybackException.ERROR_CODE_IO_FILE_NOT_FOUND,
                 ),
             )
             return
@@ -120,7 +108,6 @@ class Media3PlayerManager(
      */
     override fun pause(): Unit {
         exoPlayer.pause()
-        audioFocusManager.abandonFocus()
     }
 
     /**
@@ -135,7 +122,6 @@ class Media3PlayerManager(
      */
     override fun stop(): Unit {
         exoPlayer.stop()
-        audioFocusManager.abandonFocus()
     }
 
     /**
@@ -163,7 +149,6 @@ class Media3PlayerManager(
         exoPlayer.removeListener(playerListener)
         stopProgressUpdates()
         coroutineScope.cancel()
-        audioFocusManager.abandonFocus()
         exoPlayer.release()
     }
 
@@ -199,6 +184,7 @@ class Media3PlayerManager(
     private fun buildPlayerListener(): Player.Listener {
         val listener: Player.Listener = object : Player.Listener {
             override fun onIsPlayingChanged(isPlaying: Boolean): Unit {
+                Log.d(TAG, "isPlaying changed: $isPlaying")
                 if (isPlaying) {
                     clearPlaybackError()
                 }
@@ -206,10 +192,16 @@ class Media3PlayerManager(
             }
 
             override fun onPlaybackStateChanged(playbackState: Int): Unit {
+                Log.d(TAG, "playbackState changed: $playbackState")
                 updatePlaybackState(error = null)
             }
 
             override fun onPlayerError(error: PlaybackException): Unit {
+                Log.e(
+                    TAG,
+                    "player error: ${PlaybackException.getErrorCodeName(error.errorCode)}",
+                    error,
+                )
                 handlePlaybackError(error = error)
             }
 
@@ -292,53 +284,7 @@ class Media3PlayerManager(
      */
     internal fun handlePlaybackError(error: PlaybackException): Unit {
         exoPlayer.stop()
-        audioFocusManager.abandonFocus()
         updatePlaybackState(error = error)
-    }
-
-    /**
-     * 处理音频焦点变化，确保播放行为与系统规则一致
-     *
-     * @param focusChange 音频焦点变化类型
-     */
-    internal fun handleAudioFocusChange(focusChange: Int): Unit {
-        when (focusChange) {
-            android.media.AudioManager.AUDIOFOCUS_GAIN -> {
-                restoreVolume()
-                if (resumeOnFocusGain) {
-                    resumeOnFocusGain = false
-                    exoPlayer.play()
-                }
-            }
-            android.media.AudioManager.AUDIOFOCUS_LOSS -> {
-                resumeOnFocusGain = false
-                exoPlayer.pause()
-                audioFocusManager.abandonFocus()
-            }
-            android.media.AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
-                resumeOnFocusGain = exoPlayer.isPlaying
-                exoPlayer.pause()
-            }
-            android.media.AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> {
-                resumeOnFocusGain = exoPlayer.isPlaying
-                duckVolume()
-            }
-        }
-    }
-
-    /**
-     * 降低音量以响应 [AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK]
-     */
-    private fun duckVolume(): Unit {
-        lastVolume = exoPlayer.volume
-        exoPlayer.volume = DUCK_VOLUME
-    }
-
-    /**
-     * 恢复音量，避免长期保持低音量
-     */
-    private fun restoreVolume(): Unit {
-        exoPlayer.volume = lastVolume
     }
 
     /**
@@ -356,12 +302,13 @@ class Media3PlayerManager(
 
     private companion object {
         /**
+         * 日志标签
+         */
+        private const val TAG: String = "Media3PlayerManager"
+
+        /**
          * 默认进度更新间隔（500ms）
          */
         private const val DEFAULT_PROGRESS_UPDATE_INTERVAL_MS: Long = 500L
-        /**
-         * 音量降低比例（20%）
-         */
-        private const val DUCK_VOLUME: Float = 0.2f
     }
 }

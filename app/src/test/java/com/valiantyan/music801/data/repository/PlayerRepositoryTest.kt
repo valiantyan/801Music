@@ -5,6 +5,7 @@ import android.net.Uri
 import com.valiantyan.music801.domain.model.PlaybackState
 import com.valiantyan.music801.player.MediaPlayerManager
 import com.valiantyan.music801.player.MediaQueueManager
+import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,7 +50,7 @@ class PlayerRepositoryTest {
         assertFalse(actualState.isPlaying)
         assertEqualsLong(expected = 1200L, actual = actualState.position)
         assertEqualsInt(expected = 0, actual = actualState.currentIndex)
-        assertEqualsAny(expected = Uri.parse(inputSongs[0].filePath), actual = fakeManager.lastUri)
+        assertEqualsAny(expected = Uri.fromFile(File(inputSongs[0].filePath)), actual = fakeManager.lastUri)
     }
 
     @Test

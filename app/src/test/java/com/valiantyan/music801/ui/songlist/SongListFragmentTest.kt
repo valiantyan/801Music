@@ -149,6 +149,7 @@ class SongListFragmentTest {
             songs = songs,
             startIndex = 0,
         )
+        verify(playerRepository).play()
         assertEquals(R.id.playerFragment, navController.currentDestination?.id)
     }
 

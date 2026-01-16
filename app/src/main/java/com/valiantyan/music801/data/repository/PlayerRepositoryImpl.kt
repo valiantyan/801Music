@@ -1,10 +1,12 @@
 package com.valiantyan.music801.data.repository
 
 import android.net.Uri
+import java.io.File
 import com.valiantyan.music801.domain.model.PlaybackState
 import com.valiantyan.music801.domain.model.Song
 import com.valiantyan.music801.player.MediaPlayerManager
 import com.valiantyan.music801.player.MediaQueueManager
+import android.util.Log
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -31,6 +33,12 @@ class PlayerRepositoryImpl(
     private val mediaPlayerManager: MediaPlayerManager,
     dispatcher: CoroutineDispatcher = Dispatchers.Main.immediate,
 ) : PlayerRepository {
+    /**
+     * 日志标签
+     */
+    private companion object {
+        private const val TAG: String = "PlayerRepositoryImpl"
+    }
     /**
      * 用于监听播放状态的协程作用域
      */
@@ -68,9 +76,11 @@ class PlayerRepositoryImpl(
     override fun play(): Unit {
         val currentSong: Song? = _playbackState.value.currentSong
         if (currentSong == null) {
+            Log.d(TAG, "play skipped: currentSong is null")
             return
         }
-        val mediaUri: Uri = Uri.parse(currentSong.filePath)
+        Log.d(TAG, "play request: ${currentSong.filePath}")
+        val mediaUri: Uri = Uri.fromFile(File(currentSong.filePath))
         mediaPlayerManager.play(uri = mediaUri)
     }
 

@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import android.util.Log
 import androidx.activity.OnBackPressedCallback
 import androidx.core.os.BundleCompat
 import androidx.fragment.app.Fragment
@@ -37,6 +38,22 @@ import kotlinx.coroutines.launch
  * 展示扫描结果的歌曲列表，支持空状态与加载状态。
  */
 class SongListFragment : Fragment() {
+    /**
+     * 日志标签
+     */
+    private companion object {
+        private const val TAG: String = "SongListFragment"
+
+        /**
+         * 列表滚动状态存储键
+         */
+        private const val KEY_LIST_STATE: String = "song_list_state"
+
+        /**
+         * 退出应用的双击间隔(2000ms)
+         */
+        private const val EXIT_INTERVAL_MS: Long = 2000L
+    }
     /**
      * 视图绑定缓存
      */
@@ -189,16 +206,20 @@ class SongListFragment : Fragment() {
     private fun handleSongClick(song: Song) {
         val songs: List<Song> = viewModel.uiState.value.songs
         if (songs.isEmpty()) {
+            Log.d(TAG, "song click ignored: empty list")
             return
         }
         val startIndex: Int = songs.indexOf(song)
         if (startIndex < 0) {
+            Log.d(TAG, "song click ignored: index not found")
             return
         }
+        Log.d(TAG, "song click play: index=$startIndex path=${song.filePath}")
         playerRepository.setQueue(
             songs = songs,
             startIndex = startIndex,
         )
+        playerRepository.play()
         val navController = findNavController()
         navController.navigate(
             resId = R.id.action_songListFragment_to_playerFragment,
@@ -341,15 +362,4 @@ class SongListFragment : Fragment() {
         _binding = null
     }
 
-    private companion object {
-        /**
-         * 列表滚动状态存储键
-         */
-        private const val KEY_LIST_STATE: String = "song_list_state"
-
-        /**
-         * 退出应用的双击间隔(2000ms)
-         */
-        private const val EXIT_INTERVAL_MS: Long = 2000L
-    }
 }
