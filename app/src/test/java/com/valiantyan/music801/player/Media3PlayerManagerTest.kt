@@ -176,6 +176,32 @@ class Media3PlayerManagerTest {
         manager.release()
     }
 
+    @Test
+    fun `发生播放错误后应更新错误状态`() = runBlocking {
+        // Arrange - 模拟播放错误回调
+        val context: Application = RuntimeEnvironment.getApplication()
+        val manager: Media3PlayerManager = Media3PlayerManager(
+            context = context,
+            progressUpdateIntervalMs = 100L,
+            dispatcher = Dispatchers.Default,
+        )
+        val inputError: PlaybackException = PlaybackException(
+            "test-error",
+            null,
+            PlaybackException.ERROR_CODE_UNSPECIFIED,
+        )
+        // Act
+        manager.playbackState().test {
+            awaitItem()
+            manager.handlePlaybackError(error = inputError)
+            val updatedState: PlaybackState = awaitItem()
+            // Assert
+            assertEquals(inputError, updatedState.error)
+            cancelAndIgnoreRemainingEvents()
+        }
+        manager.release()
+    }
+
     private fun assertIntEquals(
         expected: Int,
         actual: Int,

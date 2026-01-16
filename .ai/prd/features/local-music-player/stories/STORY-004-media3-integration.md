@@ -196,7 +196,7 @@ val exoPlayer = ExoPlayer.Builder(context)
     - *Test Case*: 测试进度实时更新
     - *Test Case*: 测试缓冲进度更新
 
-- [ ] **Task 9**: 实现错误处理
+- [x] **Task 9**: 实现错误处理
     - *Test Case*: 测试文件不存在错误处理
     - *Test Case*: 测试格式不支持错误处理
     - *Test Case*: 测试错误恢复逻辑
@@ -235,6 +235,7 @@ val exoPlayer = ExoPlayer.Builder(context)
 - [x] 2025-01-27 完成 Task 6：补充进度跳转测试并验证 seekTo 行为。
 - [x] 2025-01-27 完成 Task 7：监听播放器状态并转换为 PlaybackState，补充映射测试。
 - [x] 2025-01-27 完成 Task 8：实现进度更新任务并补充周期更新测试。
+- [x] 2025-01-27 完成 Task 9：补充错误处理逻辑并验证错误状态更新。
 
 ---
 

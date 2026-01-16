@@ -63,6 +63,10 @@ class Media3PlayerManager(
      */
     private val playbackStateFlow: MutableStateFlow<PlaybackState> =
         MutableStateFlow(PlaybackState())
+    /**
+     * 记录最近一次播放错误，避免被进度刷新覆盖
+     */
+    private var lastError: PlaybackException? = null
 
     init {
         // 统一监听入口，避免多处订阅造成状态不一致
@@ -77,6 +81,7 @@ class Media3PlayerManager(
      * @param uri 音频资源 [Uri]
      */
     override fun play(uri: Uri): Unit {
+        clearPlaybackError()
         val mediaItem: MediaItem = MediaItem.fromUri(uri)
         exoPlayer.setMediaItem(mediaItem)
         exoPlayer.prepare()
@@ -163,6 +168,9 @@ class Media3PlayerManager(
     private fun buildPlayerListener(): Player.Listener {
         val listener: Player.Listener = object : Player.Listener {
             override fun onIsPlayingChanged(isPlaying: Boolean): Unit {
+                if (isPlaying) {
+                    clearPlaybackError()
+                }
                 updatePlaybackState(error = null)
             }
 
@@ -171,7 +179,7 @@ class Media3PlayerManager(
             }
 
             override fun onPlayerError(error: PlaybackException): Unit {
-                updatePlaybackState(error = error)
+                handlePlaybackError(error = error)
             }
 
             override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int): Unit {
@@ -205,12 +213,22 @@ class Media3PlayerManager(
     }
 
     /**
+     * 清理错误状态，避免成功播放后仍展示旧错误
+     */
+    private fun clearPlaybackError(): Unit {
+        lastError = null
+    }
+
+    /**
      * 统一更新 [PlaybackState]，避免多处写入导致状态不一致
      */
     private fun updatePlaybackState(error: PlaybackException?): Unit {
+        if (error != null) {
+            lastError = error
+        }
         val state: PlaybackState = buildPlaybackState(
             player = exoPlayer,
-            error = error,
+            error = resolvePlaybackError(error = error),
         )
         playbackStateFlow.value = state
     }
@@ -234,6 +252,29 @@ class Media3PlayerManager(
             playbackState = player.playbackState,
             error = error,
         )
+    }
+
+    /**
+     * 处理播放错误并同步状态，确保错误信息可被上层观察
+     *
+     * @param error 播放异常
+     */
+    internal fun handlePlaybackError(error: PlaybackException): Unit {
+        exoPlayer.stop()
+        updatePlaybackState(error = error)
+    }
+
+    /**
+     * 优先返回最新错误，避免刷新逻辑清空错误状态
+     *
+     * @param error 当前回调携带的错误
+     * @return 最终用于状态的错误
+     */
+    private fun resolvePlaybackError(error: PlaybackException?): PlaybackException? {
+        if (error != null) {
+            return error
+        }
+        return lastError
     }
 
     private companion object {
