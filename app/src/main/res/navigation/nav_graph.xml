@@ -16,5 +16,22 @@
     <fragment
         android:id="@+id/songListFragment"
         android:name="com.valiantyan.music801.ui.songlist.SongListFragment"
-        android:label="song_list" />
+        android:label="song_list">
+        <action
+            android:id="@+id/action_songListFragment_to_playerFragment"
+            app:destination="@id/playerFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/playerFragment"
+        android:name="com.valiantyan.music801.ui.player.PlayerFragment"
+        android:label="player">
+        <argument
+            android:name="queue"
+            app:argType="com.valiantyan.music801.domain.model.Song[]" />
+        <argument
+            android:name="startIndex"
+            android:defaultValue="-1"
+            app:argType="integer" />
+    </fragment>
 </navigation>

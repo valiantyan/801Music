@@ -13,6 +13,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.valiantyan.music801.R
 import com.valiantyan.music801.data.datasource.AudioFileScanner
@@ -175,7 +176,24 @@ class SongListFragment : Fragment() {
      * 处理列表项点击
      */
     private fun handleSongClick(song: Song) {
-        // TODO: To be implemented in Story STORY-003
+        val songs: List<Song> = viewModel.uiState.value.songs
+        if (songs.isEmpty()) {
+            return
+        }
+        val startIndex: Int = songs.indexOf(song)
+        if (startIndex < 0) {
+            return
+        }
+        val queue: Array<Song> = songs.toTypedArray()
+        val args: Bundle = Bundle().apply {
+            putParcelableArray(ARG_QUEUE, queue)
+            putInt(ARG_START_INDEX, startIndex)
+        }
+        val navController = findNavController()
+        navController.navigate(
+            resId = R.id.action_songListFragment_to_playerFragment,
+            args = args,
+        )
     }
 
     /**
@@ -291,6 +309,16 @@ class SongListFragment : Fragment() {
          * 列表滚动状态存储键
          */
         private const val KEY_LIST_STATE: String = "song_list_state"
+
+        /**
+         * 播放队列参数键
+         */
+        private const val ARG_QUEUE: String = "queue"
+
+        /**
+         * 播放索引参数键
+         */
+        private const val ARG_START_INDEX: String = "startIndex"
 
         /**
          * 退出应用的双击间隔(2000ms)

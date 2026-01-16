@@ -204,7 +204,7 @@ class MediaQueueManager {
     - *Test Case*: UI 测试 - 上一首/下一首按钮功能
     - *Test Case*: UI 测试 - 进度条拖拽跳转
 
-- [ ] **Task 10**: 实现列表到播放的导航
+- [x] **Task 10**: 实现列表到播放的导航
     - *Test Case*: UI 测试 - 点击列表项导航到播放页面
     - *Test Case*: UI 测试 - 歌曲信息和列表正确传递
 
@@ -240,6 +240,8 @@ class MediaQueueManager {
 - [x] 2025-01-27 新增 [PlayerFragment] 基础展示与 [PlayerViewModelFactory]。
 - [x] 2025-01-27 运行单元测试：`./gradlew :app:testDebugUnitTest`。
 - [x] 2025-01-27 完成播放控制交互与 [PlayerFragmentTest] 单元测试。
+- [x] 2025-01-27 运行单元测试：`./gradlew :app:testDebugUnitTest`。
+- [x] 2025-01-27 新增列表到播放的导航参数传递并接入队列初始化。
 - [x] 2025-01-27 运行单元测试：`./gradlew :app:testDebugUnitTest`。
 - [x] 2025-01-27 运行单元测试：`./gradlew :app:testDebugUnitTest`。
 

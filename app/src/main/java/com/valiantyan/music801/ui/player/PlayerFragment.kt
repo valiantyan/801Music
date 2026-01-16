@@ -1,9 +1,11 @@
 package com.valiantyan.music801.ui.player
 
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.BundleCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -50,6 +52,11 @@ class PlayerFragment : Fragment() {
     internal var viewModelFactoryForTest: ViewModelProvider.Factory? = null
 
     /**
+     * 是否已初始化队列
+     */
+    private var hasInitializedQueue: Boolean = false
+
+    /**
      * 创建播放器视图
      */
     override fun onCreateView(
@@ -86,6 +93,7 @@ class PlayerFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupUi()
         observeViewModel()
+        initQueueFromArgs()
     }
 
     /**
@@ -185,6 +193,34 @@ class PlayerFragment : Fragment() {
     }
 
     /**
+     * 读取导航参数并初始化队列
+     */
+    private fun initQueueFromArgs(): Unit {
+        if (hasInitializedQueue) {
+            return
+        }
+        val args: Bundle? = arguments
+        if (args == null) {
+            return
+        }
+        val rawQueue: Array<Parcelable>? = BundleCompat.getParcelableArray(
+            args,
+            ARG_QUEUE,
+            Song::class.java,
+        )
+        if (rawQueue == null) {
+            return
+        }
+        val queue: List<Song> = rawQueue.filterIsInstance<Song>()
+        if (queue.isEmpty()) {
+            return
+        }
+        val startIndex: Int = args.getInt(ARG_START_INDEX, -1)
+        viewModel.setQueue(songs = queue, startIndex = startIndex)
+        hasInitializedQueue = true
+    }
+
+    /**
      * 处理拖拽进度跳转
      *
      * @param position 目标位置（毫秒）
@@ -227,5 +263,17 @@ class PlayerFragment : Fragment() {
             parent,
             attachToParent,
         )
+    }
+
+    private companion object {
+        /**
+         * 播放队列参数键
+         */
+        private const val ARG_QUEUE: String = "queue"
+
+        /**
+         * 播放索引参数键
+         */
+        private const val ARG_START_INDEX: String = "startIndex"
     }
 }

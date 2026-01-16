@@ -1,5 +1,8 @@
 package com.valiantyan.music801.domain.model
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
 /**
  * 歌曲领域模型
  *
@@ -13,6 +16,7 @@ package com.valiantyan.music801.domain.model
  * @param dateAdded 添加时间（时间戳）
  * @param albumArtPath 封面路径（可选）
  */
+@Parcelize
 data class Song(
     val id: String,
     val title: String,
@@ -23,4 +27,4 @@ data class Song(
     val fileSize: Long,
     val dateAdded: Long,
     val albumArtPath: String?,
-)
+) : Parcelable
