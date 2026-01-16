@@ -68,6 +68,13 @@ class PlayerRepositoryImpl(
         updateCurrentSong()
     }
 
+    /**
+     * 释放播放器资源
+     */
+    override fun release(): Unit {
+        _playbackState.value = PlaybackState()
+    }
+
     private fun updateCurrentSong(): Unit {
         val currentSong: Song? = mediaQueueManager.getCurrentSong()
         val currentQueue: List<Song> = _playbackState.value.queue

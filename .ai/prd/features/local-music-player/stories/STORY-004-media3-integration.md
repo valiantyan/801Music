@@ -206,7 +206,7 @@ val exoPlayer = ExoPlayer.Builder(context)
     - *Test Case*: 测试音频焦点丢失处理
     - *Test Case*: 测试音频焦点恢复处理
 
-- [ ] **Task 11**: 实现播放器生命周期管理
+- [x] **Task 11**: 实现播放器生命周期管理
     - *Test Case*: 测试播放器资源释放
     - *Test Case*: 测试应用生命周期处理
 
@@ -238,6 +238,7 @@ val exoPlayer = ExoPlayer.Builder(context)
 - [x] 2025-01-27 完成 Task 9：补充错误处理逻辑并验证错误状态更新。
 - [x] 2025-01-27 完成 Task 10：接入音频焦点管理并补充失焦测试。
 - [x] 2025-01-27 优化 Task 10：拆分音频焦点管理为独立组件以符合职责划分。
+- [x] 2025-01-27 完成 Task 11：在 Activity 销毁时释放播放器资源并补充仓库释放接口。
 
 ---
 

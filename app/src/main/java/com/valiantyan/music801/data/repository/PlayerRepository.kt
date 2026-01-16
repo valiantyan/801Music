@@ -52,4 +52,9 @@ interface PlayerRepository {
      * 切换到上一首
      */
     fun skipToPrevious(): Unit
+
+    /**
+     * 释放播放器资源
+     */
+    fun release(): Unit
 }

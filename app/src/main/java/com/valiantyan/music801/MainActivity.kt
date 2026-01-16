@@ -176,4 +176,14 @@ class MainActivity : AppCompatActivity(), AudioRepositoryProvider, PlayerReposit
         }
         navController.setGraph(R.navigation.nav_graph)
     }
+
+    /**
+     * Activity 销毁时释放播放器资源
+     */
+    override fun onDestroy() {
+        super.onDestroy()
+        if (isFinishing) {
+            playerRepository.release()
+        }
+    }
 }
