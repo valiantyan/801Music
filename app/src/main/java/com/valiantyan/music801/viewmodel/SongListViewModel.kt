@@ -71,6 +71,7 @@ class SongListViewModel(
         _uiState.update { currentState ->
             currentState.copy(
                 isLoading = true,
+                isEmpty = false,
                 error = null,
             )
         }
