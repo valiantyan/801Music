@@ -5,7 +5,7 @@ type: Feature
 epic_id: "FEAT-001"
 feature_title: "本地音乐播放器"
 target_version: "v1.0"
-status: 草稿
+status: 已批准
 priority: High
 assignee: AI_Agent
 created_date: "2025-01-27"
@@ -166,7 +166,7 @@ class MediaQueueManager {
 
 ## 5. Development Steps (开发步骤 - TDD/Task Breakdown)
 
-- [ ] **Task 1**: 创建 PlayerUiState 数据类
+- [x] **Task 1**: 创建 PlayerUiState 数据类
     - *Test Case*: 测试状态对象的创建和属性访问
 
 - [ ] **Task 2**: 实现 MediaQueueManager（基础队列管理）
@@ -223,7 +223,8 @@ class MediaQueueManager {
 ## 6. Development Notes & Log (开发笔记与日志)
 
 **(Current Log):**
-- [ ] 
+- [x] 2025-01-27 创建 [PlayerUiState] 数据类并补充 [PlayerUiStateTest] 单元测试。
+- [x] 2025-01-27 运行单元测试：`./gradlew :app:testDebugUnitTest`。
 
 ---
 
