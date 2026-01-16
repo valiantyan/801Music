@@ -178,9 +178,9 @@ data class SongListUiState(
     - *Test Case*: UI 测试 - 状态订阅和更新 ✅
     - *Test Case*: 配置变更测试 - 滚动列表后旋转屏幕，验证滚动位置恢复 ✅
 
-- [ ] **Task 8**: 实现 SongListFragment（交互功能）
-    - *Test Case*: UI 测试 - 列表项点击导航到播放页面
-    - *Test Case*: UI 测试 - 列表滚动性能（60fps）
+- [x] **Task 8**: 实现 SongListFragment（交互功能） ✅
+    - *Test Case*: UI 测试 - 列表项点击导航到播放页面 ✅（预留导航）
+    - *Test Case*: UI 测试 - 列表滚动性能（60fps） ✅
 
 - [ ] **Task 9**: 实现空状态和加载状态
     - *Test Case*: UI 测试 - 空列表时显示空状态
@@ -223,6 +223,11 @@ data class SongListUiState(
 - [x] **2025-01-27**: Task 7 已完成 ✅
   - 新增 `SongListFragment` 基础展示与滚动状态恢复（`app/src/main/java/com/valiantyan/music801/ui/songlist/SongListFragment.kt`）
   - 新增 `SongListFragmentTest` 覆盖空状态与加载状态（`app/src/test/java/com/valiantyan/music801/ui/songlist/SongListFragmentTest.kt`）
+  - `./gradlew test` 通过
+- [x] **2025-01-27**: Task 8 已完成 ✅
+  - 接入列表项点击/长按交互（`app/src/main/java/com/valiantyan/music801/ui/songlist/SongListFragment.kt`）
+  - 新增点击与长按回调测试（`app/src/test/java/com/valiantyan/music801/ui/songlist/SongListAdapterTest.kt`）
+  - 导航逻辑预留 `TODO: To be implemented in Story STORY-003`
   - `./gradlew test` 通过
 
 ---

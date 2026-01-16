@@ -16,6 +16,7 @@ import com.valiantyan.music801.data.datasource.AudioFileScanner
 import com.valiantyan.music801.data.datasource.MediaMetadataExtractor
 import com.valiantyan.music801.data.repository.AudioRepository
 import com.valiantyan.music801.databinding.FragmentSongListBinding
+import com.valiantyan.music801.domain.model.Song
 import com.valiantyan.music801.viewmodel.SongListUiState
 import com.valiantyan.music801.viewmodel.SongListViewModel
 import com.valiantyan.music801.viewmodel.SongListViewModelFactory
@@ -78,7 +79,14 @@ class SongListFragment : Fragment() {
 
     private fun setupRecyclerView() {
         val layoutManager: LinearLayoutManager = LinearLayoutManager(requireContext())
-        adapter = SongListAdapter()
+        adapter = SongListAdapter(
+            onItemClick = { song: Song ->
+                handleSongClick(song = song)
+            },
+            onItemLongClick = { song: Song ->
+                handleSongLongClick(song = song)
+            },
+        )
         binding.songListRecyclerView.layoutManager = layoutManager
         binding.songListRecyclerView.adapter = adapter
         restoreListState()
@@ -99,6 +107,14 @@ class SongListFragment : Fragment() {
         binding.songListLoading.visibility = if (state.isLoading) View.VISIBLE else View.GONE
         binding.songListEmptyText.visibility = if (state.isEmpty) View.VISIBLE else View.GONE
         binding.songListRecyclerView.visibility = if (state.isLoading) View.INVISIBLE else View.VISIBLE
+    }
+
+    private fun handleSongClick(song: Song) {
+        // TODO: To be implemented in Story STORY-003
+    }
+
+    private fun handleSongLongClick(song: Song) {
+        // TODO: To be implemented in Story STORY-003
     }
 
     private fun restoreListState() {

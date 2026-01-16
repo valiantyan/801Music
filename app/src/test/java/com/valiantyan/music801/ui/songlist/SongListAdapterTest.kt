@@ -70,8 +70,82 @@ class SongListAdapterTest {
         assertEquals("03:00", durationText.text.toString())
     }
 
-    private fun createAdapter(): SongListAdapter {
-        return SongListAdapter()
+    @Test
+    fun `点击列表项后触发回调`() : Unit {
+        // Arrange
+        var actualClickCount: Int = 0
+        val adapter: SongListAdapter = createAdapter(
+            onItemClick = {
+                actualClickCount += 1
+            },
+        )
+        val song: Song = createSong(
+            id = "/storage/music/song3.mp3",
+            title = "Song 3",
+            artist = "Artist 3",
+            durationMs = 120000L,
+        )
+        val songs: List<Song> = listOf(song)
+        val baseContext: Context = ApplicationProvider.getApplicationContext()
+        val themedContext: Context = createThemedContext(baseContext = baseContext)
+        val parent: FrameLayout = FrameLayout(themedContext)
+        // Act
+        adapter.submitList(songs = songs)
+        val viewHolder: SongListAdapter.SongViewHolder = adapter.onCreateViewHolder(
+            parent = parent,
+            viewType = 0,
+        )
+        adapter.onBindViewHolder(
+            holder = viewHolder,
+            position = 0,
+        )
+        viewHolder.itemView.performClick()
+        // Assert
+        assertEquals(1, actualClickCount)
+    }
+
+    @Test
+    fun `长按列表项后触发回调`() : Unit {
+        // Arrange
+        var actualLongClickCount: Int = 0
+        val adapter: SongListAdapter = createAdapter(
+            onItemLongClick = {
+                actualLongClickCount += 1
+            },
+        )
+        val song: Song = createSong(
+            id = "/storage/music/song4.mp3",
+            title = "Song 4",
+            artist = "Artist 4",
+            durationMs = 90000L,
+        )
+        val songs: List<Song> = listOf(song)
+        val baseContext: Context = ApplicationProvider.getApplicationContext()
+        val themedContext: Context = createThemedContext(baseContext = baseContext)
+        val parent: FrameLayout = FrameLayout(themedContext)
+        // Act
+        adapter.submitList(songs = songs)
+        val viewHolder: SongListAdapter.SongViewHolder = adapter.onCreateViewHolder(
+            parent = parent,
+            viewType = 0,
+        )
+        adapter.onBindViewHolder(
+            holder = viewHolder,
+            position = 0,
+        )
+        viewHolder.itemView.performLongClick()
+        // Assert
+        assertEquals(1, actualLongClickCount)
+    }
+
+    private fun createAdapter(
+        onItemClick: (Song) -> Unit = {},
+        onItemLongClick: (Song) -> Unit = {},
+    ): SongListAdapter {
+        return SongListAdapter(
+            onItemClick = onItemClick,
+            onItemLongClick = onItemLongClick,
+        )
     }
 
     private fun createThemedContext(baseContext: Context): Context {
