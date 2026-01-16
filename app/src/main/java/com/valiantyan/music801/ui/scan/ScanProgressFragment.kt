@@ -6,8 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
@@ -19,17 +19,17 @@ import com.valiantyan.music801.data.datasource.MediaMetadataExtractor
 import com.valiantyan.music801.data.repository.AudioRepository
 import com.valiantyan.music801.databinding.FragmentScanProgressBinding
 import com.valiantyan.music801.di.AudioRepositoryProvider
+import com.valiantyan.music801.viewmodel.ScanUiState
 import com.valiantyan.music801.viewmodel.ScanViewModel
 import com.valiantyan.music801.viewmodel.ScanViewModelFactory
-import com.valiantyan.music801.viewmodel.ScanUiState
 import kotlinx.coroutines.launch
 
 /**
  * 扫描进度 Fragment
- * 
+ *
  * 显示音频文件扫描进度，支持取消扫描操作。
  * 扫描完成后自动导航到歌曲列表。
- * 
+ *
  * 配置变更处理：
  * - 使用 ViewModel 保存扫描进度状态（已扫描数量、当前路径）
  * - 配置变更后从 ViewModel 恢复进度显示
@@ -41,6 +41,7 @@ class ScanProgressFragment : Fragment() {
      * ViewBinding
      */
     private var _binding: FragmentScanProgressBinding? = null
+
     /**
      * 视图绑定访问器
      */
@@ -51,10 +52,12 @@ class ScanProgressFragment : Fragment() {
      * ViewModel
      */
     private lateinit var viewModel: ScanViewModel
+
     /**
      * 测试用 ViewModelFactory（仅用于 Robolectric 测试注入）
      */
     internal var viewModelFactoryForTest: ViewModelProvider.Factory? = null
+
     /**
      * 导航完成标记，避免重复跳转
      */
@@ -107,7 +110,8 @@ class ScanProgressFragment : Fragment() {
         if (savedInstanceState == null) {
             if (!viewModel.uiState.value.isScanning &&
                 !viewModel.uiState.value.isCompleted &&
-                viewModel.uiState.value.error == null) {
+                viewModel.uiState.value.error == null
+            ) {
                 startScan()
             }
         }
@@ -170,7 +174,7 @@ class ScanProgressFragment : Fragment() {
 
     /**
      * 开始扫描
-     * 
+     *
      * 注意：实际扫描路径应该从外部传入或从配置中读取。
      * 这里暂时使用默认路径，后续会完善。
      */

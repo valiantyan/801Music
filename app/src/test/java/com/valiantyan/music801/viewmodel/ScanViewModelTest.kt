@@ -61,9 +61,9 @@ class ScanViewModelTest {
                     scannedCount = 0,
                     totalCount = null,
                     currentPath = rootPath,
-                    isScanning = true
-                )
-            )
+                    isScanning = true,
+                ),
+            ),
         )
         viewModel = ScanViewModel(repository)
 
@@ -71,7 +71,7 @@ class ScanViewModelTest {
         viewModel.uiState.test {
             // 跳过初始状态
             awaitItem()
-            
+
             viewModel.startScan(rootPath)
             advanceUntilIdle()
 
@@ -82,7 +82,7 @@ class ScanViewModelTest {
             assertEquals(rootPath, state.currentPath)
             assertNull(state.error)
         }
-        
+
         // 验证 repository 被调用（在 test 块外）
         verify(repository).scanAudioFiles(any(), any())
     }
@@ -104,7 +104,7 @@ class ScanViewModelTest {
         viewModel.uiState.test {
             // 跳过初始状态
             awaitItem()
-            
+
             viewModel.startScan(rootPath)
             advanceUntilIdle()
 
@@ -112,13 +112,13 @@ class ScanViewModelTest {
             val state1 = awaitItem() // 开始扫描
             assertTrue(state1.isScanning)
             assertEquals(0, state1.scannedCount)
-            
+
             val state2 = awaitItem() // 第一个文件
             assertEquals(1, state2.scannedCount)
-            
+
             val state3 = awaitItem() // 第二个文件
             assertEquals(2, state3.scannedCount)
-            
+
             val finalState = awaitItem() // 完成
             assertFalse(finalState.isScanning)
             assertEquals(2, finalState.scannedCount)
@@ -144,14 +144,14 @@ class ScanViewModelTest {
         viewModel.uiState.test {
             // 跳过初始状态
             awaitItem()
-            
+
             viewModel.startScan(rootPath)
             advanceUntilIdle()
 
             // Then
             val state1 = awaitItem() // 开始扫描
             assertTrue(state1.isScanning)
-            
+
             val finalState = awaitItem() // 完成
             assertFalse(finalState.isScanning)
             assertEquals(5, finalState.scannedCount)
@@ -176,14 +176,14 @@ class ScanViewModelTest {
         viewModel.uiState.test {
             // 跳过初始状态
             awaitItem()
-            
+
             viewModel.startScan(rootPath)
             advanceUntilIdle()
 
             // Then
             val state1 = awaitItem() // 开始扫描
             assertTrue(state1.isScanning)
-            
+
             val errorState = awaitItem() // 错误状态
             assertFalse(errorState.isScanning)
             assertTrue(errorState.hasError)
@@ -234,7 +234,7 @@ class ScanViewModelTest {
             filePath = "/path/to/song1.mp3",
             fileSize = 5000000L,
             dateAdded = System.currentTimeMillis(),
-            albumArtPath = null
+            albumArtPath = null,
         )
         val song2 = Song(
             id = "/path/to/song2.mp3",
@@ -245,9 +245,9 @@ class ScanViewModelTest {
             filePath = "/path/to/song2.mp3",
             fileSize = 6000000L,
             dateAdded = System.currentTimeMillis(),
-            albumArtPath = null
+            albumArtPath = null,
         )
-        
+
         var capturedCallback: ((Song) -> Unit)? = null
         val progressFlow = flow {
             emit(ScanProgress(0, null, rootPath, true))
@@ -257,7 +257,7 @@ class ScanViewModelTest {
             emit(ScanProgress(2, null, "/path/to/song2.mp3", true))
             emit(ScanProgress(2, 2, null, false))
         }
-        
+
         whenever(repository.scanAudioFiles(any(), any())).thenAnswer { invocation ->
             capturedCallback = invocation.getArgument(1)
             progressFlow
@@ -268,7 +268,7 @@ class ScanViewModelTest {
         viewModel.uiState.test {
             // 跳过初始状态
             awaitItem()
-            
+
             viewModel.startScan(rootPath)
             advanceUntilIdle()
 
@@ -277,7 +277,7 @@ class ScanViewModelTest {
             awaitItem() // 第一个文件
             awaitItem() // 第二个文件
             val finalState = awaitItem() // 完成
-            
+
             assertTrue(finalState.isCompleted)
             assertEquals(2, finalState.scannedCount)
             // 验证回调被调用

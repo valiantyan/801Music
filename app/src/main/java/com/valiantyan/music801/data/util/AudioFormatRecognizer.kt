@@ -2,7 +2,7 @@ package com.valiantyan.music801.data.util
 
 /**
  * 音频文件格式识别工具类
- * 
+ *
  * 用于识别和验证设备存储中的音频文件格式。
  * 支持常见音频格式：MP3、AAC、FLAC、WAV、OGG、M4A
  */
@@ -17,12 +17,12 @@ object AudioFormatRecognizer {
         "flac",
         "wav",
         "ogg",
-        "m4a"
+        "m4a",
     )
 
     /**
      * 检查给定的文件路径是否为支持的音频文件
-     * 
+     *
      * @param filePath 文件路径或文件名
      * @return 如果是支持的音频格式返回 true，否则返回 false
      */
@@ -36,7 +36,7 @@ object AudioFormatRecognizer {
 
     /**
      * 从文件路径中提取扩展名
-     * 
+     *
      * @param filePath 文件路径
      * @return 扩展名（不包含点号），如果无法提取则返回 null
      */
@@ -54,7 +54,7 @@ object AudioFormatRecognizer {
 
     /**
      * 获取所有支持的音频文件扩展名列表
-     * 
+     *
      * @return 支持的扩展名集合（小写）
      */
     fun getSupportedExtensions(): Set<String> {

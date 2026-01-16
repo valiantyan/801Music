@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.spotless)
 }
 
 android {
@@ -26,13 +27,13 @@ android {
     testOptions {
         unitTests.isIncludeAndroidResources = true
     }
-    
+
     buildTypes {
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
@@ -45,27 +46,43 @@ android {
     }
 }
 
+spotless {
+    kotlin {
+        target("**/*.kt")
+        ktlint("0.50.0")
+            .editorConfigOverride(
+                mapOf(
+                    "ktlint_standard_no-unit-return" to "disabled",
+                ),
+            )
+    }
+    kotlinGradle {
+        target("**/*.kts")
+        ktlint("0.50.0")
+    }
+}
+
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
-    
+
     // Coroutines
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
-    
+
     // ViewModel
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    
+
     // Fragment
     implementation(libs.androidx.fragment.ktx)
-    
+
     // Navigation
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
-    
+
     // Testing
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)
@@ -74,13 +91,13 @@ dependencies {
     testImplementation(libs.turbine)
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.fragment.testing.manifest)
-    
+
     // Fragment testing for Robolectric
     // fragment-testing 需要作为 testImplementation（类文件）
     // fragment-testing-manifest 需要作为 debugImplementation（manifest 合并）
     testImplementation(libs.androidx.fragment.testing)
     debugImplementation(libs.androidx.fragment.testing.manifest)
-    
+
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.test.rules)

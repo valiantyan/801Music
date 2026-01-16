@@ -1,7 +1,10 @@
 package com.valiantyan.music801.domain.model
 
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
-import org.junit.Assert.*
 
 /**
  * 测试 ScanProgress 数据模型的创建和状态更新
@@ -15,7 +18,7 @@ class ScanProgressTest {
             scannedCount = 10,
             totalCount = 100,
             currentPath = "/storage/emulated/0/Music",
-            isScanning = true
+            isScanning = true,
         )
 
         // Then
@@ -32,7 +35,7 @@ class ScanProgressTest {
             scannedCount = 5,
             totalCount = null,
             currentPath = null,
-            isScanning = true
+            isScanning = true,
         )
 
         // Then
@@ -49,14 +52,14 @@ class ScanProgressTest {
             scannedCount = 10,
             totalCount = 100,
             currentPath = "/storage/emulated/0/Music",
-            isScanning = true
+            isScanning = true,
         )
 
         val progress2 = ScanProgress(
             scannedCount = 10,
             totalCount = 100,
             currentPath = "/storage/emulated/0/Music",
-            isScanning = true
+            isScanning = true,
         )
 
         // Then
@@ -71,7 +74,7 @@ class ScanProgressTest {
             scannedCount = 100,
             totalCount = 100,
             currentPath = null,
-            isScanning = false
+            isScanning = false,
         )
 
         // Then
@@ -88,7 +91,7 @@ class ScanProgressTest {
             scannedCount = 50,
             totalCount = 100,
             currentPath = "/storage/emulated/0/Music/Album1",
-            isScanning = true
+            isScanning = true,
         )
 
         // Then

@@ -1,7 +1,8 @@
 package com.valiantyan.music801.domain.model
 
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
-import org.junit.Assert.*
 
 /**
  * 测试 Song 数据模型的创建和属性访问
@@ -20,7 +21,7 @@ class SongTest {
             filePath = "/storage/emulated/0/Music/test.mp3",
             fileSize = 1024000L, // 1MB
             dateAdded = 1234567890L,
-            albumArtPath = "/storage/emulated/0/Music/art.jpg"
+            albumArtPath = "/storage/emulated/0/Music/art.jpg",
         )
 
         // Then
@@ -47,7 +48,7 @@ class SongTest {
             filePath = "/storage/emulated/0/Music/test.mp3",
             fileSize = 1024000L,
             dateAdded = 1234567890L,
-            albumArtPath = null
+            albumArtPath = null,
         )
 
         // Then
@@ -67,7 +68,7 @@ class SongTest {
             filePath = "/storage/emulated/0/Music/test.mp3",
             fileSize = 1024000L,
             dateAdded = 1234567890L,
-            albumArtPath = null
+            albumArtPath = null,
         )
 
         val song2 = Song(
@@ -79,7 +80,7 @@ class SongTest {
             filePath = "/storage/emulated/0/Music/test.mp3",
             fileSize = 1024000L,
             dateAdded = 1234567890L,
-            albumArtPath = null
+            albumArtPath = null,
         )
 
         // Then

@@ -7,13 +7,13 @@ import org.junit.Test
 
 /**
  * PermissionHelper 单元测试
- * 
+ *
  * 本测试类专注于测试 PermissionHelper 中的纯逻辑部分（不依赖真实 Android 系统行为）。
- * 
+ *
  * 注意：由于 getRequiredPermission() 方法依赖于 Build.VERSION.SDK_INT，
  * 这些测试只能在真实设备或模拟器上验证不同 Android 版本的行为。
  * 在单元测试环境中，我们只能测试当前运行环境的版本行为。
- * 
+ *
  * 需要真实设备测试的部分（如权限请求流程、ActivityResultLauncher）应在 androidTest 目录下进行集成测试。
  */
 class PermissionHelperTest {
@@ -23,7 +23,7 @@ class PermissionHelperTest {
         // Given
         // 注意：这个测试依赖于当前运行环境的 Android 版本
         // 在不同版本的设备/模拟器上运行会得到不同的结果
-        
+
         // When
         // 由于 PermissionHelper 需要 Activity 实例，我们直接测试逻辑
         val expectedPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

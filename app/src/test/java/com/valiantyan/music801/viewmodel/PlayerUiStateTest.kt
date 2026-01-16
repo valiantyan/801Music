@@ -12,7 +12,7 @@ import org.junit.Test
  */
 class PlayerUiStateTest {
     @Test
-    fun `创建默认状态时字段应为默认值`() : Unit {
+    fun `创建默认状态时字段应为默认值`() {
         // Arrange
         val expectedQueue: List<Song> = emptyList()
         // Act
@@ -29,7 +29,7 @@ class PlayerUiStateTest {
     }
 
     @Test
-    fun `创建包含数据状态时字段应正确赋值`() : Unit {
+    fun `创建包含数据状态时字段应正确赋值`() {
         // Arrange
         val inputSong: Song = Song(
             id = "/storage/music/song1.mp3",

@@ -5,15 +5,19 @@ import com.valiantyan.music801.data.datasource.MediaMetadataExtractor
 import com.valiantyan.music801.domain.model.ScanProgress
 import com.valiantyan.music801.domain.model.Song
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.take
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
-import org.junit.Test
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
+import org.junit.Test
 import org.junit.rules.TemporaryFolder
-import org.mockito.kotlin.*
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import java.io.File
 
 /**
@@ -52,7 +56,7 @@ class AudioRepositoryTest {
             filePath = file1.absolutePath,
             fileSize = file1.length(),
             dateAdded = file1.lastModified(),
-            albumArtPath = null
+            albumArtPath = null,
         )
         val song2 = Song(
             id = file2.absolutePath,
@@ -63,7 +67,7 @@ class AudioRepositoryTest {
             filePath = file2.absolutePath,
             fileSize = file2.length(),
             dateAdded = file2.lastModified(),
-            albumArtPath = null
+            albumArtPath = null,
         )
 
         // Mock scanDirectory 返回进度流
@@ -106,7 +110,7 @@ class AudioRepositoryTest {
             filePath = file1.absolutePath,
             fileSize = file1.length(),
             dateAdded = file1.lastModified(),
-            albumArtPath = null
+            albumArtPath = null,
         )
         val song2 = Song(
             id = file2.absolutePath,
@@ -117,7 +121,7 @@ class AudioRepositoryTest {
             filePath = file2.absolutePath,
             fileSize = file2.length(),
             dateAdded = file2.lastModified(),
-            albumArtPath = null
+            albumArtPath = null,
         )
 
         // Mock scanDirectory 返回进度流，并在回调中传递歌曲
@@ -166,7 +170,7 @@ class AudioRepositoryTest {
             filePath = file1.absolutePath,
             fileSize = file1.length(),
             dateAdded = file1.lastModified(),
-            albumArtPath = null
+            albumArtPath = null,
         )
 
         // Mock scanDirectory 返回进度流
@@ -203,7 +207,7 @@ class AudioRepositoryTest {
         // Then: 应该从缓存获取，不需要重新扫描
         assertEquals("应该从缓存获取相同的数据", 1, secondGetSongs.size)
         assertEquals("缓存的歌曲应该匹配", song1.id, secondGetSongs.first().id)
-        
+
         // 验证 AudioFileScanner 只被调用一次（第一次扫描时）
         verify(mockScanner, times(1)).scanDirectory(any(), any())
     }
@@ -224,7 +228,7 @@ class AudioRepositoryTest {
             filePath = file1.absolutePath,
             fileSize = file1.length(),
             dateAdded = file1.lastModified(),
-            albumArtPath = null
+            albumArtPath = null,
         )
         val song2 = Song(
             id = file2.absolutePath,
@@ -235,7 +239,7 @@ class AudioRepositoryTest {
             filePath = file2.absolutePath,
             fileSize = file2.length(),
             dateAdded = file2.lastModified(),
-            albumArtPath = null
+            albumArtPath = null,
         )
 
         var capturedCallback: ((Song) -> Unit)? = null

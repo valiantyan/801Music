@@ -2,22 +2,22 @@ package com.valiantyan.music801.viewmodel
 
 import com.valiantyan.music801.data.repository.AudioRepository
 import com.valiantyan.music801.domain.model.Song
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.setMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import org.junit.After
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -86,9 +86,11 @@ class SongListViewModelTest {
     fun `加载失败时进入错误状态`() = runTest(testDispatcher) {
         // Arrange
         val inputMessage = "加载失败"
-        whenever(repository.getAllSongs()).thenReturn(flow {
-            throw IllegalStateException(inputMessage)
-        })
+        whenever(repository.getAllSongs()).thenReturn(
+            flow {
+                throw IllegalStateException(inputMessage)
+            },
+        )
         // Act
         viewModel = SongListViewModel(repository)
         advanceUntilIdle()

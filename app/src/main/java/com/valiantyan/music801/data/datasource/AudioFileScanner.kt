@@ -14,14 +14,14 @@ import java.util.logging.Logger
 
 /**
  * 音频文件扫描器
- * 
+ *
  * 负责扫描设备存储中的音频文件，支持递归扫描子目录。
  * 使用 Kotlin Coroutines 在后台线程执行，通过 Flow 发送扫描进度更新。
- * 
+ *
  * @param metadataExtractor 元数据提取器，用于从音频文件中提取元数据
  */
 class AudioFileScanner(
-    private val metadataExtractor: MediaMetadataExtractor
+    private val metadataExtractor: MediaMetadataExtractor,
 ) {
     /**
      * 扫描日志记录器
@@ -30,14 +30,14 @@ class AudioFileScanner(
 
     /**
      * 扫描指定目录中的音频文件
-     * 
+     *
      * @param rootPath 要扫描的根目录路径
      * @param onSongFound 当找到音频文件时的回调函数
      * @return Flow<ScanProgress> 扫描进度更新流
      */
     fun scanDirectory(
         rootPath: String,
-        onSongFound: (Song) -> Unit = {}
+        onSongFound: (Song) -> Unit = {},
     ): Flow<ScanProgress> = flow {
         val rootDir: File = File(rootPath)
         if (!isValidDirectory(rootDir = rootDir)) {
@@ -51,25 +51,29 @@ class AudioFileScanner(
             onSongFound = onSongFound,
             onFileScanned = { currentPath: String ->
                 scannedCount += 1
-                emit(createProgress(
-                    scannedCount = scannedCount,
-                    totalCount = null,
-                    currentPath = currentPath,
-                    isScanning = true,
-                ))
+                emit(
+                    createProgress(
+                        scannedCount = scannedCount,
+                        totalCount = null,
+                        currentPath = currentPath,
+                        isScanning = true,
+                    ),
+                )
             },
         )
-        emit(createProgress(
-            scannedCount = scannedCount,
-            totalCount = scannedCount,
-            currentPath = null,
-            isScanning = false,
-        ))
+        emit(
+            createProgress(
+                scannedCount = scannedCount,
+                totalCount = scannedCount,
+                currentPath = null,
+                isScanning = false,
+            ),
+        )
     }.flowOn(Dispatchers.IO)
 
     /**
      * 迭代扫描目录
-     * 
+     *
      * @param directory 要扫描的目录
      * @param onSongFound 当找到音频文件时的回调
      * @param onFileScanned 当扫描一个文件时的回调（用于进度更新），这是一个挂起函数

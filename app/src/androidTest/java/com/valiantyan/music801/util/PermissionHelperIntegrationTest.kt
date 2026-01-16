@@ -14,14 +14,14 @@ import org.junit.runner.RunWith
 
 /**
  * PermissionHelper 集成测试
- * 
+ *
  * 测试需要真实 Android 设备的功能：
  * - 权限检查（hasPermission）
  * - 权限请求流程（requestPermission）
  * - 权限说明显示判断（shouldShowRationale）
- * 
+ *
  * 注意：这些测试需要在真实设备或模拟器上运行。
- * 
+ *
  * 使用 TestActivity 而不是 MainActivity，因为 PermissionHelper 必须在 Activity 的 onCreate 中初始化。
  */
 @RunWith(AndroidJUnit4::class)
@@ -40,12 +40,12 @@ class PermissionHelperIntegrationTest {
         scenario = ActivityScenario.launch(TestActivity::class.java)
         scenario?.onActivity { activity ->
             val permissionHelper = activity.permissionHelper
-            
+
             // 授予权限（需要在测试设备上手动授予，或使用 GrantPermissionRule）
             val permission = permissionHelper.getRequiredPermission()
             val hasPermission = ContextCompat.checkSelfPermission(
                 activity,
-                permission
+                permission,
             ) == PackageManager.PERMISSION_GRANTED
 
             // When
@@ -68,11 +68,11 @@ class PermissionHelperIntegrationTest {
         scenario = ActivityScenario.launch(TestActivity::class.java)
         scenario?.onActivity { activity ->
             val permissionHelper = activity.permissionHelper
-            
+
             val permission = permissionHelper.getRequiredPermission()
             val hasPermission = ContextCompat.checkSelfPermission(
                 activity,
-                permission
+                permission,
             ) == PackageManager.PERMISSION_GRANTED
 
             // When
@@ -92,18 +92,18 @@ class PermissionHelperIntegrationTest {
         scenario = ActivityScenario.launch(TestActivity::class.java)
         scenario?.onActivity { activity ->
             val permissionHelper = activity.permissionHelper
-            
+
             var callbackInvoked = false
             var callbackResult = false
             permissionHelper.onPermissionResult = { isGranted ->
                 callbackInvoked = true
                 callbackResult = isGranted
             }
-            
+
             val permission = permissionHelper.getRequiredPermission()
             val hasPermission = ContextCompat.checkSelfPermission(
                 activity,
-                permission
+                permission,
             ) == PackageManager.PERMISSION_GRANTED
 
             // When

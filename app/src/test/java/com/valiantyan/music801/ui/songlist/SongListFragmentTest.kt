@@ -51,7 +51,7 @@ class SongListFragmentTest {
     }
 
     @Test
-    fun `更新空状态时显示空提示`() : Unit {
+    fun `更新空状态时显示空提示`() {
         val fragment: SongListFragment = launchFragment()
         idleMainLooper()
         invokeUpdateUi(
@@ -68,7 +68,7 @@ class SongListFragmentTest {
     }
 
     @Test
-    fun `更新加载状态时显示加载指示`() : Unit {
+    fun `更新加载状态时显示加载指示`() {
         val fragment: SongListFragment = launchFragment()
         idleMainLooper()
         invokeUpdateUi(
@@ -85,7 +85,7 @@ class SongListFragmentTest {
     }
 
     @Test
-    fun `端到端列表展示应显示歌曲`() : Unit {
+    fun `端到端列表展示应显示歌曲`() {
         val songs: List<Song> = createSongs(count = 3)
         whenever(repository.getAllSongs()).thenReturn(flowOf(songs))
         val fragment: SongListFragment = launchFragment()
@@ -97,7 +97,7 @@ class SongListFragmentTest {
     }
 
     @Test
-    fun `保存并恢复列表状态后位置保持`() : Unit {
+    fun `保存并恢复列表状态后位置保持`() {
         val songs: List<Song> = createSongs(count = 30)
         whenever(repository.getAllSongs()).thenReturn(flowOf(songs))
         val fragment: SongListFragment = launchFragment()
@@ -137,11 +137,11 @@ class SongListFragmentTest {
         return activity.supportFragmentManager.findFragmentByTag("song_list") as SongListFragment
     }
 
-    private fun idleMainLooper(): Unit {
+    private fun idleMainLooper() {
         Shadows.shadowOf(Looper.getMainLooper()).idle()
     }
 
-    private fun invokeUpdateUi(fragment: SongListFragment, state: SongListUiState): Unit {
+    private fun invokeUpdateUi(fragment: SongListFragment, state: SongListUiState) {
         val method: java.lang.reflect.Method = SongListFragment::class.java.getDeclaredMethod(
             "updateUI",
             SongListUiState::class.java,
@@ -164,7 +164,7 @@ class SongListFragmentTest {
                     fileSize = 1024L,
                     dateAdded = 1700000000000L,
                     albumArtPath = null,
-                )
+                ),
             )
         }
         return songs

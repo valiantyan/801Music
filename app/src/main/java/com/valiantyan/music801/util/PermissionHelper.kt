@@ -10,13 +10,13 @@ import androidx.core.content.ContextCompat
 
 /**
  * 权限助手
- * 
+ *
  * 封装权限请求逻辑，支持 Android 不同版本的权限模型。
- * 
+ *
  * @param activity Activity 实例
  */
 class PermissionHelper(
-    private val activity: ComponentActivity
+    private val activity: ComponentActivity,
 ) {
     /**
      * 权限请求结果回调
@@ -36,7 +36,7 @@ class PermissionHelper(
 
     /**
      * 获取当前需要的权限
-     * 
+     *
      * @return 权限字符串，根据 Android 版本返回不同的权限
      */
     fun getRequiredPermission(): String {
@@ -49,23 +49,23 @@ class PermissionHelper(
 
     /**
      * 检查权限是否已授予
-     * 
+     *
      * @return true 如果权限已授予，false 否则
      */
     fun hasPermission(): Boolean {
         val permission = getRequiredPermission()
         return ContextCompat.checkSelfPermission(
             activity,
-            permission
+            permission,
         ) == PackageManager.PERMISSION_GRANTED
     }
 
     /**
      * 请求权限
-     * 
+     *
      * 如果权限已授予，直接调用回调并返回 true。
      * 如果权限未授予，请求权限并返回 false。
-     * 
+     *
      * @return true 如果权限已授予，false 如果正在请求权限
      */
     fun requestPermission(): Boolean {
@@ -80,9 +80,9 @@ class PermissionHelper(
 
     /**
      * 检查是否应该显示权限说明
-     * 
+     *
      * 当用户之前拒绝过权限时，应该显示说明为什么需要这个权限。
-     * 
+     *
      * @return true 如果应该显示说明，false 否则
      */
     fun shouldShowRationale(): Boolean {

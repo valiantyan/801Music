@@ -6,9 +6,9 @@ import com.valiantyan.music801.R
 
 /**
  * 测试专用的 Activity
- * 
+ *
  * 用于集成测试，在 onCreate 中创建 PermissionHelper 并暴露给测试。
- * 
+ *
  * 注意：此 Activity 仅用于测试目的，不会在正常应用流程中使用。
  */
 class TestActivity : ComponentActivity() {

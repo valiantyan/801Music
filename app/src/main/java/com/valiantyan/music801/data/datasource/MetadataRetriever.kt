@@ -2,7 +2,7 @@ package com.valiantyan.music801.data.datasource
 
 /**
  * 元数据检索器接口
- * 
+ *
  * 用于抽象 MediaMetadataRetriever，便于测试和扩展
  */
 interface MetadataRetriever {

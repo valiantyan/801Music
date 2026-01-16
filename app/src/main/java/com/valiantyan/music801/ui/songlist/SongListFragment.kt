@@ -7,12 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.core.os.BundleCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.core.os.BundleCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.valiantyan.music801.R
 import com.valiantyan.music801.data.datasource.AudioFileScanner
@@ -36,27 +36,33 @@ class SongListFragment : Fragment() {
      * 视图绑定缓存
      */
     private var _binding: FragmentSongListBinding? = null
+
     /**
      * 视图绑定访问器
      */
     private val binding: FragmentSongListBinding
         get() = _binding!!
+
     /**
      * 列表页面状态管理
      */
     private lateinit var viewModel: SongListViewModel
+
     /**
      * 列表适配器实例
      */
     private lateinit var adapter: SongListAdapter
+
     /**
      * 列表滚动状态缓存
      */
     private var pendingListState: Parcelable? = null
+
     /**
      * 测试注入的 ViewModel 工厂
      */
     internal var viewModelFactoryForTest: ViewModelProvider.Factory? = null
+
     /**
      * 上一次返回键时间戳
      */
@@ -285,6 +291,7 @@ class SongListFragment : Fragment() {
          * 列表滚动状态存储键
          */
         private const val KEY_LIST_STATE: String = "song_list_state"
+
         /**
          * 退出应用的双击间隔(2000ms)
          */

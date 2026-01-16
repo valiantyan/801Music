@@ -16,7 +16,7 @@ import com.valiantyan.music801.util.PermissionHelper
 
 /**
  * 主 Activity
- * 
+ *
  * 负责应用入口、权限请求和导航管理。
  */
 class MainActivity : AppCompatActivity(), AudioRepositoryProvider {
@@ -25,10 +25,12 @@ class MainActivity : AppCompatActivity(), AudioRepositoryProvider {
      * 权限助手
      */
     private lateinit var permissionHelper: PermissionHelper
+
     /**
      * 音频仓库
      */
     private lateinit var audioRepository: AudioRepository
+
     /**
      * 导航控制器
      */
@@ -74,7 +76,7 @@ class MainActivity : AppCompatActivity(), AudioRepositoryProvider {
 
     /**
      * 显示权限说明对话框
-     * 
+     *
      * @param onConfirm 用户确认后的回调
      */
     private fun showPermissionRationaleDialog(onConfirm: () -> Unit) {
@@ -90,7 +92,7 @@ class MainActivity : AppCompatActivity(), AudioRepositoryProvider {
 
     /**
      * 处理权限请求结果
-     * 
+     *
      * @param isGranted 权限是否被授予
      */
     private fun handlePermissionResult(isGranted: Boolean) {

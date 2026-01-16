@@ -1,7 +1,9 @@
 package com.valiantyan.music801.data.util
 
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
-import org.junit.Assert.*
 
 /**
  * 测试音频文件格式识别逻辑
@@ -16,14 +18,14 @@ class AudioFormatRecognizerTest {
             "MUSIC.MP3",
             "test_file.Mp3",
             "/storage/emulated/0/Music/song.mp3",
-            "path/to/file.mp3"
+            "path/to/file.mp3",
         )
 
         // Then
         mp3Files.forEach { fileName ->
             assertTrue(
                 "文件 $fileName 应该被识别为音频文件",
-                AudioFormatRecognizer.isAudioFile(fileName)
+                AudioFormatRecognizer.isAudioFile(fileName),
             )
         }
     }
@@ -35,14 +37,14 @@ class AudioFormatRecognizerTest {
             "song.aac",
             "MUSIC.AAC",
             "test_file.Aac",
-            "/storage/emulated/0/Music/song.aac"
+            "/storage/emulated/0/Music/song.aac",
         )
 
         // Then
         aacFiles.forEach { fileName ->
             assertTrue(
                 "文件 $fileName 应该被识别为音频文件",
-                AudioFormatRecognizer.isAudioFile(fileName)
+                AudioFormatRecognizer.isAudioFile(fileName),
             )
         }
     }
@@ -54,14 +56,14 @@ class AudioFormatRecognizerTest {
             "song.flac",
             "MUSIC.FLAC",
             "test_file.Flac",
-            "/storage/emulated/0/Music/song.flac"
+            "/storage/emulated/0/Music/song.flac",
         )
 
         // Then
         flacFiles.forEach { fileName ->
             assertTrue(
                 "文件 $fileName 应该被识别为音频文件",
-                AudioFormatRecognizer.isAudioFile(fileName)
+                AudioFormatRecognizer.isAudioFile(fileName),
             )
         }
     }
@@ -73,14 +75,14 @@ class AudioFormatRecognizerTest {
             "song.wav",
             "MUSIC.WAV",
             "test_file.Wav",
-            "/storage/emulated/0/Music/song.wav"
+            "/storage/emulated/0/Music/song.wav",
         )
 
         // Then
         wavFiles.forEach { fileName ->
             assertTrue(
                 "文件 $fileName 应该被识别为音频文件",
-                AudioFormatRecognizer.isAudioFile(fileName)
+                AudioFormatRecognizer.isAudioFile(fileName),
             )
         }
     }
@@ -92,14 +94,14 @@ class AudioFormatRecognizerTest {
             "song.ogg",
             "MUSIC.OGG",
             "test_file.Ogg",
-            "/storage/emulated/0/Music/song.ogg"
+            "/storage/emulated/0/Music/song.ogg",
         )
 
         // Then
         oggFiles.forEach { fileName ->
             assertTrue(
                 "文件 $fileName 应该被识别为音频文件",
-                AudioFormatRecognizer.isAudioFile(fileName)
+                AudioFormatRecognizer.isAudioFile(fileName),
             )
         }
     }
@@ -111,14 +113,14 @@ class AudioFormatRecognizerTest {
             "song.m4a",
             "MUSIC.M4A",
             "test_file.M4a",
-            "/storage/emulated/0/Music/song.m4a"
+            "/storage/emulated/0/Music/song.m4a",
         )
 
         // Then
         m4aFiles.forEach { fileName ->
             assertTrue(
                 "文件 $fileName 应该被识别为音频文件",
-                AudioFormatRecognizer.isAudioFile(fileName)
+                AudioFormatRecognizer.isAudioFile(fileName),
             )
         }
     }
@@ -136,18 +138,18 @@ class AudioFormatRecognizerTest {
             "style.css",
             "archive.zip",
             "executable.exe",
-            "song.mp3.backup",  // 备份文件
-            "song",              // 无扩展名
-            ".hidden",           // 隐藏文件
-            "song.mp3.",         // 异常扩展名
-            ""                   // 空字符串
+            "song.mp3.backup", // 备份文件
+            "song", // 无扩展名
+            ".hidden", // 隐藏文件
+            "song.mp3.", // 异常扩展名
+            "", // 空字符串
         )
 
         // Then
         nonAudioFiles.forEach { fileName ->
             assertFalse(
                 "文件 $fileName 不应该被识别为音频文件",
-                AudioFormatRecognizer.isAudioFile(fileName)
+                AudioFormatRecognizer.isAudioFile(fileName),
             )
         }
     }
@@ -164,7 +166,7 @@ class AudioFormatRecognizerTest {
             "song.AAC" to true,
             "song.aac" to true,
             "song.FLAC" to true,
-            "song.flac" to true
+            "song.flac" to true,
         )
 
         // Then
@@ -172,7 +174,7 @@ class AudioFormatRecognizerTest {
             assertEquals(
                 "文件 $fileName 的识别结果应该为 $expected",
                 expected,
-                AudioFormatRecognizer.isAudioFile(fileName)
+                AudioFormatRecognizer.isAudioFile(fileName),
             )
         }
     }
@@ -185,7 +187,7 @@ class AudioFormatRecognizerTest {
             "/sdcard/Music/album/track.aac" to true,
             "/data/user/0/com.app/files/audio.flac" to true,
             "/storage/emulated/0/Documents/file.pdf" to false,
-            "/sdcard/Images/photo.jpg" to false
+            "/sdcard/Images/photo.jpg" to false,
         )
 
         // Then
@@ -193,7 +195,7 @@ class AudioFormatRecognizerTest {
             assertEquals(
                 "路径 $filePath 的识别结果应该为 $expected",
                 expected,
-                AudioFormatRecognizer.isAudioFile(filePath)
+                AudioFormatRecognizer.isAudioFile(filePath),
             )
         }
     }

@@ -9,14 +9,14 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentFactory
-import androidx.fragment.app.commitNow
 import androidx.fragment.app.add
+import androidx.fragment.app.commitNow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.valiantyan.music801.R
 import com.valiantyan.music801.data.repository.AudioRepository
-import com.valiantyan.music801.viewmodel.ScanViewModel
 import com.valiantyan.music801.viewmodel.ScanUiState
+import com.valiantyan.music801.viewmodel.ScanViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -51,7 +51,7 @@ class ScanProgressFragmentTest {
     private val mainDispatcher: TestDispatcher = UnconfinedTestDispatcher()
 
     @Before
-    fun setup(): Unit {
+    fun setup() {
         Dispatchers.setMain(mainDispatcher)
         repository = mock()
         whenever(repository.scanAudioFiles(any(), any())).thenReturn(emptyFlow())
@@ -62,14 +62,14 @@ class ScanProgressFragmentTest {
             }
         }
     }
-    
+
     @After
-    fun tearDown(): Unit {
+    fun tearDown() {
         Dispatchers.resetMain()
     }
 
     @Test
-    fun `扫描中状态应显示进度与路径`() : Unit {
+    fun `扫描中状态应显示进度与路径`() {
         val fragment: ScanProgressFragment = launchFragment()
         idleMainLooper()
         runOnUiThread(fragment = fragment) {
@@ -96,7 +96,7 @@ class ScanProgressFragmentTest {
     }
 
     @Test
-    fun `取消扫描后应显示错误并禁用按钮`() : Unit {
+    fun `取消扫描后应显示错误并禁用按钮`() {
         val fragment: ScanProgressFragment = launchFragment()
         idleMainLooper()
         runOnUiThread(fragment = fragment) {
@@ -161,11 +161,11 @@ class ScanProgressFragmentTest {
         return activity.supportFragmentManager.findFragmentByTag("scan_progress") as ScanProgressFragment
     }
 
-    private fun idleMainLooper(): Unit {
+    private fun idleMainLooper() {
         Shadows.shadowOf(Looper.getMainLooper()).idle()
     }
 
-    private fun invokeUpdateUi(fragment: ScanProgressFragment, state: ScanUiState): Unit {
+    private fun invokeUpdateUi(fragment: ScanProgressFragment, state: ScanUiState) {
         val method: java.lang.reflect.Method = ScanProgressFragment::class.java.getDeclaredMethod(
             "updateUI",
             ScanUiState::class.java,
@@ -174,7 +174,7 @@ class ScanProgressFragmentTest {
         method.invoke(fragment, state)
     }
 
-    private fun setViewModelState(fragment: ScanProgressFragment, state: ScanUiState): Unit {
+    private fun setViewModelState(fragment: ScanProgressFragment, state: ScanUiState) {
         val viewModel: ScanViewModel = getViewModel(fragment)
         val field: java.lang.reflect.Field = ScanViewModel::class.java.getDeclaredField("_uiState")
         field.isAccessible = true
@@ -189,7 +189,7 @@ class ScanProgressFragmentTest {
         return field.get(fragment) as ScanViewModel
     }
 
-    private fun runOnUiThread(fragment: ScanProgressFragment, action: () -> Unit): Unit {
+    private fun runOnUiThread(fragment: ScanProgressFragment, action: () -> Unit) {
         val activity: FragmentActivity = fragment.requireActivity()
         activity.runOnUiThread(action)
         idleMainLooper()

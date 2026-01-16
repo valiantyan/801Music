@@ -1,18 +1,21 @@
 package com.valiantyan.music801.data.datasource
 
-import com.valiantyan.music801.data.util.AudioFormatRecognizer
 import com.valiantyan.music801.domain.model.ScanProgress
 import com.valiantyan.music801.domain.model.Song
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.take
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
-import org.junit.Test
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
+import org.junit.Test
 import org.junit.rules.TemporaryFolder
-import org.mockito.kotlin.*
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import java.io.File
 
 /**
@@ -50,7 +53,7 @@ class AudioFileScannerTest {
             filePath = audioFile1.absolutePath,
             fileSize = audioFile1.length(),
             dateAdded = audioFile1.lastModified(),
-            albumArtPath = null
+            albumArtPath = null,
         )
         val song2 = Song(
             id = audioFile2.absolutePath,
@@ -61,20 +64,24 @@ class AudioFileScannerTest {
             filePath = audioFile2.absolutePath,
             fileSize = audioFile2.length(),
             dateAdded = audioFile2.lastModified(),
-            albumArtPath = null
+            albumArtPath = null,
         )
 
-        whenever(mockMetadataExtractor.extractMetadata(
-            eq(audioFile1.absolutePath),
-            eq(audioFile1.length()),
-            eq(audioFile1.lastModified())
-        )).thenReturn(song1)
+        whenever(
+            mockMetadataExtractor.extractMetadata(
+                eq(audioFile1.absolutePath),
+                eq(audioFile1.length()),
+                eq(audioFile1.lastModified()),
+            ),
+        ).thenReturn(song1)
 
-        whenever(mockMetadataExtractor.extractMetadata(
-            eq(audioFile2.absolutePath),
-            eq(audioFile2.length()),
-            eq(audioFile2.lastModified())
-        )).thenReturn(song2)
+        whenever(
+            mockMetadataExtractor.extractMetadata(
+                eq(audioFile2.absolutePath),
+                eq(audioFile2.length()),
+                eq(audioFile2.lastModified()),
+            ),
+        ).thenReturn(song2)
 
         // When: 扫描目录并收集所有歌曲和进度
         val allSongs = mutableListOf<Song>()
@@ -119,7 +126,7 @@ class AudioFileScannerTest {
             filePath = file1.absolutePath,
             fileSize = file1.length(),
             dateAdded = file1.lastModified(),
-            albumArtPath = null
+            albumArtPath = null,
         )
         val song2 = Song(
             id = file2.absolutePath,
@@ -130,7 +137,7 @@ class AudioFileScannerTest {
             filePath = file2.absolutePath,
             fileSize = file2.length(),
             dateAdded = file2.lastModified(),
-            albumArtPath = null
+            albumArtPath = null,
         )
         val song3 = Song(
             id = file3.absolutePath,
@@ -141,26 +148,32 @@ class AudioFileScannerTest {
             filePath = file3.absolutePath,
             fileSize = file3.length(),
             dateAdded = file3.lastModified(),
-            albumArtPath = null
+            albumArtPath = null,
         )
 
-        whenever(mockMetadataExtractor.extractMetadata(
-            eq(file1.absolutePath),
-            eq(file1.length()),
-            eq(file1.lastModified())
-        )).thenReturn(song1)
+        whenever(
+            mockMetadataExtractor.extractMetadata(
+                eq(file1.absolutePath),
+                eq(file1.length()),
+                eq(file1.lastModified()),
+            ),
+        ).thenReturn(song1)
 
-        whenever(mockMetadataExtractor.extractMetadata(
-            eq(file2.absolutePath),
-            eq(file2.length()),
-            eq(file2.lastModified())
-        )).thenReturn(song2)
+        whenever(
+            mockMetadataExtractor.extractMetadata(
+                eq(file2.absolutePath),
+                eq(file2.length()),
+                eq(file2.lastModified()),
+            ),
+        ).thenReturn(song2)
 
-        whenever(mockMetadataExtractor.extractMetadata(
-            eq(file3.absolutePath),
-            eq(file3.length()),
-            eq(file3.lastModified())
-        )).thenReturn(song3)
+        whenever(
+            mockMetadataExtractor.extractMetadata(
+                eq(file3.absolutePath),
+                eq(file3.length()),
+                eq(file3.lastModified()),
+            ),
+        ).thenReturn(song3)
 
         // When: 递归扫描目录并收集所有歌曲和进度
         val allSongs = mutableListOf<Song>()
@@ -196,7 +209,7 @@ class AudioFileScannerTest {
             filePath = file1.absolutePath,
             fileSize = file1.length(),
             dateAdded = file1.lastModified(),
-            albumArtPath = null
+            albumArtPath = null,
         )
         val song2 = Song(
             id = file2.absolutePath,
@@ -207,7 +220,7 @@ class AudioFileScannerTest {
             filePath = file2.absolutePath,
             fileSize = file2.length(),
             dateAdded = file2.lastModified(),
-            albumArtPath = null
+            albumArtPath = null,
         )
         val song3 = Song(
             id = file3.absolutePath,
@@ -218,7 +231,7 @@ class AudioFileScannerTest {
             filePath = file3.absolutePath,
             fileSize = file3.length(),
             dateAdded = file3.lastModified(),
-            albumArtPath = null
+            albumArtPath = null,
         )
 
         whenever(mockMetadataExtractor.extractMetadata(any(), any(), any()))
@@ -235,7 +248,7 @@ class AudioFileScannerTest {
 
         // Then: 应该收到进度更新
         assertTrue("应该收到至少一个进度更新", progressUpdates.isNotEmpty())
-        
+
         // 验证最后一个进度更新应该是完成状态
         val lastProgress = progressUpdates.last()
         assertEquals("已扫描文件数应该匹配", 3, lastProgress.scannedCount)
@@ -297,7 +310,7 @@ class AudioFileScannerTest {
             filePath = file1.absolutePath,
             fileSize = file1.length(),
             dateAdded = file1.lastModified(),
-            albumArtPath = null
+            albumArtPath = null,
         )
         val song2 = Song(
             id = file2.absolutePath,
@@ -308,7 +321,7 @@ class AudioFileScannerTest {
             filePath = file2.absolutePath,
             fileSize = file2.length(),
             dateAdded = file2.lastModified(),
-            albumArtPath = null
+            albumArtPath = null,
         )
 
         whenever(mockMetadataExtractor.extractMetadata(any(), any(), any()))
@@ -325,8 +338,10 @@ class AudioFileScannerTest {
         // Then: 进度更新应该包含当前扫描路径信息
         val progressWithPath = progressUpdates.find { it.currentPath != null }
         assertNotNull("至少应该有一个进度更新包含当前路径", progressWithPath)
-        assertTrue("当前路径应该包含目录路径", 
-            progressWithPath?.currentPath?.contains(musicDir.name) == true)
+        assertTrue(
+            "当前路径应该包含目录路径",
+            progressWithPath?.currentPath?.contains(musicDir.name) == true,
+        )
     }
 
     @Test
@@ -348,18 +363,20 @@ class AudioFileScannerTest {
                 filePath = file.absolutePath,
                 fileSize = file.length(),
                 dateAdded = file.lastModified(),
-                albumArtPath = null
+                albumArtPath = null,
             )
         }
 
         // Mock 每个文件返回对应的 Song
         songs.forEachIndexed { index, song ->
             val file = files[index]
-            whenever(mockMetadataExtractor.extractMetadata(
-                eq(file.absolutePath),
-                eq(file.length()),
-                eq(file.lastModified())
-            )).thenReturn(song)
+            whenever(
+                mockMetadataExtractor.extractMetadata(
+                    eq(file.absolutePath),
+                    eq(file.length()),
+                    eq(file.lastModified()),
+                ),
+            ).thenReturn(song)
         }
 
         // When: 扫描目录并收集进度更新
@@ -372,12 +389,12 @@ class AudioFileScannerTest {
 
         // Then: 验证进度正确递增
         assertTrue("应该收到多个进度更新", progressUpdates.size > 1)
-        
+
         // 验证第一个进度更新（开始扫描）
         val firstProgress = progressUpdates.first()
         assertEquals("开始扫描时计数应为 0", 0, firstProgress.scannedCount)
         assertTrue("应该正在扫描", firstProgress.isScanning)
-        
+
         // 验证中间进度更新递增
         val intermediateProgresses = progressUpdates.drop(1).dropLast(1)
         if (intermediateProgresses.isNotEmpty()) {
@@ -388,7 +405,7 @@ class AudioFileScannerTest {
                 previousCount = progress.scannedCount
             }
         }
-        
+
         // 验证最后一个进度更新（完成扫描）
         val lastProgress = progressUpdates.last()
         assertEquals("完成扫描时计数应为 10", 10, lastProgress.scannedCount)
@@ -416,18 +433,20 @@ class AudioFileScannerTest {
                 filePath = file.absolutePath,
                 fileSize = file.length(),
                 dateAdded = file.lastModified(),
-                albumArtPath = null
+                albumArtPath = null,
             )
         }
 
         // Mock 每个文件返回对应的 Song
         songs.forEachIndexed { index, song ->
             val file = files[index]
-            whenever(mockMetadataExtractor.extractMetadata(
-                eq(file.absolutePath),
-                eq(file.length()),
-                eq(file.lastModified())
-            )).thenReturn(song)
+            whenever(
+                mockMetadataExtractor.extractMetadata(
+                    eq(file.absolutePath),
+                    eq(file.length()),
+                    eq(file.lastModified()),
+                ),
+            ).thenReturn(song)
         }
 
         // When: 扫描目录并测量时间
@@ -443,15 +462,17 @@ class AudioFileScannerTest {
 
         // Then: 验证扫描结果和性能
         assertEquals("应该找到所有文件", fileCount, allSongs.size)
-        
+
         // 性能要求：100个文件应该在合理时间内完成（例如 < 5秒）
         // 注意：实际性能取决于系统，这里主要验证不会超时或卡死
         assertTrue("扫描应该在合理时间内完成（< 30秒）", duration < 30000)
-        
+
         // 验证所有文件都被扫描到
         (1..fileCount).forEach { i ->
-            assertTrue("应该包含 song$i.mp3", 
-                allSongs.any { it.filePath.contains("song$i.mp3") })
+            assertTrue(
+                "应该包含 song$i.mp3",
+                allSongs.any { it.filePath.contains("song$i.mp3") },
+            )
         }
     }
 
@@ -474,18 +495,20 @@ class AudioFileScannerTest {
                 filePath = file.absolutePath,
                 fileSize = file.length(),
                 dateAdded = file.lastModified(),
-                albumArtPath = null
+                albumArtPath = null,
             )
         }
 
         // Mock 每个文件返回对应的 Song
         songs.forEachIndexed { index, song ->
             val file = files[index]
-            whenever(mockMetadataExtractor.extractMetadata(
-                eq(file.absolutePath),
-                eq(file.length()),
-                eq(file.lastModified())
-            )).thenReturn(song)
+            whenever(
+                mockMetadataExtractor.extractMetadata(
+                    eq(file.absolutePath),
+                    eq(file.length()),
+                    eq(file.lastModified()),
+                ),
+            ).thenReturn(song)
         }
 
         // When: 扫描目录并收集进度更新
@@ -500,7 +523,9 @@ class AudioFileScannerTest {
         // 应该有开始、中间更新（每个文件一个）、完成更新
         // 至少应该有 2 个更新（开始和完成），最多可能有 22 个（开始 + 20个文件 + 完成）
         assertTrue("应该有进度更新", progressUpdates.size >= 2)
-        assertTrue("进度更新数量应该合理（不超过文件数+2）", 
-            progressUpdates.size <= files.size + 2)
+        assertTrue(
+            "进度更新数量应该合理（不超过文件数+2）",
+            progressUpdates.size <= files.size + 2,
+        )
     }
 }

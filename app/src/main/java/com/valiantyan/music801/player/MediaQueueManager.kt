@@ -15,7 +15,7 @@ class MediaQueueManager {
      * @param songs 歌曲列表
      * @param startIndex 开始位置
      */
-    fun setQueue(songs: List<Song>, startIndex: Int): Unit {
+    fun setQueue(songs: List<Song>, startIndex: Int) {
         queue = songs
         currentIndex = resolveStartIndex(songs = songs, startIndex = startIndex)
     }

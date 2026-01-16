@@ -16,15 +16,15 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.annotation.Config
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 import java.io.File
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [33])
 class AudioScanIntegrationTest {
     @Test
-    fun `扫描有效文件时返回歌曲与进度信息`() : Unit = runBlocking {
+    fun `扫描有效文件时返回歌曲与进度信息`(): Unit = runBlocking {
         val context: Context = getContext()
         val rootDir: File = createRootDir(context = context, name = "scan_valid")
         val subDir: File = createDirectory(parent = rootDir, name = "sub")
@@ -48,7 +48,7 @@ class AudioScanIntegrationTest {
     }
 
     @Test
-    fun `扫描包含损坏文件时跳过并完成`() : Unit = runBlocking {
+    fun `扫描包含损坏文件时跳过并完成`(): Unit = runBlocking {
         val context: Context = getContext()
         val rootDir: File = createRootDir(context = context, name = "scan_corrupted")
         val okFile1: File = createAudioFile(parent = rootDir, fileName = "ok1.mp3")
@@ -67,7 +67,7 @@ class AudioScanIntegrationTest {
     }
 
     @Test
-    fun `扫描空目录时返回空结果`() : Unit = runBlocking {
+    fun `扫描空目录时返回空结果`(): Unit = runBlocking {
         val context: Context = getContext()
         val rootDir: File = createRootDir(context = context, name = "scan_empty")
         val repository: AudioRepository = createRepository(failPaths = emptySet())
@@ -79,7 +79,7 @@ class AudioScanIntegrationTest {
     }
 
     @Test
-    fun `扫描无效路径时返回未扫描状态`() : Unit = runBlocking {
+    fun `扫描无效路径时返回未扫描状态`(): Unit = runBlocking {
         val context: Context = getContext()
         val rootDir: File = createRootDir(context = context, name = "scan_invalid_root")
         val missingDir: File = File(rootDir, "missing")
@@ -92,7 +92,7 @@ class AudioScanIntegrationTest {
     }
 
     @Test
-    fun `扫描不可读目录时不会崩溃`() : Unit = runBlocking {
+    fun `扫描不可读目录时不会崩溃`(): Unit = runBlocking {
         val context: Context = getContext()
         val rootDir: File = createRootDir(context = context, name = "scan_unreadable")
         val unreadableDir: File = createDirectory(parent = rootDir, name = "no_access")
@@ -111,7 +111,7 @@ class AudioScanIntegrationTest {
     }
 
     @Test
-    fun `扫描一千文件时耗时低于阈值`() : Unit = runBlocking {
+    fun `扫描一千文件时耗时低于阈值`(): Unit = runBlocking {
         val context: Context = getContext()
         val rootDir: File = createRootDir(context = context, name = "scan_perf")
         createAudioFiles(parent = rootDir, count = 1000)

@@ -20,7 +20,7 @@ import org.robolectric.annotation.Config
 @Config(sdk = [33])
 class SongListAdapterTest {
     @Test
-    fun `提交列表后返回正确数量`() : Unit {
+    fun `提交列表后返回正确数量`() {
         // Arrange
         val adapter: SongListAdapter = createAdapter()
         val song: Song = createSong(
@@ -38,7 +38,7 @@ class SongListAdapterTest {
     }
 
     @Test
-    fun `绑定数据后显示标题艺术家与时长`() : Unit {
+    fun `绑定数据后显示标题艺术家与时长`() {
         // Arrange
         val adapter: SongListAdapter = createAdapter()
         val song: Song = createSong(
@@ -71,7 +71,7 @@ class SongListAdapterTest {
     }
 
     @Test
-    fun `点击列表项后触发回调`() : Unit {
+    fun `点击列表项后触发回调`() {
         // Arrange
         var actualClickCount: Int = 0
         val adapter: SongListAdapter = createAdapter(
@@ -105,7 +105,7 @@ class SongListAdapterTest {
     }
 
     @Test
-    fun `长按列表项后触发回调`() : Unit {
+    fun `长按列表项后触发回调`() {
         // Arrange
         var actualLongClickCount: Int = 0
         val adapter: SongListAdapter = createAdapter(
@@ -139,7 +139,7 @@ class SongListAdapterTest {
     }
 
     @Test
-    fun `提交大列表后数量正确`() : Unit {
+    fun `提交大列表后数量正确`() {
         // Arrange
         val adapter: SongListAdapter = createAdapter()
         val songs: List<Song> = createSongs(count = 1000)
@@ -151,7 +151,7 @@ class SongListAdapterTest {
     }
 
     @Test
-    fun `绑定特殊字符标题后正确显示`() : Unit {
+    fun `绑定特殊字符标题后正确显示`() {
         // Arrange
         val adapter: SongListAdapter = createAdapter()
         val song: Song = createSong(
@@ -198,7 +198,7 @@ class SongListAdapterTest {
                     title = "Song $index",
                     artist = "Artist $index",
                     durationMs = 120000L,
-                )
+                ),
             )
         }
         return songs

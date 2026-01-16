@@ -2,9 +2,9 @@ package com.valiantyan.music801.viewmodel
 
 /**
  * 扫描 UI 状态
- * 
+ *
  * 用于管理扫描界面的所有状态信息，包括扫描进度、错误信息等。
- * 
+ *
  * @param isScanning 是否正在扫描
  * @param scannedCount 已扫描文件数
  * @param totalCount 总文件数（可能未知，为 null）
@@ -23,7 +23,7 @@ data class ScanUiState(
      */
     val hasError: Boolean
         get() = error != null
-    
+
     /**
      * 扫描是否已完成
      */

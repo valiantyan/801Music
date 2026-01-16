@@ -1,11 +1,16 @@
 package com.valiantyan.music801.data.datasource
 
-import com.valiantyan.music801.domain.model.Song
-import org.junit.Test
-import org.junit.Assert.*
-import org.junit.Before
-import org.mockito.kotlin.*
 import android.media.MediaMetadataRetriever
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Before
+import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doThrow
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 /**
  * 测试 MediaMetadataExtractor 元数据提取逻辑
@@ -51,7 +56,7 @@ class MediaMetadataExtractorTest {
         assertEquals("专辑应该匹配", "Test Album", song?.album)
         assertEquals("时长应该匹配", 180000L, song?.duration)
         assertNull("封面应该为 null", song?.albumArtPath)
-        
+
         // 验证调用了 setDataSource 和 release
         verify(mockRetriever).setDataSource(filePath)
         verify(mockRetriever).release()
@@ -236,8 +241,11 @@ class MediaMetadataExtractorTest {
 
         // Then
         assertNotNull("应该能处理特殊字符", song)
-        assertEquals("标题应该正确提取文件名（去除扩展名）", 
-            "My Song (2024) [Remix]", song?.title)
+        assertEquals(
+            "标题应该正确提取文件名（去除扩展名）",
+            "My Song (2024) [Remix]",
+            song?.title,
+        )
     }
 
     @Test

@@ -11,7 +11,7 @@ import org.junit.Test
  */
 class MediaQueueManagerTest {
     @Test
-    fun `设置队列后应返回当前歌曲`() : Unit {
+    fun `设置队列后应返回当前歌曲`() {
         // Arrange - 准备队列起点以验证索引生效
         val inputSongs: List<Song> = listOf(
             Song(
@@ -49,7 +49,7 @@ class MediaQueueManagerTest {
     }
 
     @Test
-    fun `获取下一首应返回正确歌曲`() : Unit {
+    fun `获取下一首应返回正确歌曲`() {
         // Arrange - 验证当前索引后的下一首可被读取
         val inputSongs: List<Song> = listOf(
             Song(
@@ -84,7 +84,7 @@ class MediaQueueManagerTest {
     }
 
     @Test
-    fun `到最后一首时获取下一首应回到第一首`() : Unit {
+    fun `到最后一首时获取下一首应回到第一首`() {
         // Arrange - 验证循环播放时下一首回到开头
         val inputSongs: List<Song> = listOf(
             Song(
@@ -119,7 +119,7 @@ class MediaQueueManagerTest {
     }
 
     @Test
-    fun `切换到下一首应更新当前索引`() : Unit {
+    fun `切换到下一首应更新当前索引`() {
         // Arrange - 验证切歌动作会更新当前歌曲
         val inputSongs: List<Song> = listOf(
             Song(
@@ -157,7 +157,7 @@ class MediaQueueManagerTest {
     }
 
     @Test
-    fun `到最后一首时切换下一首应回到第一首`() : Unit {
+    fun `到最后一首时切换下一首应回到第一首`() {
         // Arrange - 验证循环播放时切歌回到开头
         val inputSongs: List<Song> = listOf(
             Song(
@@ -195,7 +195,7 @@ class MediaQueueManagerTest {
     }
 
     @Test
-    fun `切换到上一首应更新当前索引`() : Unit {
+    fun `切换到上一首应更新当前索引`() {
         // Arrange - 验证向前切歌会更新当前歌曲
         val inputSongs: List<Song> = listOf(
             Song(
@@ -233,7 +233,7 @@ class MediaQueueManagerTest {
     }
 
     @Test
-    fun `单首歌曲循环时切歌应保持当前歌曲`() : Unit {
+    fun `单首歌曲循环时切歌应保持当前歌曲`() {
         // Arrange - 验证单首歌曲循环切换保持自身
         val inputSongs: List<Song> = listOf(
             Song(

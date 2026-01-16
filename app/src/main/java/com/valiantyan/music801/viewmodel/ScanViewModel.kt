@@ -3,7 +3,6 @@ package com.valiantyan.music801.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.valiantyan.music801.data.repository.AudioRepository
-import com.valiantyan.music801.domain.model.ScanProgress
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,14 +13,14 @@ import kotlinx.coroutines.launch
 
 /**
  * 扫描 ViewModel
- * 
+ *
  * 管理音频文件扫描的状态和逻辑，协调 UI 和 Repository 之间的交互。
  * 使用 StateFlow 管理 UI 状态，支持配置变更后状态恢复。
- * 
+ *
  * @param audioRepository 音频数据仓库
  */
 class ScanViewModel(
-    private val audioRepository: AudioRepository
+    private val audioRepository: AudioRepository,
 ) : ViewModel() {
 
     /**
@@ -41,7 +40,7 @@ class ScanViewModel(
 
     /**
      * 开始扫描音频文件
-     * 
+     *
      * @param rootPath 要扫描的根目录路径
      */
     fun startScan(rootPath: String) {
@@ -55,7 +54,7 @@ class ScanViewModel(
                     _uiState.update { currentState ->
                         currentState.copy(
                             isScanning = false,
-                            error = exception.message ?: "扫描过程中发生未知错误"
+                            error = exception.message ?: "扫描过程中发生未知错误",
                         )
                     }
                 }
@@ -66,7 +65,7 @@ class ScanViewModel(
                             scannedCount = progress.scannedCount,
                             totalCount = progress.totalCount,
                             currentPath = progress.currentPath,
-                            error = null // 清除之前的错误（如果有）
+                            error = null, // 清除之前的错误（如果有）
                         )
                     }
                 }
@@ -83,7 +82,7 @@ class ScanViewModel(
             if (currentState.isScanning) {
                 currentState.copy(
                     isScanning = false,
-                    error = "扫描已取消"
+                    error = "扫描已取消",
                 )
             } else {
                 currentState

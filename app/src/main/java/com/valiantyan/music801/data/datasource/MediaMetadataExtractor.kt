@@ -1,7 +1,7 @@
 package com.valiantyan.music801.data.datasource
 
-import com.valiantyan.music801.domain.model.Song
 import android.media.MediaMetadataRetriever
+import com.valiantyan.music801.domain.model.Song
 import java.io.File
 
 /**
@@ -13,12 +13,12 @@ import java.io.File
  * @param metadataRetrieverFactory [MetadataRetriever] 工厂，用于测试替换
  */
 class MediaMetadataExtractor(
-    private val metadataRetrieverFactory: () -> MetadataRetriever = { AndroidMetadataRetriever() }
+    private val metadataRetrieverFactory: () -> MetadataRetriever = { AndroidMetadataRetriever() },
 ) {
 
     /**
      * 从音频文件中提取元数据并创建 Song 对象
-     * 
+     *
      * @param filePath 音频文件路径
      * @param fileSize 文件大小（字节）
      * @param dateAdded 添加时间（时间戳，毫秒）
@@ -60,7 +60,7 @@ class MediaMetadataExtractor(
 
     /**
      * 从文件名中提取标题（去除扩展名）
-     * 
+     *
      * @param filePath 文件路径
      * @return 文件名（不含扩展名）
      */
