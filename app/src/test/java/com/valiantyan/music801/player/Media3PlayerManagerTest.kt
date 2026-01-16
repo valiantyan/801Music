@@ -4,12 +4,15 @@ import android.app.Application
 import android.os.Build
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
+import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import org.robolectric.annotation.Config
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
@@ -104,6 +107,42 @@ class Media3PlayerManagerTest {
         val actualPosition: Long = manager.exoPlayer.currentPosition
         // Assert
         assertLongEquals(expected = inputPosition, actual = actualPosition)
+        manager.release()
+    }
+
+    @Test
+    fun `构建PlaybackState时应映射播放器字段`() {
+        // Arrange - 准备播放器属性与错误信息
+        val manager: Media3PlayerManager = Media3PlayerManager(
+            context = RuntimeEnvironment.getApplication(),
+        )
+        val mockPlayer: Player = mock()
+        val inputPosition: Long = 1200L
+        val inputDuration: Long = 3000L
+        val inputBuffered: Long = 2000L
+        val inputState: Int = Player.STATE_READY
+        val inputError: PlaybackException = PlaybackException(
+            "test-error",
+            null,
+            PlaybackException.ERROR_CODE_UNSPECIFIED,
+        )
+        whenever(mockPlayer.isPlaying).thenReturn(true)
+        whenever(mockPlayer.currentPosition).thenReturn(inputPosition)
+        whenever(mockPlayer.duration).thenReturn(inputDuration)
+        whenever(mockPlayer.bufferedPosition).thenReturn(inputBuffered)
+        whenever(mockPlayer.playbackState).thenReturn(inputState)
+        // Act
+        val actualState: com.valiantyan.music801.domain.model.PlaybackState = manager.buildPlaybackState(
+            player = mockPlayer,
+            error = inputError,
+        )
+        // Assert
+        assertBooleanEquals(expected = true, actual = actualState.isPlaying)
+        assertLongEquals(expected = inputPosition, actual = actualState.position)
+        assertLongEquals(expected = inputDuration, actual = actualState.duration)
+        assertLongEquals(expected = inputBuffered, actual = actualState.bufferedPosition)
+        assertIntEquals(expected = inputState, actual = actualState.playbackState)
+        assertEquals(inputError, actualState.error)
         manager.release()
     }
 

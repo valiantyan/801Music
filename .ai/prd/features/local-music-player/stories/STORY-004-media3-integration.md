@@ -188,7 +188,7 @@ val exoPlayer = ExoPlayer.Builder(context)
     - *Test Case*: 测试跳转到指定位置
     - *Test Case*: 测试边界情况（开始、结束位置）
 
-- [ ] **Task 7**: 实现播放状态监听和转换
+- [x] **Task 7**: 实现播放状态监听和转换
     - *Test Case*: 测试播放状态 Flow 的发送
     - *Test Case*: 测试状态转换的正确性
 
@@ -233,6 +233,7 @@ val exoPlayer = ExoPlayer.Builder(context)
 - [x] 2025-01-27 完成 Task 4：实现 Media3 ExoPlayer 初始化与音频属性配置并补充测试。
 - [x] 2025-01-27 完成 Task 5：补充播放控制行为测试并验证播放/暂停/停止路径。
 - [x] 2025-01-27 完成 Task 6：补充进度跳转测试并验证 seekTo 行为。
+- [x] 2025-01-27 完成 Task 7：监听播放器状态并转换为 PlaybackState，补充映射测试。
 
 ---
 

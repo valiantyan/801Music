@@ -27,6 +27,8 @@ alwaysApply: false
 - Avoid meaningless or obvious comments
 - Keep comments updated to match code changes
 - When mentioning classes, methods, or fields in comments, they must be referenced using square brackets `[]`
+- New private members and functions must have Chinese comments explaining why they exist
+- New internal members and functions must have Chinese comments explaining why they exist
 - Critical private methods in key classes must have detailed comments:
   - Key class definition: Classes exceeding 200 lines of code
   - Critical method definition: Methods exceeding 30 lines of code or calling more than 5 other methods
