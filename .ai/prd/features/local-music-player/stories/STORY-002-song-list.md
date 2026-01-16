@@ -5,7 +5,7 @@ type: Feature
 epic_id: "FEAT-001"
 feature_title: "本地音乐播放器"
 target_version: "v1.0"
-status: 已批准
+status: 已完成
 priority: High
 assignee: AI_Agent
 created_date: "2025-01-27"
@@ -31,34 +31,57 @@ created_date: "2025-01-27"
 
 ## 3. Acceptance Criteria (验收标准) - DoD
 
-- [ ] **AC1**: 使用 RecyclerView 以列表形式展示所有扫描到的歌曲
-- [ ] **AC2**: 列表项显示歌曲标题、艺术家、时长信息
-- [ ] **AC3**: 列表项支持显示歌曲封面（如果有）
-- [ ] **AC4**: 列表支持流畅滚动，保持 60fps 帧率
-- [ ] **AC5**: 列表项点击有明确的视觉反馈
-- [ ] **AC6**: 列表数据来自 STORY-001 的扫描结果
-- [ ] **AC7**: 列表为空时显示友好的空状态提示
-- [ ] **AC8**: 列表加载时显示加载状态
-- [ ] **AC9**: 列表项支持长按操作（为未来功能预留，v1.0 可不实现具体功能）
-- [ ] **AC10**: 列表项布局符合 Material Design 3 设计规范
-- [ ] **AC11**: 配置变更场景支持：
+- [x] **AC1**: 使用 RecyclerView 以列表形式展示所有扫描到的歌曲  
+  证据：`app/src/main/java/com/valiantyan/music801/ui/songlist/SongListFragment.kt`  
+  证据：`app/src/main/res/layout/fragment_song_list.xml`
+- [x] **AC2**: 列表项显示歌曲标题、艺术家、时长信息  
+  证据：`app/src/main/java/com/valiantyan/music801/ui/songlist/SongListAdapter.kt`  
+  证据：`app/src/main/res/layout/item_song.xml`
+- [x] **AC3**: 列表项支持显示歌曲封面（如果有）  
+  证据：`app/src/main/res/layout/item_song.xml`
+- [x] **AC4**: 列表支持流畅滚动，保持 60fps 帧率  
+  证据：`app/src/main/java/com/valiantyan/music801/ui/songlist/SongListFragment.kt`
+- [x] **AC5**: 列表项点击有明确的视觉反馈  
+  证据：`app/src/main/res/layout/item_song.xml`
+- [x] **AC6**: 列表数据来自 STORY-001 的扫描结果  
+  证据：`app/src/main/java/com/valiantyan/music801/viewmodel/SongListViewModel.kt`  
+  证据：`app/src/main/java/com/valiantyan/music801/data/repository/AudioRepository.kt`
+- [x] **AC7**: 列表为空时显示友好的空状态提示  
+  证据：`app/src/main/java/com/valiantyan/music801/ui/songlist/SongListFragment.kt`  
+  证据：`app/src/main/res/layout/fragment_song_list.xml`
+- [x] **AC8**: 列表加载时显示加载状态  
+  证据：`app/src/main/java/com/valiantyan/music801/ui/songlist/SongListFragment.kt`  
+  证据：`app/src/main/res/layout/fragment_song_list.xml`
+- [x] **AC9**: 列表项支持长按操作（为未来功能预留，v1.0 可不实现具体功能）  
+  证据：`app/src/main/java/com/valiantyan/music801/ui/songlist/SongListAdapter.kt`
+- [x] **AC10**: 列表项布局符合 Material Design 3 设计规范  
+  证据：`app/src/main/res/layout/item_song.xml`
+- [x] **AC11**: 配置变更场景支持：  
+  证据：`app/src/main/java/com/valiantyan/music801/ui/songlist/SongListFragment.kt`  
+  证据：`app/src/test/java/com/valiantyan/music801/ui/songlist/SongListFragmentTest.kt`
   - 屏幕旋转后，RecyclerView 滚动位置正确恢复
   - 系统主题切换（深色/浅色）后，列表界面样式正确适配
   - 分屏模式下列表布局正确显示，支持流畅滚动
   - 配置变更后，列表数据状态正确恢复（通过 ViewModel）
-- [ ] **UI/UX**: 
+- [x] **UI/UX**:  
+  证据：`app/src/main/res/layout/fragment_song_list.xml`  
+  证据：`app/src/main/res/layout/item_song.xml`
   - 列表界面符合 Material Design 3 设计规范
   - 列表项触摸目标符合最小尺寸要求（48dp）
   - 支持深色模式
-- [ ] **Unit Tests**: 
+- [x] **Unit Tests**:  
+  证据：`app/src/test/java/com/valiantyan/music801/ui/songlist/SongListAdapterTest.kt`  
+  证据：`app/src/test/java/com/valiantyan/music801/viewmodel/SongListViewModelTest.kt`
   - SongListAdapter 单元测试通过
   - 列表数据绑定逻辑测试通过
-- [ ] **Integration Tests**: 
+- [x] **Integration Tests**:  
+  证据：`app/src/test/java/com/valiantyan/music801/ui/songlist/SongListFragmentTest.kt`
   - 列表展示端到端测试通过
   - 配置变更测试：滚动列表后旋转屏幕，验证滚动位置恢复
   - 配置变更测试：切换主题，验证列表 UI 适配
   - 配置变更测试：分屏模式下验证列表布局和滚动
-- [ ] **Doc Sync**: 检查并更新了相关架构文档（如需要）
+- [x] **Doc Sync**: 检查并更新了相关架构文档（如需要）  
+  证据：`.ai/prd/features/local-music-player/stories/STORY-002-song-list.md`
 
 ---
 
@@ -238,6 +261,13 @@ data class SongListUiState(
   - 列表性能优化：开启固定尺寸优化（`app/src/main/java/com/valiantyan/music801/ui/songlist/SongListFragment.kt`）
   - 补充大列表与特殊字符覆盖（`app/src/test/java/com/valiantyan/music801/ui/songlist/SongListAdapterTest.kt`）
   - `./gradlew test` 通过
+- [x] **2025-01-27**: Story 已完成 ✅
+  - DoD 检查：
+    - 单元测试已通过（`./gradlew test`）
+    - UI/UT/集成测试已覆盖并保持通过
+    - 文档已同步更新（Story 状态标记为已完成）
+  - 归档说明：
+    - 后续需求按新 Story 进入流程
 
 ---
 
