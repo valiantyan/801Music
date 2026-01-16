@@ -190,7 +190,7 @@ class MediaQueueManager {
     - *Test Case*: 测试队列设置和当前歌曲选择
     - *Test Case*: 测试队列状态更新
 
-- [ ] **Task 7**: 实现 PlayerFragment 布局 (fragment_player.xml)
+- [x] **Task 7**: 实现 PlayerFragment 布局 (fragment_player.xml)
     - *Test Case*: UI 测试 - 播放控制界面布局
     - *Test Case*: UI 测试 - 播放进度条显示
 
@@ -234,6 +234,9 @@ class MediaQueueManager {
 - [x] 2025-01-27 新增 [PlayerViewModel] 播放控制并补充 [PlayerViewModelTest] 单元测试。
 - [x] 2025-01-27 运行单元测试：`./gradlew :app:testDebugUnitTest`。
 - [x] 2025-01-27 新增 [PlayerViewModel] 队列管理接口并完善单元测试。
+- [x] 2025-01-27 运行单元测试：`./gradlew :app:testDebugUnitTest`。
+- [x] 2025-01-27 新增播放控制布局 [fragment_player.xml] 并补充字符串资源。
+- [x] 2025-01-27 运行单元测试：`./gradlew :app:testDebugUnitTest`。
 - [x] 2025-01-27 运行单元测试：`./gradlew :app:testDebugUnitTest`。
 
 ---

@@ -15,4 +15,14 @@
     <string name="song_list">歌曲列表</string>
     <string name="song_list_loading">歌曲列表加载中</string>
     <string name="song_list_empty">暂无歌曲</string>
+
+    <!-- 播放控制界面 -->
+    <string name="player_album_art">歌曲封面</string>
+    <string name="player_song_title_placeholder">歌曲标题</string>
+    <string name="player_song_artist_placeholder">艺术家</string>
+    <string name="player_progress">播放进度</string>
+    <string name="player_time_placeholder">00:00</string>
+    <string name="player_previous">上一首</string>
+    <string name="player_play_pause">播放或暂停</string>
+    <string name="player_next">下一首</string>
 </resources>
