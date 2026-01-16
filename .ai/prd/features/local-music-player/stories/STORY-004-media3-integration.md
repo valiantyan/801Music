@@ -210,7 +210,7 @@ val exoPlayer = ExoPlayer.Builder(context)
     - *Test Case*: 测试播放器资源释放
     - *Test Case*: 测试应用生命周期处理
 
-- [ ] **Task 12**: 实现 PlayerRepository（集成 MediaPlayerManager）
+- [x] **Task 12**: 实现 PlayerRepository（集成 MediaPlayerManager）
     - *Test Case*: 测试仓库接口实现
     - *Test Case*: 测试与 ViewModel 的集成
 
@@ -239,6 +239,7 @@ val exoPlayer = ExoPlayer.Builder(context)
 - [x] 2025-01-27 完成 Task 10：接入音频焦点管理并补充失焦测试。
 - [x] 2025-01-27 优化 Task 10：拆分音频焦点管理为独立组件以符合职责划分。
 - [x] 2025-01-27 完成 Task 11：在 Activity 销毁时释放播放器资源并补充仓库释放接口。
+- [x] 2025-01-27 完成 Task 12：接入 MediaPlayerManager 并补充仓库集成测试。
 
 ---
 

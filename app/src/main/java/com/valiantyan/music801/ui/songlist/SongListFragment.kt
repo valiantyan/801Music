@@ -297,7 +297,12 @@ class SongListFragment : Fragment() {
         if (provider != null) {
             return provider.providePlayerRepository()
         }
-        return PlayerRepositoryImpl(mediaQueueManager = MediaQueueManager())
+        val mediaPlayerManager: com.valiantyan.music801.player.MediaPlayerManager =
+            com.valiantyan.music801.player.Media3PlayerManager(context = requireContext())
+        return PlayerRepositoryImpl(
+            mediaQueueManager = MediaQueueManager(),
+            mediaPlayerManager = mediaPlayerManager,
+        )
     }
 
     /**

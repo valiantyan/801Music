@@ -155,7 +155,12 @@ class MainActivity : AppCompatActivity(), AudioRepositoryProvider, PlayerReposit
      */
     private fun createPlayerRepository(): PlayerRepository {
         val queueManager: MediaQueueManager = MediaQueueManager()
-        return PlayerRepositoryImpl(mediaQueueManager = queueManager)
+        val mediaPlayerManager: com.valiantyan.music801.player.MediaPlayerManager =
+            com.valiantyan.music801.player.Media3PlayerManager(context = this)
+        return PlayerRepositoryImpl(
+            mediaQueueManager = queueManager,
+            mediaPlayerManager = mediaPlayerManager,
+        )
     }
 
     /**
