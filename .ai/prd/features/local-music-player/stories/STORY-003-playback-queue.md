@@ -173,7 +173,7 @@ class MediaQueueManager {
     - *Test Case*: 测试队列设置和当前歌曲获取
     - *Test Case*: 测试上一首/下一首切换逻辑
 
-- [ ] **Task 3**: 实现 MediaQueueManager（循环播放）
+- [x] **Task 3**: 实现 MediaQueueManager（循环播放）
     - *Test Case*: 测试播放到最后一首后循环到第一首
     - *Test Case*: 测试单首歌曲的循环播放
 
@@ -226,6 +226,8 @@ class MediaQueueManager {
 - [x] 2025-01-27 创建 [PlayerUiState] 数据类并补充 [PlayerUiStateTest] 单元测试。
 - [x] 2025-01-27 运行单元测试：`./gradlew :app:testDebugUnitTest`。
 - [x] 2025-01-27 实现 [MediaQueueManager] 基础队列管理并补充 [MediaQueueManagerTest] 单元测试。
+- [x] 2025-01-27 运行单元测试：`./gradlew :app:testDebugUnitTest`。
+- [x] 2025-01-27 完成 [MediaQueueManager] 循环播放逻辑并更新单元测试用例。
 - [x] 2025-01-27 运行单元测试：`./gradlew :app:testDebugUnitTest`。
 
 ---

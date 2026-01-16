@@ -38,9 +38,13 @@ class MediaQueueManager {
      * @return 下一首歌曲，不存在时返回 null
      */
     fun getNextSong(): Song? {
-        val nextIndex: Int = currentIndex + 1
-        if (nextIndex < 0 || nextIndex >= queue.size) {
+        if (queue.isEmpty() || currentIndex < 0) {
             return null
+        }
+        val nextIndex: Int = if (currentIndex == queue.size - 1) {
+            0
+        } else {
+            currentIndex + 1
         }
         return queue[nextIndex]
     }
@@ -51,9 +55,13 @@ class MediaQueueManager {
      * @return 上一首歌曲，不存在时返回 null
      */
     fun getPreviousSong(): Song? {
-        val previousIndex: Int = currentIndex - 1
-        if (previousIndex < 0 || previousIndex >= queue.size) {
+        if (queue.isEmpty() || currentIndex < 0) {
             return null
+        }
+        val previousIndex: Int = if (currentIndex == 0) {
+            queue.size - 1
+        } else {
+            currentIndex - 1
         }
         return queue[previousIndex]
     }
@@ -64,11 +72,14 @@ class MediaQueueManager {
      * @return 是否切换成功
      */
     fun moveToNext(): Boolean {
-        val nextIndex: Int = currentIndex + 1
-        if (nextIndex < 0 || nextIndex >= queue.size) {
+        if (queue.isEmpty() || currentIndex < 0) {
             return false
         }
-        currentIndex = nextIndex
+        currentIndex = if (currentIndex == queue.size - 1) {
+            0
+        } else {
+            currentIndex + 1
+        }
         return true
     }
 
@@ -78,11 +89,14 @@ class MediaQueueManager {
      * @return 是否切换成功
      */
     fun moveToPrevious(): Boolean {
-        val previousIndex: Int = currentIndex - 1
-        if (previousIndex < 0 || previousIndex >= queue.size) {
+        if (queue.isEmpty() || currentIndex < 0) {
             return false
         }
-        currentIndex = previousIndex
+        currentIndex = if (currentIndex == 0) {
+            queue.size - 1
+        } else {
+            currentIndex - 1
+        }
         return true
     }
 
