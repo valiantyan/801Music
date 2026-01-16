@@ -12,10 +12,9 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.slider.Slider
 import com.valiantyan.music801.R
 import com.valiantyan.music801.data.repository.PlayerRepository
-import com.valiantyan.music801.data.repository.PlayerRepositoryImpl
 import com.valiantyan.music801.databinding.FragmentPlayerBinding
+import com.valiantyan.music801.di.PlayerRepositoryProvider
 import com.valiantyan.music801.domain.model.Song
-import com.valiantyan.music801.player.MediaQueueManager
 import com.valiantyan.music801.viewmodel.PlayerUiState
 import com.valiantyan.music801.viewmodel.PlayerViewModel
 import com.valiantyan.music801.viewmodel.PlayerViewModelFactory
@@ -71,9 +70,7 @@ class PlayerFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val factory: ViewModelProvider.Factory = viewModelFactoryForTest ?: run {
-            val repository: PlayerRepository = PlayerRepositoryImpl(
-                mediaQueueManager = MediaQueueManager(),
-            )
+            val repository: PlayerRepository = resolvePlayerRepository()
             PlayerViewModelFactory(playerRepository = repository)
         }
         viewModel = ViewModelProvider(this, factory)[PlayerViewModel::class.java]
@@ -228,6 +225,17 @@ class PlayerFragment : Fragment() {
             parent,
             attachToParent,
         )
+    }
+
+    /**
+     * 获取播放器仓库
+     */
+    private fun resolvePlayerRepository(): PlayerRepository {
+        val provider: PlayerRepositoryProvider? = activity as? PlayerRepositoryProvider
+        if (provider != null) {
+            return provider.providePlayerRepository()
+        }
+        throw IllegalStateException("PlayerRepositoryProvider not found")
     }
 
 }

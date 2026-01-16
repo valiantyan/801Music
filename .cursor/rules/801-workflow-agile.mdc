@@ -77,7 +77,15 @@ alwaysApply: true
 *   持续更新 Story `.md` 文件中的 `Task List` 和 `Development Log`。
 *   遇到架构冲突：
     *   **小调整**（类名、参数）：直接更新架构文档。
-    *   **大变更**（数据流、模块依赖）：**暂停 Story**，请求用户介入或创建架构重构任务。
+*   **大变更**（数据流、模块依赖）：**暂停 Story**，请求用户介入或创建架构重构任务。
+
+### Bug 记录格式 (Mandatory)
+在 Story 的 `Development Notes & Log` 中记录 Bug 时，必须使用以下固定格式（逐行换行）：
+
+Bug 描述：...
+问题原因：...
+解决方案：...
+影响范围：...
 
 ### C. 完成标准 (Definition of Done - DoD)
 一个 Story 只有满足以下所有条件才算 `已完成`：

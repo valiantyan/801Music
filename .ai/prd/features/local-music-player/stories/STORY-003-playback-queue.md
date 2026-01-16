@@ -245,6 +245,12 @@ class MediaQueueManager {
 - [x] 2025-01-27 运行单元测试：`./gradlew :app:testDebugUnitTest`。
 - [x] 2025-01-27 调整为共享 [PlayerRepository] 传递队列，避免 Bundle 传输大列表。
 - [x] 2025-01-27 运行单元测试：`./gradlew :app:testDebugUnitTest`。
+- [x] 2025-01-27 修复播放页使用共享 [PlayerRepository]，保证歌曲信息正确显示。
+- [x] 2025-01-27 运行单元测试：`./gradlew :app:testDebugUnitTest`。
+- [x] 2025-01-27 Bug 描述：播放页标题/艺术家为空。
+  问题原因：[SongListFragment] 使用共享 [PlayerRepository] 设置队列，但 [PlayerFragment] 仍新建仓库导致状态不一致。
+  解决方案：通过 [PlayerRepositoryProvider] 获取共享仓库。
+  影响范围：播放页首屏信息展示与状态同步。
 - [x] 2025-01-27 运行单元测试：`./gradlew :app:testDebugUnitTest`。
 
 ---
