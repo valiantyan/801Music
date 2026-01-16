@@ -175,7 +175,7 @@ val exoPlayer = ExoPlayer.Builder(context)
 - [x] **Task 3**: 定义 MediaPlayerManager 接口
     - *Test Case*: 测试接口定义的正确性
 
-- [ ] **Task 4**: 实现 ExoPlayer 初始化
+- [x] **Task 4**: 实现 ExoPlayer 初始化
     - *Test Case*: 测试 ExoPlayer 实例创建
     - *Test Case*: 测试音频属性配置
 
@@ -230,6 +230,7 @@ val exoPlayer = ExoPlayer.Builder(context)
 - [x] 2025-01-27 完成 Task 1：新增 Media3 依赖（exoplayer/session/ui/common）并通过编译验证。
 - [x] 2025-01-27 完成 Task 2：扩展 PlaybackState 字段以覆盖播放缓冲、状态与错误信息。
 - [x] 2025-01-27 完成 Task 3：定义 MediaPlayerManager 接口以统一播放控制与状态流出口。
+- [x] 2025-01-27 完成 Task 4：实现 Media3 ExoPlayer 初始化与音频属性配置并补充测试。
 
 ---
 
