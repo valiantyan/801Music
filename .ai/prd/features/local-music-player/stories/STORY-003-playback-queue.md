@@ -243,6 +243,8 @@ class MediaQueueManager {
 - [x] 2025-01-27 运行单元测试：`./gradlew :app:testDebugUnitTest`。
 - [x] 2025-01-27 新增列表到播放的导航参数传递并接入队列初始化。
 - [x] 2025-01-27 运行单元测试：`./gradlew :app:testDebugUnitTest`。
+- [x] 2025-01-27 调整为共享 [PlayerRepository] 传递队列，避免 Bundle 传输大列表。
+- [x] 2025-01-27 运行单元测试：`./gradlew :app:testDebugUnitTest`。
 - [x] 2025-01-27 运行单元测试：`./gradlew :app:testDebugUnitTest`。
 
 ---

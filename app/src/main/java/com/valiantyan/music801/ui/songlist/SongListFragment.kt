@@ -19,9 +19,13 @@ import com.valiantyan.music801.R
 import com.valiantyan.music801.data.datasource.AudioFileScanner
 import com.valiantyan.music801.data.datasource.MediaMetadataExtractor
 import com.valiantyan.music801.data.repository.AudioRepository
+import com.valiantyan.music801.data.repository.PlayerRepository
+import com.valiantyan.music801.data.repository.PlayerRepositoryImpl
 import com.valiantyan.music801.databinding.FragmentSongListBinding
 import com.valiantyan.music801.di.AudioRepositoryProvider
+import com.valiantyan.music801.di.PlayerRepositoryProvider
 import com.valiantyan.music801.domain.model.Song
+import com.valiantyan.music801.player.MediaQueueManager
 import com.valiantyan.music801.viewmodel.SongListUiState
 import com.valiantyan.music801.viewmodel.SongListViewModel
 import com.valiantyan.music801.viewmodel.SongListViewModelFactory
@@ -184,15 +188,15 @@ class SongListFragment : Fragment() {
         if (startIndex < 0) {
             return
         }
-        val queue: Array<Song> = songs.toTypedArray()
-        val args: Bundle = Bundle().apply {
-            putParcelableArray(ARG_QUEUE, queue)
-            putInt(ARG_START_INDEX, startIndex)
-        }
+        val playerRepository: PlayerRepository = resolvePlayerRepository()
+        playerRepository.setQueue(
+            songs = songs,
+            startIndex = startIndex,
+        )
         val navController = findNavController()
         navController.navigate(
             resId = R.id.action_songListFragment_to_playerFragment,
-            args = args,
+            args = null,
         )
     }
 
@@ -264,6 +268,17 @@ class SongListFragment : Fragment() {
     }
 
     /**
+     * 获取播放器仓库
+     */
+    private fun resolvePlayerRepository(): PlayerRepository {
+        val provider: PlayerRepositoryProvider? = activity as? PlayerRepositoryProvider
+        if (provider != null) {
+            return provider.providePlayerRepository()
+        }
+        return PlayerRepositoryImpl(mediaQueueManager = MediaQueueManager())
+    }
+
+    /**
      * 处理双击返回退出逻辑
      */
     private fun setupBackPressHandler() {
@@ -309,16 +324,6 @@ class SongListFragment : Fragment() {
          * 列表滚动状态存储键
          */
         private const val KEY_LIST_STATE: String = "song_list_state"
-
-        /**
-         * 播放队列参数键
-         */
-        private const val ARG_QUEUE: String = "queue"
-
-        /**
-         * 播放索引参数键
-         */
-        private const val ARG_START_INDEX: String = "startIndex"
 
         /**
          * 退出应用的双击间隔(2000ms)

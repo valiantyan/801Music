@@ -11,7 +11,11 @@ import androidx.navigation.fragment.NavHostFragment
 import com.valiantyan.music801.data.datasource.AudioFileScanner
 import com.valiantyan.music801.data.datasource.MediaMetadataExtractor
 import com.valiantyan.music801.data.repository.AudioRepository
+import com.valiantyan.music801.data.repository.PlayerRepository
+import com.valiantyan.music801.data.repository.PlayerRepositoryImpl
 import com.valiantyan.music801.di.AudioRepositoryProvider
+import com.valiantyan.music801.di.PlayerRepositoryProvider
+import com.valiantyan.music801.player.MediaQueueManager
 import com.valiantyan.music801.util.PermissionHelper
 
 /**
@@ -19,7 +23,7 @@ import com.valiantyan.music801.util.PermissionHelper
  *
  * 负责应用入口、权限请求和导航管理。
  */
-class MainActivity : AppCompatActivity(), AudioRepositoryProvider {
+class MainActivity : AppCompatActivity(), AudioRepositoryProvider, PlayerRepositoryProvider {
 
     /**
      * 权限助手
@@ -35,6 +39,11 @@ class MainActivity : AppCompatActivity(), AudioRepositoryProvider {
      * 导航控制器
      */
     private lateinit var navController: NavController
+
+    /**
+     * 播放器仓库
+     */
+    private lateinit var playerRepository: PlayerRepository
 
     /**
      * 初始化入口页面与权限检查
@@ -53,6 +62,7 @@ class MainActivity : AppCompatActivity(), AudioRepositoryProvider {
             handlePermissionResult(isGranted = isGranted)
         }
         audioRepository = createAudioRepository()
+        playerRepository = createPlayerRepository()
         navController = getNavController()
         if (!permissionHelper.hasPermission()) {
             requestStoragePermission()
@@ -125,12 +135,27 @@ class MainActivity : AppCompatActivity(), AudioRepositoryProvider {
     }
 
     /**
+     * 暴露统一的 [PlayerRepository] 供页面共享
+     */
+    override fun providePlayerRepository(): PlayerRepository {
+        return playerRepository
+    }
+
+    /**
      * 创建音频仓库实例
      */
     private fun createAudioRepository(): AudioRepository {
         val metadataExtractor: MediaMetadataExtractor = MediaMetadataExtractor()
         val audioFileScanner: AudioFileScanner = AudioFileScanner(metadataExtractor = metadataExtractor)
         return AudioRepository(audioFileScanner = audioFileScanner)
+    }
+
+    /**
+     * 创建播放器仓库实例
+     */
+    private fun createPlayerRepository(): PlayerRepository {
+        val queueManager: MediaQueueManager = MediaQueueManager()
+        return PlayerRepositoryImpl(mediaQueueManager = queueManager)
     }
 
     /**
