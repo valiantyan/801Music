@@ -177,7 +177,7 @@ class MediaQueueManager {
     - *Test Case*: 测试播放到最后一首后循环到第一首
     - *Test Case*: 测试单首歌曲的循环播放
 
-- [ ] **Task 4**: 实现 PlayerRepository（播放接口定义）
+- [x] **Task 4**: 实现 PlayerRepository（播放接口定义）
     - *Test Case*: 测试播放、暂停、跳转接口调用
     - *Test Case*: 测试播放状态 Flow 订阅
 
@@ -228,6 +228,8 @@ class MediaQueueManager {
 - [x] 2025-01-27 实现 [MediaQueueManager] 基础队列管理并补充 [MediaQueueManagerTest] 单元测试。
 - [x] 2025-01-27 运行单元测试：`./gradlew :app:testDebugUnitTest`。
 - [x] 2025-01-27 完成 [MediaQueueManager] 循环播放逻辑并更新单元测试用例。
+- [x] 2025-01-27 运行单元测试：`./gradlew :app:testDebugUnitTest`。
+- [x] 2025-01-27 新增 [PlayerRepository] 接口与 [PlayerRepositoryImpl]，补充 [PlaybackState] 与单元测试。
 - [x] 2025-01-27 运行单元测试：`./gradlew :app:testDebugUnitTest`。
 
 ---
