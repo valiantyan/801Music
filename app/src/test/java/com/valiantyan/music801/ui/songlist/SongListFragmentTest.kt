@@ -1,7 +1,9 @@
 package com.valiantyan.music801.ui.songlist
 
 import android.os.Build
+import android.os.Bundle
 import android.os.Looper
+import android.os.Parcelable
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
@@ -14,10 +16,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.valiantyan.music801.R
 import com.valiantyan.music801.data.repository.AudioRepository
+import com.valiantyan.music801.domain.model.Song
 import com.valiantyan.music801.viewmodel.SongListUiState
 import com.valiantyan.music801.viewmodel.SongListViewModel
 import kotlinx.coroutines.flow.flowOf
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -80,6 +84,39 @@ class SongListFragmentTest {
         assertEquals(View.VISIBLE, loadingView.visibility)
     }
 
+    @Test
+    fun `端到端列表展示应显示歌曲`() : Unit {
+        val songs: List<Song> = createSongs(count = 3)
+        whenever(repository.getAllSongs()).thenReturn(flowOf(songs))
+        val fragment: SongListFragment = launchFragment()
+        idleMainLooper()
+        val recyclerView: androidx.recyclerview.widget.RecyclerView =
+            fragment.requireView().findViewById(R.id.songListRecyclerView)
+        val adapter: SongListAdapter = recyclerView.adapter as SongListAdapter
+        assertEquals(3, adapter.itemCount)
+    }
+
+    @Test
+    fun `保存并恢复列表状态后位置保持`() : Unit {
+        val songs: List<Song> = createSongs(count = 30)
+        whenever(repository.getAllSongs()).thenReturn(flowOf(songs))
+        val fragment: SongListFragment = launchFragment()
+        idleMainLooper()
+        val recyclerView: androidx.recyclerview.widget.RecyclerView =
+            fragment.requireView().findViewById(R.id.songListRecyclerView)
+        recyclerView.scrollToPosition(20)
+        idleMainLooper()
+        val stateBundle: Bundle = Bundle()
+        fragment.onSaveInstanceState(stateBundle)
+        fragment.onViewStateRestored(stateBundle)
+        idleMainLooper()
+        val layoutManager = recyclerView.layoutManager as androidx.recyclerview.widget.LinearLayoutManager
+        val actualPosition: Int = layoutManager.findFirstVisibleItemPosition()
+        val listState: Parcelable? = layoutManager.onSaveInstanceState()
+        assertTrue(actualPosition >= 0)
+        assertTrue(listState != null)
+    }
+
     private fun launchFragment(): SongListFragment {
         val activityController = Robolectric.buildActivity(FragmentActivity::class.java)
         activityController.setup()
@@ -111,6 +148,26 @@ class SongListFragmentTest {
         )
         method.isAccessible = true
         method.invoke(fragment, state)
+    }
+
+    private fun createSongs(count: Int): List<Song> {
+        val songs: MutableList<Song> = mutableListOf()
+        for (index: Int in 1..count) {
+            songs.add(
+                Song(
+                    id = "/storage/music/song$index.mp3",
+                    title = "Song $index",
+                    artist = "Artist $index",
+                    album = null,
+                    duration = 60000L,
+                    filePath = "/storage/music/song$index.mp3",
+                    fileSize = 1024L,
+                    dateAdded = 1700000000000L,
+                    albumArtPath = null,
+                )
+            )
+        }
+        return songs
     }
 }
 

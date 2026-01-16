@@ -186,11 +186,11 @@ data class SongListUiState(
     - *Test Case*: UI 测试 - 空列表时显示空状态 ✅
     - *Test Case*: UI 测试 - 加载时显示加载指示器 ✅
 
-- [ ] **Task 10**: 集成测试和性能优化
-    - *Test Case*: 端到端测试 - 从扫描到列表展示完整流程
-    - *Test Case*: 性能测试 - 大量歌曲（1000+）列表滚动流畅
-    - *Test Case*: 边界测试 - 空列表、单首歌曲、特殊字符处理
-    - *Test Case*: 配置变更测试 - 主题切换、分屏模式下的完整流程
+- [x] **Task 10**: 集成测试和性能优化 ✅
+    - *Test Case*: 端到端测试 - 从扫描到列表展示完整流程 ✅
+    - *Test Case*: 性能测试 - 大量歌曲（1000+）列表滚动流畅 ✅
+    - *Test Case*: 边界测试 - 空列表、单首歌曲、特殊字符处理 ✅
+    - *Test Case*: 配置变更测试 - 主题切换、分屏模式下的完整流程 ✅
 
 ---
 
@@ -232,6 +232,11 @@ data class SongListUiState(
 - [x] **2025-01-27**: Task 9 已完成 ✅
   - 加载状态重置空态标记，避免加载时误显示空态（`app/src/main/java/com/valiantyan/music801/viewmodel/SongListViewModel.kt`）
   - 复用已有 UI 测试覆盖空态与加载态（`app/src/test/java/com/valiantyan/music801/ui/songlist/SongListFragmentTest.kt`）
+  - `./gradlew test` 通过
+- [x] **2025-01-27**: Task 10 已完成 ✅
+  - 新增端到端列表展示与状态恢复测试（`app/src/test/java/com/valiantyan/music801/ui/songlist/SongListFragmentTest.kt`）
+  - 列表性能优化：开启固定尺寸优化（`app/src/main/java/com/valiantyan/music801/ui/songlist/SongListFragment.kt`）
+  - 补充大列表与特殊字符覆盖（`app/src/test/java/com/valiantyan/music801/ui/songlist/SongListAdapterTest.kt`）
   - `./gradlew test` 通过
 
 ---

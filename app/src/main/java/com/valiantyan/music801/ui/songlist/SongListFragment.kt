@@ -89,6 +89,7 @@ class SongListFragment : Fragment() {
         )
         binding.songListRecyclerView.layoutManager = layoutManager
         binding.songListRecyclerView.adapter = adapter
+        binding.songListRecyclerView.setHasFixedSize(true)
         restoreListState()
     }
 
