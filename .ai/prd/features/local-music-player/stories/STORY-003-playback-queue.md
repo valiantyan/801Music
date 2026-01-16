@@ -181,7 +181,7 @@ class MediaQueueManager {
     - *Test Case*: 测试播放、暂停、跳转接口调用
     - *Test Case*: 测试播放状态 Flow 订阅
 
-- [ ] **Task 5**: 实现 PlayerViewModel（播放控制）
+- [x] **Task 5**: 实现 PlayerViewModel（播放控制）
     - *Test Case*: 测试播放/暂停状态管理
     - *Test Case*: 测试上一首/下一首切换
     - *Test Case*: 测试进度跳转
@@ -230,6 +230,8 @@ class MediaQueueManager {
 - [x] 2025-01-27 完成 [MediaQueueManager] 循环播放逻辑并更新单元测试用例。
 - [x] 2025-01-27 运行单元测试：`./gradlew :app:testDebugUnitTest`。
 - [x] 2025-01-27 新增 [PlayerRepository] 接口与 [PlayerRepositoryImpl]，补充 [PlaybackState] 与单元测试。
+- [x] 2025-01-27 运行单元测试：`./gradlew :app:testDebugUnitTest`。
+- [x] 2025-01-27 新增 [PlayerViewModel] 播放控制并补充 [PlayerViewModelTest] 单元测试。
 - [x] 2025-01-27 运行单元测试：`./gradlew :app:testDebugUnitTest`。
 
 ---
