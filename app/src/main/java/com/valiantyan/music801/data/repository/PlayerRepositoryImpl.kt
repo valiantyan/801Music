@@ -1,6 +1,8 @@
 package com.valiantyan.music801.data.repository
 
 import android.net.Uri
+import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
 import java.io.File
 import androidx.media3.common.Player
 import com.valiantyan.music801.domain.model.PlaybackState
@@ -82,6 +84,12 @@ class PlayerRepositoryImpl(
             return
         }
         Log.d(TAG, "play request: ${currentSong.filePath}")
+        val media3Manager: Media3PlayerManager? = mediaPlayerManager as? Media3PlayerManager
+        if (media3Manager != null) {
+            val mediaItem: MediaItem = buildMediaItem(song = currentSong)
+            media3Manager.playMediaItem(mediaItem = mediaItem)
+            return
+        }
         val mediaUri: Uri = Uri.fromFile(File(currentSong.filePath))
         mediaPlayerManager.play(uri = mediaUri)
     }
@@ -136,6 +144,27 @@ class PlayerRepositoryImpl(
     internal fun getSessionPlayer(): Player? {
         val media3Manager: Media3PlayerManager? = mediaPlayerManager as? Media3PlayerManager
         return media3Manager?.exoPlayer
+    }
+
+    private fun buildMediaItem(song: Song): MediaItem {
+        val metadata: MediaMetadata = MediaMetadata.Builder()
+            .setTitle(song.title)
+            .setArtist(song.artist)
+            .setAlbumTitle(song.album)
+            .setArtworkUri(resolveArtworkUri(song = song))
+            .build()
+        return MediaItem.Builder()
+            .setUri(Uri.fromFile(File(song.filePath)))
+            .setMediaMetadata(metadata)
+            .build()
+    }
+
+    private fun resolveArtworkUri(song: Song): Uri? {
+        val path: String? = song.albumArtPath
+        if (path.isNullOrBlank()) {
+            return null
+        }
+        return Uri.fromFile(File(path))
     }
 
     private fun updateCurrentSong(): Unit {

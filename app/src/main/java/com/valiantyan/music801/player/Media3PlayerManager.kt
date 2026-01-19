@@ -83,24 +83,8 @@ class Media3PlayerManager(
      * @param uri 音频资源 [Uri]
      */
     override fun play(uri: Uri): Unit {
-        Log.d(TAG, "play request: $uri")
-        val file: File? = uri.path?.let { path -> File(path) }
-        if (file != null && !file.exists()) {
-            Log.e(TAG, "play file not found: ${file.absolutePath}")
-            handlePlaybackError(
-                error = PlaybackException(
-                    "file-not-found",
-                    null,
-                    PlaybackException.ERROR_CODE_IO_FILE_NOT_FOUND,
-                ),
-            )
-            return
-        }
-        clearPlaybackError()
         val mediaItem: MediaItem = MediaItem.fromUri(uri)
-        exoPlayer.setMediaItem(mediaItem)
-        exoPlayer.prepare()
-        exoPlayer.play()
+        playMediaItem(mediaItem = mediaItem)
     }
 
     /**
@@ -288,6 +272,28 @@ class Media3PlayerManager(
     }
 
     /**
+     * 使用完整媒体项发起播放，确保元数据同步到系统
+     */
+    internal fun playMediaItem(mediaItem: MediaItem): Unit {
+        val file: File? = resolveMediaFile(mediaItem = mediaItem)
+        if (file != null && !file.exists()) {
+            Log.e(TAG, "play file not found: ${file.absolutePath}")
+            handlePlaybackError(
+                error = PlaybackException(
+                    "file-not-found",
+                    null,
+                    PlaybackException.ERROR_CODE_IO_FILE_NOT_FOUND,
+                ),
+            )
+            return
+        }
+        clearPlaybackError()
+        exoPlayer.setMediaItem(mediaItem)
+        exoPlayer.prepare()
+        exoPlayer.play()
+    }
+
+    /**
      * 优先返回最新错误，避免刷新逻辑清空错误状态
      *
      * @param error 当前回调携带的错误
@@ -298,6 +304,15 @@ class Media3PlayerManager(
             return error
         }
         return lastError
+    }
+
+    private fun resolveMediaFile(mediaItem: MediaItem): File? {
+        val uri: Uri? = mediaItem.localConfiguration?.uri
+        val path: String? = uri?.path
+        if (path == null) {
+            return null
+        }
+        return File(path)
     }
 
     private companion object {

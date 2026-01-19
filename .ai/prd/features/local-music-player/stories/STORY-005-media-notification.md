@@ -188,7 +188,7 @@ val notification = NotificationCompat.Builder(context, CHANNEL_ID)
     - *Test Case*: 测试播放状态同步
     - *Test Case*: 测试播放进度更新
 
-- [ ] **Task 7**: 实现播放元数据更新到 MediaSession
+- [x] **Task 7**: 实现播放元数据更新到 MediaSession
     - *Test Case*: 测试歌曲信息更新
     - *Test Case*: 测试封面更新
 
@@ -239,6 +239,8 @@ val notification = NotificationCompat.Builder(context, CHANNEL_ID)
 - [x] Task 5 测试：`./gradlew :app:testDebugUnitTest --tests "com.valiantyan.music801.service.*"` 通过。
 - [x] Task 6 完成：同步播放错误到 `MediaSession` 并启用进度定期更新。
 - [x] Task 6 测试：`./gradlew :app:testDebugUnitTest --tests "com.valiantyan.music801.service.*"` 通过。
+- [x] Task 7 完成：播放时将标题、艺术家与专辑元数据注入 Media3 MediaItem。
+- [x] Task 7 测试：`./gradlew :app:testDebugUnitTest --tests "com.valiantyan.music801.data.repository.PlayerRepositoryMetadataTest"` 通过。
 
 ---
 
