@@ -5,7 +5,7 @@ type: Feature
 epic_id: "FEAT-001"
 feature_title: "本地音乐播放器"
 target_version: "v1.0"
-status: 草稿
+status: 已批准
 priority: High
 assignee: AI_Agent
 created_date: "2025-01-27"
@@ -166,10 +166,10 @@ val notification = NotificationCompat.Builder(context, CHANNEL_ID)
 
 ## 5. Development Steps (开发步骤 - TDD/Task Breakdown)
 
-- [ ] **Task 1**: 添加 Media3 Session 依赖到 build.gradle.kts
+- [x] **Task 1**: 添加 Media3 Session 依赖到 build.gradle.kts
     - *Test Case*: 验证依赖正确添加，项目能够编译
 
-- [ ] **Task 2**: 在 AndroidManifest.xml 中声明 MediaSessionService
+- [x] **Task 2**: 在 AndroidManifest.xml 中声明 MediaSessionService
     - *Test Case*: 验证服务声明正确
 
 - [ ] **Task 3**: 创建 MediaSessionService 基础框架
@@ -228,7 +228,9 @@ val notification = NotificationCompat.Builder(context, CHANNEL_ID)
 ## 6. Development Notes & Log (开发笔记与日志)
 
 **(Current Log):**
-- [ ] 
+- [x] Task 1 完成：`app/build.gradle.kts` 已存在 `implementation(libs.androidx.media3.session)` 依赖，无需变更。
+- [x] Task 2 完成：已在 `app/src/main/AndroidManifest.xml` 声明 `.service.MusicPlayerService`。
+- [x] Task 2 测试：`./gradlew :app:assembleDebug` 通过。
 
 ---
 
