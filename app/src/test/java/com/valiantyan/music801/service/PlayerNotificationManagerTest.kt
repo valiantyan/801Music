@@ -88,6 +88,12 @@ class PlayerNotificationManagerTest {
         )
         // Assert
         assertEquals(actualNotification, manager.lastNotification)
+        assertTrue(manager.isPlayPauseActionEnabled)
+        assertTrue(manager.isNextActionEnabled)
+        assertTrue(manager.isPreviousActionEnabled)
+        assertTrue(manager.isStopActionEnabled)
+        assertTrue(manager.isCompactNextActionEnabled)
+        assertTrue(manager.isCompactPreviousActionEnabled)
         mediaSession.release()
         playerManager.release()
     }

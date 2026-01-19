@@ -24,6 +24,12 @@ class PlayerNotificationManager(
         context.getSystemService(NotificationManager::class.java)
     internal var lastNotification: Notification? = null
     internal var isNotificationPosted: Boolean = false
+    internal var isPlayPauseActionEnabled: Boolean = false
+    internal var isNextActionEnabled: Boolean = false
+    internal var isPreviousActionEnabled: Boolean = false
+    internal var isStopActionEnabled: Boolean = false
+    internal var isCompactNextActionEnabled: Boolean = false
+    internal var isCompactPreviousActionEnabled: Boolean = false
     private var media3NotificationManager: Media3PlayerNotificationManager? = null
 
     /**
@@ -85,12 +91,16 @@ class PlayerNotificationManager(
         media3NotificationManager = manager
         manager.setMediaSessionToken(mediaSession.getPlatformToken())
         manager.setPlayer(player)
-        val notification: Notification = lastNotification ?: buildNotification(
+        if (lastNotification == null) {
+            lastNotification = buildNotification(
+                song = song,
+                isPlaying = isPlaying,
+            )
+        }
+        return lastNotification ?: buildNotification(
             song = song,
             isPlaying = isPlaying,
         )
-        lastNotification = notification
-        return notification
     }
 
     private fun buildMedia3Manager(
@@ -112,6 +122,20 @@ class PlayerNotificationManager(
             .setMediaDescriptionAdapter(adapter)
             .setNotificationListener(listener)
             .build()
+            .apply {
+                setUsePlayPauseActions(true)
+                setUseNextAction(true)
+                setUsePreviousAction(true)
+                setUseStopAction(true)
+                setUseNextActionInCompactView(true)
+                setUsePreviousActionInCompactView(true)
+                isPlayPauseActionEnabled = true
+                isNextActionEnabled = true
+                isPreviousActionEnabled = true
+                isStopActionEnabled = true
+                isCompactNextActionEnabled = true
+                isCompactPreviousActionEnabled = true
+            }
     }
 
     private inner class NotificationListenerImpl :

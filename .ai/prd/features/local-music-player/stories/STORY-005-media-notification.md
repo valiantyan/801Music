@@ -200,7 +200,7 @@ val notification = NotificationCompat.Builder(context, CHANNEL_ID)
     - *Test Case*: 测试 MediaStyle 通知样式
     - *Test Case*: 测试控制按钮显示
 
-- [ ] **Task 10**: 实现通知栏按钮点击处理
+- [x] **Task 10**: 实现通知栏按钮点击处理
     - *Test Case*: 测试播放/暂停按钮点击
     - *Test Case*: 测试上一首/下一首按钮点击
     - *Test Case*: 测试关闭按钮点击
@@ -245,6 +245,8 @@ val notification = NotificationCompat.Builder(context, CHANNEL_ID)
 - [x] Task 8 测试：`./gradlew :app:testDebugUnitTest --tests "com.valiantyan.music801.service.PlayerNotificationManagerTest"` 通过。
 - [x] Task 9 完成：使用 Media3 `PlayerNotificationManager` 构建媒体样式通知。
 - [x] Task 9 测试：`./gradlew :app:testDebugUnitTest --tests "com.valiantyan.music801.service.PlayerNotificationManagerTest"` 通过。
+- [x] Task 10 完成：配置通知栏播放、上一首、下一首、停止按钮及紧凑模式显示。
+- [x] Task 10 测试：`./gradlew :app:testDebugUnitTest --tests "com.valiantyan.music801.service.PlayerNotificationManagerTest"` 通过。
 
 ---
 
