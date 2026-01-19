@@ -2,8 +2,10 @@ package com.valiantyan.music801.data.repository
 
 import android.net.Uri
 import java.io.File
+import androidx.media3.common.Player
 import com.valiantyan.music801.domain.model.PlaybackState
 import com.valiantyan.music801.domain.model.Song
+import com.valiantyan.music801.player.Media3PlayerManager
 import com.valiantyan.music801.player.MediaPlayerManager
 import com.valiantyan.music801.player.MediaQueueManager
 import android.util.Log
@@ -126,6 +128,14 @@ class PlayerRepositoryImpl(
         coroutineScope.cancel()
         mediaPlayerManager.release()
         _playbackState.value = PlaybackState()
+    }
+
+    /**
+     * 获取用于 MediaSession 的播放器实例
+     */
+    internal fun getSessionPlayer(): Player? {
+        val media3Manager: Media3PlayerManager? = mediaPlayerManager as? Media3PlayerManager
+        return media3Manager?.exoPlayer
     }
 
     private fun updateCurrentSong(): Unit {

@@ -179,7 +179,7 @@ val notification = NotificationCompat.Builder(context, CHANNEL_ID)
     - *Test Case*: 测试 MediaSession 实例创建
     - *Test Case*: 测试 MediaSession 回调注册
 
-- [ ] **Task 5**: 实现 MediaSession.Callback（播放控制）
+- [x] **Task 5**: 实现 MediaSession.Callback（播放控制）
     - *Test Case*: 测试播放/暂停命令处理
     - *Test Case*: 测试上一首/下一首命令处理
     - *Test Case*: 测试跳转命令处理
@@ -235,6 +235,8 @@ val notification = NotificationCompat.Builder(context, CHANNEL_ID)
 - [x] Task 3 测试：`./gradlew :app:testDebugUnitTest --tests "com.valiantyan.music801.service.MusicPlayerServiceTest"` 通过。
 - [x] Task 4 完成：在 `MusicPlayerService` 创建 `MediaSession` 并关联播放器实例。
 - [x] Task 4 测试：`./gradlew :app:testDebugUnitTest --tests "com.valiantyan.music801.service.MusicPlayerServiceTest"` 通过。
+- [x] Task 5 完成：新增 `PlaybackSessionCallback` 处理播放控制指令。
+- [x] Task 5 测试：`./gradlew :app:testDebugUnitTest --tests "com.valiantyan.music801.service.*"` 通过。
 
 ---
 
