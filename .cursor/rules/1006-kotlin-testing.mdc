@@ -20,6 +20,7 @@ alwaysApply: false
   - Exceptions can be made for inexpensive third-party dependencies
 - Write acceptance tests for each module
   - Follow the Given-When-Then structure
+- Test names must use backticked Chinese descriptions
 - Test names should be descriptive, clearly stating what is being tested
 - Each test should test only one scenario or behavior
 - Keep tests independent of each other, avoid dependency on execution order
@@ -42,7 +43,7 @@ class UserRepositoryTest {
     }
     
     @Test
-    fun fetchUserById_validUserId_returnsUser() {
+    fun `有效用户ID应返回用户`() {
         // Arrange - 准备测试数据
         val expectedUser = User("123", "测试用户", "test@example.com")
         `when`(mockApiService.getUser("123")).thenReturn(expectedUser)
@@ -58,7 +59,7 @@ class UserRepositoryTest {
     }
     
     @Test
-    fun fetchUserById_userNotFound_throwsException() {
+    fun `用户不存在时应抛出异常`() {
         // Arrange
         `when`(mockApiService.getUser("999")).thenThrow(UserNotFoundException("用户不存在"))
         
@@ -70,7 +71,7 @@ class UserRepositoryTest {
     
     @ParameterizedTest
     @ValueSource(strings = ["", " ", "   "])
-    fun fetchUserById_emptyUserId_throwsIllegalArgumentException(emptyId: String) {
+    fun `空用户ID应抛出非法参数异常`(emptyId: String) {
         // Act & Assert
         assertThrows<IllegalArgumentException> {
             userRepository.fetchUserById(emptyId)
@@ -112,5 +113,5 @@ class BadTestExample {
   - Follow the Arrange-Act-Assert test structure
   - Each test should test only one scenario or behavior
   - Use Test Doubles to isolate code under test
-  - Use descriptive test names
-  - Keep tests independent, not dependent on execution order 
+  - Test names must use backticked Chinese descriptions
+  - Keep tests independent, not dependent on execution order

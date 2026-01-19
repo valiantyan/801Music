@@ -172,7 +172,7 @@ val notification = NotificationCompat.Builder(context, CHANNEL_ID)
 - [x] **Task 2**: 在 AndroidManifest.xml 中声明 MediaSessionService
     - *Test Case*: 验证服务声明正确
 
-- [ ] **Task 3**: 创建 MediaSessionService 基础框架
+- [x] **Task 3**: 创建 MediaSessionService 基础框架
     - *Test Case*: 测试服务创建和生命周期
 
 - [ ] **Task 4**: 实现 MediaSession 创建和配置
@@ -231,6 +231,8 @@ val notification = NotificationCompat.Builder(context, CHANNEL_ID)
 - [x] Task 1 完成：`app/build.gradle.kts` 已存在 `implementation(libs.androidx.media3.session)` 依赖，无需变更。
 - [x] Task 2 完成：已在 `app/src/main/AndroidManifest.xml` 声明 `.service.MusicPlayerService`。
 - [x] Task 2 测试：`./gradlew :app:assembleDebug` 通过。
+- [x] Task 3 完成：新增 `MusicPlayerService` 基础框架并标记生命周期状态。
+- [x] Task 3 测试：`./gradlew :app:testDebugUnitTest --tests "com.valiantyan.music801.service.MusicPlayerServiceTest"` 通过。
 
 ---
 
