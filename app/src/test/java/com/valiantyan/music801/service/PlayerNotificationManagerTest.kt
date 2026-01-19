@@ -3,7 +3,10 @@ package com.valiantyan.music801.service
 import android.app.Application
 import android.app.Notification
 import android.os.Build
+import androidx.media3.session.MediaSession
 import com.valiantyan.music801.domain.model.Song
+import com.valiantyan.music801.player.Media3PlayerManager
+import java.util.UUID
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -65,5 +68,27 @@ class PlayerNotificationManagerTest {
         val isOngoing: Boolean =
             (actualNotification.flags and Notification.FLAG_ONGOING_EVENT) != 0
         assertTrue(isOngoing)
+    }
+
+    @Test
+    fun `媒体样式通知应携带会话令牌`() {
+        // Arrange
+        val context: Application = RuntimeEnvironment.getApplication()
+        val manager: PlayerNotificationManager = PlayerNotificationManager(context = context)
+        val playerManager: Media3PlayerManager = Media3PlayerManager(context = context)
+        val sessionId: String = UUID.randomUUID().toString()
+        val mediaSession: MediaSession = MediaSession.Builder(context, playerManager.exoPlayer)
+            .setId(sessionId)
+            .build()
+        // Act
+        val actualNotification: Notification = manager.buildMediaStyleNotification(
+            song = null,
+            isPlaying = false,
+            mediaSession = mediaSession,
+        )
+        // Assert
+        assertEquals(actualNotification, manager.lastNotification)
+        mediaSession.release()
+        playerManager.release()
     }
 }

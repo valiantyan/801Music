@@ -196,7 +196,7 @@ val notification = NotificationCompat.Builder(context, CHANNEL_ID)
     - *Test Case*: 测试通知创建和显示
     - *Test Case*: 测试通知内容更新
 
-- [ ] **Task 9**: 实现 PlayerNotificationManager（媒体样式）
+- [x] **Task 9**: 实现 PlayerNotificationManager（媒体样式）
     - *Test Case*: 测试 MediaStyle 通知样式
     - *Test Case*: 测试控制按钮显示
 
@@ -243,6 +243,8 @@ val notification = NotificationCompat.Builder(context, CHANNEL_ID)
 - [x] Task 7 测试：`./gradlew :app:testDebugUnitTest --tests "com.valiantyan.music801.data.repository.PlayerRepositoryMetadataTest"` 通过。
 - [x] Task 8 完成：新增 `PlayerNotificationManager` 并构建基础通知内容。
 - [x] Task 8 测试：`./gradlew :app:testDebugUnitTest --tests "com.valiantyan.music801.service.PlayerNotificationManagerTest"` 通过。
+- [x] Task 9 完成：使用 Media3 `PlayerNotificationManager` 构建媒体样式通知。
+- [x] Task 9 测试：`./gradlew :app:testDebugUnitTest --tests "com.valiantyan.music801.service.PlayerNotificationManagerTest"` 通过。
 
 ---
 

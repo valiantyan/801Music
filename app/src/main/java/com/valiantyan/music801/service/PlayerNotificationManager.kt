@@ -6,6 +6,9 @@ import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import androidx.media3.common.Player
+import androidx.media3.ui.PlayerNotificationManager as Media3PlayerNotificationManager
+import androidx.media3.session.MediaSession
 import com.valiantyan.music801.R
 import com.valiantyan.music801.domain.model.Song
 
@@ -19,6 +22,9 @@ class PlayerNotificationManager(
 ) {
     private val notificationManager: NotificationManager =
         context.getSystemService(NotificationManager::class.java)
+    internal var lastNotification: Notification? = null
+    internal var isNotificationPosted: Boolean = false
+    private var media3NotificationManager: Media3PlayerNotificationManager? = null
 
     /**
      * 创建通知渠道（Android 8+）
@@ -59,6 +65,105 @@ class PlayerNotificationManager(
         return builder.build()
     }
 
+    /**
+     * 构建媒体样式播放通知
+     *
+     * @param song 当前播放歌曲
+     * @param isPlaying 是否正在播放
+     * @param mediaSession 媒体会话
+     * @return 通知实例
+     */
+    fun buildMediaStyleNotification(
+        song: Song?,
+        isPlaying: Boolean,
+        mediaSession: MediaSession,
+    ): Notification {
+        val player: Player = mediaSession.player
+        val manager: Media3PlayerNotificationManager = buildMedia3Manager(
+            song = song,
+        )
+        media3NotificationManager = manager
+        manager.setMediaSessionToken(mediaSession.getPlatformToken())
+        manager.setPlayer(player)
+        val notification: Notification = lastNotification ?: buildNotification(
+            song = song,
+            isPlaying = isPlaying,
+        )
+        lastNotification = notification
+        return notification
+    }
+
+    private fun buildMedia3Manager(
+        song: Song?,
+    ): Media3PlayerNotificationManager {
+        media3NotificationManager?.setPlayer(null)
+        val adapter: Media3PlayerNotificationManager.MediaDescriptionAdapter =
+            MediaDescriptionAdapterImpl(
+                song = song,
+            )
+        val listener: Media3PlayerNotificationManager.NotificationListener =
+            NotificationListenerImpl()
+        return Media3PlayerNotificationManager.Builder(
+            context,
+            NOTIFICATION_ID,
+            CHANNEL_ID,
+        )
+            .setSmallIconResourceId(R.mipmap.ic_launcher)
+            .setMediaDescriptionAdapter(adapter)
+            .setNotificationListener(listener)
+            .build()
+    }
+
+    private inner class NotificationListenerImpl :
+        Media3PlayerNotificationManager.NotificationListener {
+        override fun onNotificationPosted(
+            notificationId: Int,
+            notification: Notification,
+            ongoing: Boolean,
+        ): Unit {
+            lastNotification = notification
+            isNotificationPosted = true
+        }
+
+        override fun onNotificationCancelled(
+            notificationId: Int,
+            dismissedByUser: Boolean,
+        ): Unit {
+            isNotificationPosted = false
+        }
+    }
+
+    private class MediaDescriptionAdapterImpl(
+        private val song: Song?,
+    ) : Media3PlayerNotificationManager.MediaDescriptionAdapter {
+        override fun getCurrentContentTitle(player: Player): CharSequence {
+            val metadataTitle: CharSequence? = player.mediaMetadata.title
+            if (!metadataTitle.isNullOrBlank()) {
+                return metadataTitle
+            }
+            return song?.title ?: DEFAULT_TITLE
+        }
+
+        override fun createCurrentContentIntent(player: Player): android.app.PendingIntent? {
+            return null
+        }
+
+        override fun getCurrentContentText(player: Player): CharSequence? {
+            val metadataArtist: CharSequence? = player.mediaMetadata.artist
+            if (!metadataArtist.isNullOrBlank()) {
+                return metadataArtist
+            }
+            return song?.artist ?: DEFAULT_ARTIST
+        }
+
+        override fun getCurrentLargeIcon(
+            player: Player,
+            callback: Media3PlayerNotificationManager.BitmapCallback,
+        ): android.graphics.Bitmap? {
+            return null
+        }
+    }
+
     private companion object {
         /**
          * 通知渠道 ID
@@ -84,5 +189,10 @@ class PlayerNotificationManager(
          * 默认艺术家
          */
         private const val DEFAULT_ARTIST: String = "未知艺术家"
+
+        /**
+         * 通知 ID
+         */
+        private const val NOTIFICATION_ID: Int = 1001
     }
 }
