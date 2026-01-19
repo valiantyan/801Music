@@ -184,7 +184,7 @@ val notification = NotificationCompat.Builder(context, CHANNEL_ID)
     - *Test Case*: 测试上一首/下一首命令处理
     - *Test Case*: 测试跳转命令处理
 
-- [ ] **Task 6**: 实现播放状态更新到 MediaSession
+- [x] **Task 6**: 实现播放状态更新到 MediaSession
     - *Test Case*: 测试播放状态同步
     - *Test Case*: 测试播放进度更新
 
@@ -237,6 +237,8 @@ val notification = NotificationCompat.Builder(context, CHANNEL_ID)
 - [x] Task 4 测试：`./gradlew :app:testDebugUnitTest --tests "com.valiantyan.music801.service.MusicPlayerServiceTest"` 通过。
 - [x] Task 5 完成：新增 `PlaybackSessionCallback` 处理播放控制指令。
 - [x] Task 5 测试：`./gradlew :app:testDebugUnitTest --tests "com.valiantyan.music801.service.*"` 通过。
+- [x] Task 6 完成：同步播放错误到 `MediaSession` 并启用进度定期更新。
+- [x] Task 6 测试：`./gradlew :app:testDebugUnitTest --tests "com.valiantyan.music801.service.*"` 通过。
 
 ---
 
