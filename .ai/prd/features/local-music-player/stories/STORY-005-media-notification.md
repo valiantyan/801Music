@@ -192,7 +192,7 @@ val notification = NotificationCompat.Builder(context, CHANNEL_ID)
     - *Test Case*: 测试歌曲信息更新
     - *Test Case*: 测试封面更新
 
-- [ ] **Task 8**: 实现 PlayerNotificationManager（基础通知）
+- [x] **Task 8**: 实现 PlayerNotificationManager（基础通知）
     - *Test Case*: 测试通知创建和显示
     - *Test Case*: 测试通知内容更新
 
@@ -241,6 +241,8 @@ val notification = NotificationCompat.Builder(context, CHANNEL_ID)
 - [x] Task 6 测试：`./gradlew :app:testDebugUnitTest --tests "com.valiantyan.music801.service.*"` 通过。
 - [x] Task 7 完成：播放时将标题、艺术家与专辑元数据注入 Media3 MediaItem。
 - [x] Task 7 测试：`./gradlew :app:testDebugUnitTest --tests "com.valiantyan.music801.data.repository.PlayerRepositoryMetadataTest"` 通过。
+- [x] Task 8 完成：新增 `PlayerNotificationManager` 并构建基础通知内容。
+- [x] Task 8 测试：`./gradlew :app:testDebugUnitTest --tests "com.valiantyan.music801.service.PlayerNotificationManagerTest"` 通过。
 
 ---
 
