@@ -175,7 +175,7 @@ val notification = NotificationCompat.Builder(context, CHANNEL_ID)
 - [x] **Task 3**: 创建 MediaSessionService 基础框架
     - *Test Case*: 测试服务创建和生命周期
 
-- [ ] **Task 4**: 实现 MediaSession 创建和配置
+- [x] **Task 4**: 实现 MediaSession 创建和配置
     - *Test Case*: 测试 MediaSession 实例创建
     - *Test Case*: 测试 MediaSession 回调注册
 
@@ -233,6 +233,8 @@ val notification = NotificationCompat.Builder(context, CHANNEL_ID)
 - [x] Task 2 测试：`./gradlew :app:assembleDebug` 通过。
 - [x] Task 3 完成：新增 `MusicPlayerService` 基础框架并标记生命周期状态。
 - [x] Task 3 测试：`./gradlew :app:testDebugUnitTest --tests "com.valiantyan.music801.service.MusicPlayerServiceTest"` 通过。
+- [x] Task 4 完成：在 `MusicPlayerService` 创建 `MediaSession` 并关联播放器实例。
+- [x] Task 4 测试：`./gradlew :app:testDebugUnitTest --tests "com.valiantyan.music801.service.MusicPlayerServiceTest"` 通过。
 
 ---
 

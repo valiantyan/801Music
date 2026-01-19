@@ -24,7 +24,9 @@ class MusicPlayerServiceTest {
         val actualService: MusicPlayerService = inputController.create().get()
         // Assert
         val actualCreated: Boolean = actualService.isCreated
+        val actualSessionCreated: Boolean = actualService.isSessionCreated
         assertTrue(actualCreated)
+        assertTrue(actualSessionCreated)
     }
 
     @Test
