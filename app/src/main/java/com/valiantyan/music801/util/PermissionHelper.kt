@@ -22,6 +22,10 @@ class PermissionHelper(
      * 权限请求结果回调
      */
     var onPermissionResult: ((Boolean) -> Unit)? = null
+    /**
+     * 通知权限请求结果回调
+     */
+    var onNotificationPermissionResult: ((Boolean) -> Unit)? = null
 
     /**
      * 权限请求启动器
@@ -32,6 +36,13 @@ class PermissionHelper(
     private val permissionLauncher: ActivityResultLauncher<String> =
         activity.registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             onPermissionResult?.invoke(isGranted)
+        }
+    /**
+     * 通知权限请求启动器
+     */
+    private val notificationPermissionLauncher: ActivityResultLauncher<String> =
+        activity.registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            onNotificationPermissionResult?.invoke(isGranted)
         }
 
     /**
@@ -46,6 +57,18 @@ class PermissionHelper(
             Manifest.permission.READ_EXTERNAL_STORAGE
         }
     }
+    /**
+     * 获取通知权限（Android 13+）
+     *
+     * @return 通知权限字符串，不需要时返回 null
+     */
+    fun getNotificationPermission(): String? {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Manifest.permission.POST_NOTIFICATIONS
+        } else {
+            null
+        }
+    }
 
     /**
      * 检查权限是否已授予
@@ -53,7 +76,22 @@ class PermissionHelper(
      * @return true 如果权限已授予，false 否则
      */
     fun hasPermission(): Boolean {
-        val permission = getRequiredPermission()
+        val permission: String = getRequiredPermission()
+        return ContextCompat.checkSelfPermission(
+            activity,
+            permission,
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+    /**
+     * 检查通知权限是否已授予
+     *
+     * @return true 如果已授予或不需要权限，false 否则
+     */
+    fun hasNotificationPermission(): Boolean {
+        val permission: String? = getNotificationPermission()
+        if (permission == null) {
+            return true
+        }
         return ContextCompat.checkSelfPermission(
             activity,
             permission,
@@ -77,6 +115,25 @@ class PermissionHelper(
             false
         }
     }
+    /**
+     * 请求通知权限
+     *
+     * @return true 如果权限已授予或不需要权限，false 如果正在请求权限
+     */
+    fun requestNotificationPermission(): Boolean {
+        val permission: String? = getNotificationPermission()
+        if (permission == null) {
+            onNotificationPermissionResult?.invoke(true)
+            return true
+        }
+        return if (hasNotificationPermission()) {
+            onNotificationPermissionResult?.invoke(true)
+            true
+        } else {
+            notificationPermissionLauncher.launch(permission)
+            false
+        }
+    }
 
     /**
      * 检查是否应该显示权限说明
@@ -86,7 +143,19 @@ class PermissionHelper(
      * @return true 如果应该显示说明，false 否则
      */
     fun shouldShowRationale(): Boolean {
-        val permission = getRequiredPermission()
+        val permission: String = getRequiredPermission()
+        return activity.shouldShowRequestPermissionRationale(permission)
+    }
+    /**
+     * 检查是否应该显示通知权限说明
+     *
+     * @return true 如果应该显示说明，false 否则
+     */
+    fun shouldShowNotificationRationale(): Boolean {
+        val permission: String? = getNotificationPermission()
+        if (permission == null) {
+            return false
+        }
         return activity.shouldShowRequestPermissionRationale(permission)
     }
 }

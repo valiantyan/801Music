@@ -62,6 +62,9 @@ class MainActivity : AppCompatActivity(), AudioRepositoryProvider, PlayerReposit
         permissionHelper.onPermissionResult = { isGranted ->
             handlePermissionResult(isGranted = isGranted)
         }
+        permissionHelper.onNotificationPermissionResult = { isGranted ->
+            handleNotificationPermissionResult(isGranted = isGranted)
+        }
         audioRepository = createAudioRepository()
         playerRepository = createPlayerRepository()
         navController = getNavController()
@@ -70,6 +73,7 @@ class MainActivity : AppCompatActivity(), AudioRepositoryProvider, PlayerReposit
             return
         }
         setNavGraphIfNeeded()
+        requestNotificationPermissionIfNeeded()
     }
 
     /**
@@ -109,9 +113,25 @@ class MainActivity : AppCompatActivity(), AudioRepositoryProvider, PlayerReposit
     private fun handlePermissionResult(isGranted: Boolean) {
         if (isGranted) {
             setNavGraphIfNeeded()
+            requestNotificationPermissionIfNeeded()
         } else {
             showPermissionDeniedDialog()
         }
+    }
+    /**
+     * 请求通知权限（Android 13+），避免播放通知被系统屏蔽
+     */
+    private fun requestNotificationPermissionIfNeeded() {
+        if (permissionHelper.hasNotificationPermission()) {
+            return
+        }
+        if (permissionHelper.shouldShowNotificationRationale()) {
+            showNotificationPermissionRationaleDialog {
+                permissionHelper.requestNotificationPermission()
+            }
+            return
+        }
+        permissionHelper.requestNotificationPermission()
     }
 
     /**
@@ -125,6 +145,42 @@ class MainActivity : AppCompatActivity(), AudioRepositoryProvider, PlayerReposit
                 // TODO: 打开应用设置页面（可选功能）
             }
             .setNegativeButton("取消", null)
+            .show()
+    }
+    /**
+     * 处理通知权限请求结果，避免反复请求影响体验
+     *
+     * @param isGranted 权限是否被授予
+     */
+    private fun handleNotificationPermissionResult(isGranted: Boolean) {
+        if (isGranted) {
+            return
+        }
+        showNotificationPermissionDeniedDialog()
+    }
+    /**
+     * 显示通知权限说明对话框，解释通知用途
+     *
+     * @param onConfirm 用户确认后的回调
+     */
+    private fun showNotificationPermissionRationaleDialog(onConfirm: () -> Unit) {
+        AlertDialog.Builder(this)
+            .setTitle("需要通知权限")
+            .setMessage("应用需要通知权限以展示播放控制通知。")
+            .setPositiveButton("授予权限") { _, _ ->
+                onConfirm()
+            }
+            .setNegativeButton("取消", null)
+            .show()
+    }
+    /**
+     * 显示通知权限被拒绝对话框，提醒用户可在设置中开启
+     */
+    private fun showNotificationPermissionDeniedDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("通知权限被拒绝")
+            .setMessage("未授予通知权限将无法显示播放控制通知，可在设置中开启。")
+            .setPositiveButton("我知道了", null)
             .show()
     }
 

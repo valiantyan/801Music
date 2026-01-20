@@ -209,7 +209,7 @@ val notification = NotificationCompat.Builder(context, CHANNEL_ID)
     - *Test Case*: 测试前台服务启动
     - *Test Case*: 测试前台服务通知显示
 
-- [ ] **Task 12**: 实现通知权限处理（Android 13+）
+- [x] **Task 12**: 实现通知权限处理（Android 13+）
     - *Test Case*: 测试权限请求
     - *Test Case*: 测试权限被拒绝时的处理
 
@@ -249,6 +249,8 @@ val notification = NotificationCompat.Builder(context, CHANNEL_ID)
 - [x] Task 10 测试：`./gradlew :app:testDebugUnitTest --tests "com.valiantyan.music801.service.PlayerNotificationManagerTest"` 通过。
 - [x] Task 11 完成：服务使用 `startForegroundService()` 启动，`MusicPlayerService` 在 `onCreate` 内调用 `startForeground()` 并配置前台服务类型与权限。
 - [x] Task 11 测试：`./gradlew :app:testDebugUnitTest --tests "com.valiantyan.music801.service.*"` 通过。
+- [x] Task 12 完成：新增 `POST_NOTIFICATIONS` 权限声明并在 `MainActivity` 内补充通知权限请求与拒绝提示。
+- [x] Task 12 测试：`./gradlew :app:testDebugUnitTest --tests "com.valiantyan.music801.util.PermissionHelperTest"` 通过。
 Bug 描述：点击歌曲播放后系统通知栏未显示媒体通知。
 问题原因：
 1. 歌曲列表播放入口未启动 `MusicPlayerService`，导致 MediaSession 与通知管理器未初始化。
