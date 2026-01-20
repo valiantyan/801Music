@@ -205,7 +205,7 @@ val notification = NotificationCompat.Builder(context, CHANNEL_ID)
     - *Test Case*: 测试上一首/下一首按钮点击
     - *Test Case*: 测试关闭按钮点击
 
-- [ ] **Task 11**: 实现前台服务配置
+- [x] **Task 11**: 实现前台服务配置
     - *Test Case*: 测试前台服务启动
     - *Test Case*: 测试前台服务通知显示
 
@@ -247,6 +247,8 @@ val notification = NotificationCompat.Builder(context, CHANNEL_ID)
 - [x] Task 9 测试：`./gradlew :app:testDebugUnitTest --tests "com.valiantyan.music801.service.PlayerNotificationManagerTest"` 通过。
 - [x] Task 10 完成：配置通知栏播放、上一首、下一首、停止按钮及紧凑模式显示。
 - [x] Task 10 测试：`./gradlew :app:testDebugUnitTest --tests "com.valiantyan.music801.service.PlayerNotificationManagerTest"` 通过。
+- [x] Task 11 完成：服务使用 `startForegroundService()` 启动，`MusicPlayerService` 在 `onCreate` 内调用 `startForeground()` 并配置前台服务类型与权限。
+- [x] Task 11 测试：`./gradlew :app:testDebugUnitTest --tests "com.valiantyan.music801.service.*"` 通过。
 Bug 描述：点击歌曲播放后系统通知栏未显示媒体通知。
 问题原因：
 1. 歌曲列表播放入口未启动 `MusicPlayerService`，导致 MediaSession 与通知管理器未初始化。
