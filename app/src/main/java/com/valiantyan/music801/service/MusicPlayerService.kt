@@ -1,5 +1,6 @@
 package com.valiantyan.music801.service
 
+import androidx.media3.common.ForwardingPlayer
 import androidx.media3.common.Player
 import androidx.media3.common.PlaybackException
 import androidx.media3.session.MediaSession
@@ -46,12 +47,15 @@ class MusicPlayerService : MediaSessionService() {
         val repository: PlayerRepository = PlayerRepositoryHolder.getOrCreate(
             context = applicationContext,
         )
-        val sessionPlayer: androidx.media3.common.Player? = resolveSessionPlayer(
+        val basePlayer: Player? = resolveSessionPlayer(
             repository = repository,
         )
-        if (sessionPlayer == null) {
+        if (basePlayer == null) {
             return
         }
+        val sessionPlayer: Player = MediaSessionPlayer(
+            player = basePlayer,
+        )
         val sessionCallback: PlaybackSessionCallback = PlaybackSessionCallback(
             playerRepository = repository,
         )
@@ -148,6 +152,31 @@ class MusicPlayerService : MediaSessionService() {
         )
     }
 
+}
+
+private class MediaSessionPlayer(
+    player: Player,
+) : ForwardingPlayer(player) {
+    override fun getAvailableCommands(): Player.Commands {
+        val baseCommands: Player.Commands = super.getAvailableCommands()
+        val builder: Player.Commands.Builder = Player.Commands.Builder()
+        builder.addAll(baseCommands)
+        builder.add(Player.COMMAND_SEEK_TO_NEXT)
+        builder.add(Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM)
+        builder.add(Player.COMMAND_SEEK_TO_PREVIOUS)
+        builder.add(Player.COMMAND_SEEK_TO_PREVIOUS_MEDIA_ITEM)
+        return builder.build()
+    }
+
+    override fun isCommandAvailable(command: Int): Boolean {
+        return when (command) {
+            Player.COMMAND_SEEK_TO_NEXT,
+            Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM,
+            Player.COMMAND_SEEK_TO_PREVIOUS,
+            Player.COMMAND_SEEK_TO_PREVIOUS_MEDIA_ITEM -> true
+            else -> super.isCommandAvailable(command)
+        }
+    }
 }
 
 /**

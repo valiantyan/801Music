@@ -134,6 +134,7 @@ class PlayerNotificationManager(
         currentSongId = newSongId
         currentSong = song
         Log.d(TAG, "updateCurrentSong: title=${song?.title}")
+        media3NotificationManager?.invalidate()
     }
 
     private fun buildMedia3Manager(): Media3PlayerNotificationManager {
@@ -206,11 +207,15 @@ class PlayerNotificationManager(
     private inner class MediaDescriptionAdapterImpl :
         Media3PlayerNotificationManager.MediaDescriptionAdapter {
         override fun getCurrentContentTitle(player: Player): CharSequence {
+            val songTitle: String? = currentSong?.title
+            if (!songTitle.isNullOrBlank()) {
+                return songTitle
+            }
             val metadataTitle: CharSequence? = player.mediaMetadata.title
             if (!metadataTitle.isNullOrBlank()) {
                 return metadataTitle
             }
-            return currentSong?.title ?: DEFAULT_TITLE
+            return DEFAULT_TITLE
         }
 
         override fun createCurrentContentIntent(player: Player): android.app.PendingIntent? {
@@ -218,11 +223,15 @@ class PlayerNotificationManager(
         }
 
         override fun getCurrentContentText(player: Player): CharSequence? {
+            val songArtist: String? = currentSong?.artist
+            if (!songArtist.isNullOrBlank()) {
+                return songArtist
+            }
             val metadataArtist: CharSequence? = player.mediaMetadata.artist
             if (!metadataArtist.isNullOrBlank()) {
                 return metadataArtist
             }
-            return currentSong?.artist ?: DEFAULT_ARTIST
+            return DEFAULT_ARTIST
         }
 
         override fun getCurrentLargeIcon(

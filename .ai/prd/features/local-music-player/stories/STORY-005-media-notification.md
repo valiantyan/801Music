@@ -261,6 +261,11 @@ Bug 描述：启动前台服务时抛出 `FOREGROUND_SERVICE` 权限异常导致
 问题原因：`MusicPlayerService` 调用 `startForeground()`，但未在 Manifest 声明前台服务权限与类型。
 解决方案：在 `AndroidManifest.xml` 添加 `FOREGROUND_SERVICE` 与 `FOREGROUND_SERVICE_MEDIA_PLAYBACK` 权限，并为服务设置 `foregroundServiceType="mediaPlayback"`。
 影响范围：前台服务启动与媒体通知展示。
+Bug 描述：媒体通知栏缺少下一首按钮，且上一首按钮触发重播当前歌曲。
+问题原因：MediaSession 直接驱动 ExoPlayer，上一首/下一首命令未映射到自定义队列逻辑，且未显式暴露下一首命令导致按钮隐藏。
+解决方案：在 `MediaSession.Callback` 处理上一首/下一首命令并委托到 `PlayerRepository`，同时通过 `ForwardingPlayer` 暴露对应 `Player.Commands` 以确保按钮显示。
+影响范围：通知栏媒体控制按钮行为与展示。
+Bug 状态：已修复并验证，通知栏显示上一首/下一首且切歌后面板信息更新。
 
 ---
 
