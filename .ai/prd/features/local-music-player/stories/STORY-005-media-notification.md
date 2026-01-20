@@ -257,6 +257,10 @@ Bug 描述：点击歌曲播放后系统通知栏未显示媒体通知。
 2. 服务内仅初始化一次 `Media3 PlayerNotificationManager` 并持久绑定 `MediaSession`，播放状态变化只更新歌曲信息。
 3. 对 `playbackState`、`updateCurrentSong` 与 `notification posted` 日志增加状态变化过滤。
 影响范围：播放通知展示、媒体控制入口与日志输出稳定性。
+Bug 描述：启动前台服务时抛出 `FOREGROUND_SERVICE` 权限异常导致崩溃。
+问题原因：`MusicPlayerService` 调用 `startForeground()`，但未在 Manifest 声明前台服务权限与类型。
+解决方案：在 `AndroidManifest.xml` 添加 `FOREGROUND_SERVICE` 与 `FOREGROUND_SERVICE_MEDIA_PLAYBACK` 权限，并为服务设置 `foregroundServiceType="mediaPlayback"`。
+影响范围：前台服务启动与媒体通知展示。
 
 ---
 

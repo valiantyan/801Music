@@ -265,4 +265,11 @@ class PlayerNotificationManager(
          */
         private const val NOTIFICATION_ID: Int = 1001
     }
+
+    /**
+     * 获取通知 ID
+     */
+    fun getNotificationId(): Int {
+        return NOTIFICATION_ID
+    }
 }

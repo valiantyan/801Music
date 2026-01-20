@@ -67,7 +67,18 @@ class MusicPlayerService : MediaSessionService() {
             .also { manager -> manager.createNotificationChannel() }
         isNotificationInitialized = true
         android.util.Log.d(TAG, "session created: id=$sessionId")
-        notificationManager?.attachToSession(mediaSession = createdSession)
+        val manager: PlayerNotificationManager? = notificationManager
+        if (manager != null) {
+            manager.attachToSession(mediaSession = createdSession)
+            val notification = manager.buildNotification(
+                song = null,
+                isPlaying = false,
+            )
+            startForeground(
+                manager.getNotificationId(),
+                notification,
+            )
+        }
         startPlaybackStateSync(
             session = createdSession,
             repository = repository,
