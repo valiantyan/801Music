@@ -5,6 +5,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.media3.common.Player
 import androidx.media3.ui.PlayerNotificationManager as Media3PlayerNotificationManager
@@ -24,6 +25,7 @@ class PlayerNotificationManager(
         context.getSystemService(NotificationManager::class.java)
     internal var lastNotification: Notification? = null
     internal var isNotificationPosted: Boolean = false
+    internal var isManagerAttached: Boolean = false
     internal var isPlayPauseActionEnabled: Boolean = false
     internal var isNextActionEnabled: Boolean = false
     internal var isPreviousActionEnabled: Boolean = false
@@ -31,6 +33,10 @@ class PlayerNotificationManager(
     internal var isCompactNextActionEnabled: Boolean = false
     internal var isCompactPreviousActionEnabled: Boolean = false
     private var media3NotificationManager: Media3PlayerNotificationManager? = null
+    private var currentSong: Song? = null
+    private var currentSongId: String? = null
+    private var lastNotificationId: Int? = null
+    private var lastNotificationOngoing: Boolean? = null
 
     /**
      * 创建通知渠道（Android 8+）
@@ -46,6 +52,7 @@ class PlayerNotificationManager(
         )
         channel.description = CHANNEL_DESCRIPTION
         notificationManager.createNotificationChannel(channel)
+        Log.d(TAG, "notification channel created")
     }
 
     /**
@@ -61,6 +68,7 @@ class PlayerNotificationManager(
     ): Notification {
         val title: String = song?.title ?: DEFAULT_TITLE
         val artist: String = song?.artist ?: DEFAULT_ARTIST
+        Log.d(TAG, "buildNotification: title=$title isPlaying=$isPlaying")
         val builder: NotificationCompat.Builder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentTitle(title)
@@ -84,13 +92,9 @@ class PlayerNotificationManager(
         isPlaying: Boolean,
         mediaSession: MediaSession,
     ): Notification {
-        val player: Player = mediaSession.player
-        val manager: Media3PlayerNotificationManager = buildMedia3Manager(
-            song = song,
-        )
-        media3NotificationManager = manager
-        manager.setMediaSessionToken(mediaSession.getPlatformToken())
-        manager.setPlayer(player)
+        Log.d(TAG, "buildMediaStyleNotification: isPlaying=$isPlaying")
+        updateCurrentSong(song = song)
+        attachToSession(mediaSession = mediaSession)
         if (lastNotification == null) {
             lastNotification = buildNotification(
                 song = song,
@@ -103,14 +107,38 @@ class PlayerNotificationManager(
         )
     }
 
-    private fun buildMedia3Manager(
-        song: Song?,
-    ): Media3PlayerNotificationManager {
-        media3NotificationManager?.setPlayer(null)
+    /**
+     * 绑定媒体会话并初始化 Media3 通知管理器
+     */
+    fun attachToSession(mediaSession: MediaSession): Unit {
+        if (media3NotificationManager != null) {
+            return
+        }
+        Log.d(TAG, "attachToSession")
+        val player: Player = mediaSession.player
+        val manager: Media3PlayerNotificationManager = buildMedia3Manager()
+        media3NotificationManager = manager
+        manager.setMediaSessionToken(mediaSession.getPlatformToken())
+        manager.setPlayer(player)
+        isManagerAttached = true
+    }
+
+    /**
+     * 更新当前歌曲信息用于通知标题回退
+     */
+    fun updateCurrentSong(song: Song?): Unit {
+        val newSongId: String? = song?.id
+        if (newSongId == currentSongId) {
+            return
+        }
+        currentSongId = newSongId
+        currentSong = song
+        Log.d(TAG, "updateCurrentSong: title=${song?.title}")
+    }
+
+    private fun buildMedia3Manager(): Media3PlayerNotificationManager {
         val adapter: Media3PlayerNotificationManager.MediaDescriptionAdapter =
-            MediaDescriptionAdapterImpl(
-                song = song,
-            )
+            MediaDescriptionAdapterImpl()
         val listener: Media3PlayerNotificationManager.NotificationListener =
             NotificationListenerImpl()
         return Media3PlayerNotificationManager.Builder(
@@ -147,6 +175,9 @@ class PlayerNotificationManager(
         ): Unit {
             lastNotification = notification
             isNotificationPosted = true
+            if (shouldLogNotificationPosted(notificationId = notificationId, ongoing = ongoing)) {
+                Log.d(TAG, "notification posted: id=$notificationId ongoing=$ongoing")
+            }
         }
 
         override fun onNotificationCancelled(
@@ -154,18 +185,32 @@ class PlayerNotificationManager(
             dismissedByUser: Boolean,
         ): Unit {
             isNotificationPosted = false
+            Log.d(TAG, "notification cancelled: id=$notificationId dismissed=$dismissedByUser")
         }
     }
 
-    private class MediaDescriptionAdapterImpl(
-        private val song: Song?,
-    ) : Media3PlayerNotificationManager.MediaDescriptionAdapter {
+    private fun shouldLogNotificationPosted(
+        notificationId: Int,
+        ongoing: Boolean,
+    ): Boolean {
+        val shouldLog: Boolean =
+            lastNotificationId != notificationId || lastNotificationOngoing != ongoing
+        if (!shouldLog) {
+            return false
+        }
+        lastNotificationId = notificationId
+        lastNotificationOngoing = ongoing
+        return true
+    }
+
+    private inner class MediaDescriptionAdapterImpl :
+        Media3PlayerNotificationManager.MediaDescriptionAdapter {
         override fun getCurrentContentTitle(player: Player): CharSequence {
             val metadataTitle: CharSequence? = player.mediaMetadata.title
             if (!metadataTitle.isNullOrBlank()) {
                 return metadataTitle
             }
-            return song?.title ?: DEFAULT_TITLE
+            return currentSong?.title ?: DEFAULT_TITLE
         }
 
         override fun createCurrentContentIntent(player: Player): android.app.PendingIntent? {
@@ -177,7 +222,7 @@ class PlayerNotificationManager(
             if (!metadataArtist.isNullOrBlank()) {
                 return metadataArtist
             }
-            return song?.artist ?: DEFAULT_ARTIST
+            return currentSong?.artist ?: DEFAULT_ARTIST
         }
 
         override fun getCurrentLargeIcon(
@@ -189,6 +234,7 @@ class PlayerNotificationManager(
     }
 
     private companion object {
+        private const val TAG: String = "MediaNotification"
         /**
          * 通知渠道 ID
          */

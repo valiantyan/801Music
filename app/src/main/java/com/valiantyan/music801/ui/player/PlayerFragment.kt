@@ -1,10 +1,14 @@
 package com.valiantyan.music801.ui.player
 
+import android.content.Context
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.util.Log
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -16,6 +20,7 @@ import com.valiantyan.music801.data.repository.PlayerRepository
 import com.valiantyan.music801.databinding.FragmentPlayerBinding
 import com.valiantyan.music801.di.PlayerRepositoryProvider
 import com.valiantyan.music801.domain.model.Song
+import com.valiantyan.music801.service.MusicPlayerService
 import com.valiantyan.music801.viewmodel.PlayerUiState
 import com.valiantyan.music801.viewmodel.PlayerViewModel
 import com.valiantyan.music801.viewmodel.PlayerViewModelFactory
@@ -32,7 +37,7 @@ class PlayerFragment : Fragment() {
      * 日志标签
      */
     private companion object {
-        private const val TAG: String = "PlayerFragment"
+        private const val TAG: String = "MediaNotification"
     }
     /**
      * ViewBinding
@@ -185,8 +190,23 @@ class PlayerFragment : Fragment() {
         if (isPlaying) {
             viewModel.pause()
         } else {
+            startMediaSessionService()
             viewModel.play()
         }
+    }
+
+    /**
+     * 启动媒体会话服务以展示系统通知
+     */
+    private fun startMediaSessionService(): Unit {
+        val context: Context = requireContext().applicationContext
+        val intent: Intent = Intent(context, MusicPlayerService::class.java)
+        Log.d(TAG, "startMediaSessionService")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            ContextCompat.startForegroundService(context, intent)
+            return
+        }
+        context.startService(intent)
     }
 
 

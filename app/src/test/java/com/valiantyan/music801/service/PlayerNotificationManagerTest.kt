@@ -81,13 +81,10 @@ class PlayerNotificationManagerTest {
             .setId(sessionId)
             .build()
         // Act
-        val actualNotification: Notification = manager.buildMediaStyleNotification(
-            song = null,
-            isPlaying = false,
-            mediaSession = mediaSession,
-        )
+        manager.attachToSession(mediaSession = mediaSession)
+        manager.updateCurrentSong(song = null)
         // Assert
-        assertEquals(actualNotification, manager.lastNotification)
+        assertTrue(manager.isManagerAttached)
         assertTrue(manager.isPlayPauseActionEnabled)
         assertTrue(manager.isNextActionEnabled)
         assertTrue(manager.isPreviousActionEnabled)

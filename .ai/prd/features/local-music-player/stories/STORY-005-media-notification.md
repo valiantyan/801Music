@@ -247,6 +247,16 @@ val notification = NotificationCompat.Builder(context, CHANNEL_ID)
 - [x] Task 9 测试：`./gradlew :app:testDebugUnitTest --tests "com.valiantyan.music801.service.PlayerNotificationManagerTest"` 通过。
 - [x] Task 10 完成：配置通知栏播放、上一首、下一首、停止按钮及紧凑模式显示。
 - [x] Task 10 测试：`./gradlew :app:testDebugUnitTest --tests "com.valiantyan.music801.service.PlayerNotificationManagerTest"` 通过。
+Bug 描述：点击歌曲播放后系统通知栏未显示媒体通知。
+问题原因：
+1. 歌曲列表播放入口未启动 `MusicPlayerService`，导致 MediaSession 与通知管理器未初始化。
+2. 通知更新时重复创建 `Media3 PlayerNotificationManager`，触发通知频繁取消/重发。
+3. 播放状态流高频更新未做状态变化过滤，日志大量重复。
+解决方案：
+1. 在歌曲列表与播放器页播放入口统一启动 `MusicPlayerService`。
+2. 服务内仅初始化一次 `Media3 PlayerNotificationManager` 并持久绑定 `MediaSession`，播放状态变化只更新歌曲信息。
+3. 对 `playbackState`、`updateCurrentSong` 与 `notification posted` 日志增加状态变化过滤。
+影响范围：播放通知展示、媒体控制入口与日志输出稳定性。
 
 ---
 

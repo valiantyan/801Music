@@ -24,17 +24,25 @@ import kotlinx.coroutines.launch
  * 负责在系统层暴露媒体会话入口，具体会话配置在后续任务中完成。
  */
 class MusicPlayerService : MediaSessionService() {
+    private companion object {
+        private const val TAG: String = "MediaNotification"
+    }
     private var mediaSession: MediaSession? = null
     private val serviceScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private var playbackStateJob: Job? = null
+    private var notificationManager: PlayerNotificationManager? = null
+    private var lastIsPlaying: Boolean? = null
+    private var lastSongId: String? = null
     internal var isCreated: Boolean = false
     internal var isDestroyed: Boolean = false
     internal var isSessionCreated: Boolean = false
     internal var isStateSyncStarted: Boolean = false
+    internal var isNotificationInitialized: Boolean = false
 
     override fun onCreate(): Unit {
         super.onCreate()
         isCreated = true
+        android.util.Log.d(TAG, "service onCreate")
         val repository: PlayerRepository = PlayerRepositoryHolder.getOrCreate(
             context = applicationContext,
         )
@@ -55,6 +63,11 @@ class MusicPlayerService : MediaSessionService() {
             .build()
         mediaSession = createdSession
         isSessionCreated = true
+        notificationManager = PlayerNotificationManager(context = applicationContext)
+            .also { manager -> manager.createNotificationChannel() }
+        isNotificationInitialized = true
+        android.util.Log.d(TAG, "session created: id=$sessionId")
+        notificationManager?.attachToSession(mediaSession = createdSession)
         startPlaybackStateSync(
             session = createdSession,
             repository = repository,
@@ -93,9 +106,12 @@ class MusicPlayerService : MediaSessionService() {
             repository.playbackState.collectLatest { state ->
                 val error: PlaybackException? = resolvePlaybackException(state = state)
                 session.setPlaybackException(error)
+                logPlaybackStateChange(state = state)
+                notificationManager?.updateCurrentSong(song = state.currentSong)
             }
         }
         isStateSyncStarted = true
+        android.util.Log.d(TAG, "state sync started")
     }
 
     internal fun resolvePlaybackException(state: PlaybackState): PlaybackException? {
@@ -105,6 +121,22 @@ class MusicPlayerService : MediaSessionService() {
         }
         return null
     }
+
+    private fun logPlaybackStateChange(state: PlaybackState): Unit {
+        val songId: String? = state.currentSong?.id
+        val isPlaying: Boolean = state.isPlaying
+        val shouldLog: Boolean = songId != lastSongId || lastIsPlaying != isPlaying
+        if (!shouldLog) {
+            return
+        }
+        lastSongId = songId
+        lastIsPlaying = isPlaying
+        android.util.Log.d(
+            TAG,
+            "playbackState: title=${state.currentSong?.title} isPlaying=$isPlaying",
+        )
+    }
+
 }
 
 /**
