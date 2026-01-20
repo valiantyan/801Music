@@ -1,11 +1,14 @@
 package com.valiantyan.music801.service
 
+import android.app.PendingIntent
+import android.content.Intent
 import androidx.media3.common.ForwardingPlayer
 import androidx.media3.common.Player
 import androidx.media3.common.PlaybackException
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
 import androidx.media3.session.SessionResult
+import com.valiantyan.music801.MainActivity
 import com.valiantyan.music801.domain.model.PlaybackState
 import com.valiantyan.music801.data.repository.PlayerRepository
 import com.valiantyan.music801.data.repository.PlayerRepositoryImpl
@@ -63,6 +66,7 @@ class MusicPlayerService : MediaSessionService() {
         val createdSession: MediaSession = MediaSession.Builder(this, sessionPlayer)
             .setId(sessionId)
             .setPeriodicPositionUpdateEnabled(true)
+            .setSessionActivity(buildSessionActivity())
             .setCallback(sessionCallback)
             .build()
         mediaSession = createdSession
@@ -110,6 +114,18 @@ class MusicPlayerService : MediaSessionService() {
 
     private fun buildSessionId(): String {
         return UUID.randomUUID().toString()
+    }
+    /**
+     * 构建锁屏入口的跳转 PendingIntent，提供系统媒体面板返回入口
+     */
+    private fun buildSessionActivity(): PendingIntent {
+        val intent: Intent = Intent(this, MainActivity::class.java)
+        return PendingIntent.getActivity(
+            this,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
     }
 
     internal fun startPlaybackStateSync(
