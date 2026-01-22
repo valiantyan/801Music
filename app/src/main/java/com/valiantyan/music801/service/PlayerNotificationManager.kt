@@ -21,6 +21,7 @@ import com.valiantyan.music801.domain.model.Song
  */
 class PlayerNotificationManager(
     private val context: Context,
+    private val serviceController: ForegroundServiceController? = null,
 ) {
     private val notificationManager: NotificationManager =
         context.getSystemService(NotificationManager::class.java)
@@ -177,6 +178,14 @@ class PlayerNotificationManager(
         ): Unit {
             lastNotification = notification
             isNotificationPosted = true
+            if (ongoing) {
+                serviceController?.startForeground(
+                    notificationId = notificationId,
+                    notification = notification,
+                )
+            } else {
+                serviceController?.stopForeground()
+            }
             if (shouldLogNotificationPosted(notificationId = notificationId, ongoing = ongoing)) {
                 Log.d(TAG, "notification posted: id=$notificationId ongoing=$ongoing")
             }
@@ -188,6 +197,8 @@ class PlayerNotificationManager(
         ): Unit {
             isNotificationPosted = false
             Log.d(TAG, "notification cancelled: id=$notificationId dismissed=$dismissedByUser")
+            serviceController?.stopForeground()
+            serviceController?.stopSelf()
         }
     }
 
@@ -289,4 +300,27 @@ class PlayerNotificationManager(
     internal fun getCurrentSongIdForTesting(): String? {
         return currentSongId
     }
+}
+
+/**
+ * 前台服务控制接口
+ */
+interface ForegroundServiceController {
+    /**
+     * 启动前台服务
+     */
+    fun startForeground(
+        notificationId: Int,
+        notification: Notification,
+    ): Unit
+
+    /**
+     * 停止前台服务状态
+     */
+    fun stopForeground(): Unit
+
+    /**
+     * 请求停止服务
+     */
+    fun stopSelf(): Unit
 }

@@ -12,9 +12,9 @@ import androidx.fragment.app.commitNow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.valiantyan.music801.R
-import com.valiantyan.music801.data.repository.PlayerRepository
 import com.valiantyan.music801.domain.model.PlaybackState
 import com.valiantyan.music801.domain.model.Song
+import com.valiantyan.music801.player.PlayerController
 import com.valiantyan.music801.viewmodel.PlayerViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Assert.assertEquals
@@ -33,19 +33,19 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.TIRAMISU])
 class PlayerFragmentTest {
-    private lateinit var repository: PlayerRepository
+    private lateinit var controller: PlayerController
     private lateinit var viewModelFactory: ViewModelProvider.Factory
     private lateinit var playbackStateFlow: MutableStateFlow<PlaybackState>
 
     @Before
     fun setup(): Unit {
-        repository = mock()
+        controller = mock()
         playbackStateFlow = MutableStateFlow(PlaybackState())
-        whenever(repository.playbackState).thenReturn(playbackStateFlow)
+        whenever(controller.playbackState).thenReturn(playbackStateFlow)
         viewModelFactory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return PlayerViewModel(playerRepository = repository) as T
+                return PlayerViewModel(playerController = controller) as T
             }
         }
     }
@@ -55,7 +55,7 @@ class PlayerFragmentTest {
         val fragment: PlayerFragment = launchFragment()
         idleMainLooper()
         fragment.requireView().findViewById<View>(R.id.playerPlayPause).performClick()
-        verify(repository).play()
+        verify(controller).play()
     }
 
     @Test
@@ -64,7 +64,7 @@ class PlayerFragmentTest {
         playbackStateFlow.value = PlaybackState(isPlaying = true)
         idleMainLooper()
         fragment.requireView().findViewById<View>(R.id.playerPlayPause).performClick()
-        verify(repository).pause()
+        verify(controller).pause()
     }
 
     @Test
@@ -73,15 +73,15 @@ class PlayerFragmentTest {
         idleMainLooper()
         fragment.requireView().findViewById<View>(R.id.playerPrevious).performClick()
         fragment.requireView().findViewById<View>(R.id.playerNext).performClick()
-        verify(repository).skipToPrevious()
-        verify(repository).skipToNext()
+        verify(controller).skipToPrevious()
+        verify(controller).skipToNext()
     }
 
     @Test
     fun `拖拽进度应调用跳转`() {
         val fragment: PlayerFragment = launchFragment()
         invokeHandleSeek(fragment = fragment, position = 1000L)
-        verify(repository).seekTo(position = 1000L)
+        verify(controller).seekTo(position = 1000L)
     }
 
     @Test

@@ -1,8 +1,5 @@
 package com.valiantyan.music801.ui.songlist
 
-import android.content.Context
-import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
 import android.util.Log
@@ -11,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.core.content.ContextCompat
 import androidx.core.os.BundleCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -24,14 +20,12 @@ import com.valiantyan.music801.R
 import com.valiantyan.music801.data.datasource.AudioFileScanner
 import com.valiantyan.music801.data.datasource.MediaMetadataExtractor
 import com.valiantyan.music801.data.repository.AudioRepository
-import com.valiantyan.music801.data.repository.PlayerRepository
-import com.valiantyan.music801.di.PlayerRepositoryHolder
 import com.valiantyan.music801.databinding.FragmentSongListBinding
 import com.valiantyan.music801.di.AudioRepositoryProvider
-import com.valiantyan.music801.di.PlayerRepositoryProvider
+import com.valiantyan.music801.di.PlayerControllerHolder
+import com.valiantyan.music801.di.PlayerControllerProvider
 import com.valiantyan.music801.domain.model.Song
-import com.valiantyan.music801.player.MediaQueueManager
-import com.valiantyan.music801.service.MusicPlayerService
+import com.valiantyan.music801.player.PlayerController
 import com.valiantyan.music801.viewmodel.SongListUiState
 import com.valiantyan.music801.viewmodel.SongListViewModel
 import com.valiantyan.music801.viewmodel.SongListViewModelFactory
@@ -98,7 +92,7 @@ class SongListFragment : Fragment() {
     /**
      * 播放器仓库
      */
-    private lateinit var playerRepository: PlayerRepository
+    private lateinit var playerController: PlayerController
 
     /**
      * 初始化 [SongListViewModel] 依赖
@@ -115,7 +109,7 @@ class SongListFragment : Fragment() {
             SongListViewModelFactory(audioRepository = audioRepository)
         }
         viewModel = ViewModelProvider(owner = this, factory = factory)[SongListViewModel::class.java]
-        playerRepository = resolvePlayerRepository()
+        playerController = resolvePlayerController()
     }
 
     /**
@@ -149,8 +143,11 @@ class SongListFragment : Fragment() {
      * 保存列表滚动状态
      */
     override fun onSaveInstanceState(outState: Bundle) {
-        val listState: Parcelable? = binding.songListRecyclerView.layoutManager?.onSaveInstanceState()
-        outState.putParcelable(KEY_LIST_STATE, listState)
+        val listState: Parcelable? =
+            _binding?.songListRecyclerView?.layoutManager?.onSaveInstanceState()
+        if (listState != null) {
+            outState.putParcelable(KEY_LIST_STATE, listState)
+        }
         super.onSaveInstanceState(outState)
     }
 
@@ -220,12 +217,11 @@ class SongListFragment : Fragment() {
             return
         }
         Log.d(TAG, "song click play: index=$startIndex path=${song.filePath}")
-        playerRepository.setQueue(
+        playerController.setQueue(
             songs = songs,
             startIndex = startIndex,
         )
-        startMediaSessionService()
-        playerRepository.play()
+        playerController.play()
         val navController = findNavController()
         navController.navigate(
             resId = R.id.action_songListFragment_to_playerFragment,
@@ -239,7 +235,7 @@ class SongListFragment : Fragment() {
     private fun observePlaybackState() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                playerRepository.playbackState.collect { state ->
+                playerController.playbackState.collect { state ->
                     adapter.updatePlaybackState(
                         currentSongId = state.currentSong?.id,
                         isPlaying = state.isPlaying,
@@ -254,20 +250,6 @@ class SongListFragment : Fragment() {
      */
     private fun handleSongLongClick(song: Song) {
         // TODO: To be implemented in Story STORY-003
-    }
-
-    /**
-     * 启动媒体会话服务以展示系统通知
-     */
-    private fun startMediaSessionService(): Unit {
-        val context: Context = requireContext().applicationContext
-        val intent: Intent = Intent(context, MusicPlayerService::class.java)
-        Log.d(TAG, "startMediaSessionService")
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            ContextCompat.startForegroundService(context, intent)
-            return
-        }
-        context.startService(intent)
     }
 
     /**
@@ -333,12 +315,12 @@ class SongListFragment : Fragment() {
     /**
      * 获取播放器仓库
      */
-    private fun resolvePlayerRepository(): PlayerRepository {
-        val provider: PlayerRepositoryProvider? = activity as? PlayerRepositoryProvider
+    private fun resolvePlayerController(): PlayerController {
+        val provider: PlayerControllerProvider? = activity as? PlayerControllerProvider
         if (provider != null) {
-            return provider.providePlayerRepository()
+            return provider.providePlayerController()
         }
-        return PlayerRepositoryHolder.getOrCreate(context = requireContext())
+        return PlayerControllerHolder.getOrCreate(context = requireContext())
     }
 
     /**

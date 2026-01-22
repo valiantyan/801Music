@@ -2,12 +2,14 @@ package com.valiantyan.music801.service
 
 import android.app.PendingIntent
 import android.content.Intent
+import android.content.pm.ServiceInfo
 import androidx.media3.common.ForwardingPlayer
 import androidx.media3.common.Player
 import androidx.media3.common.PlaybackException
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
 import androidx.media3.session.SessionResult
+import androidx.core.app.ServiceCompat
 import com.valiantyan.music801.MainActivity
 import com.valiantyan.music801.domain.model.PlaybackState
 import com.valiantyan.music801.data.repository.PlayerRepository
@@ -80,21 +82,16 @@ class MusicPlayerService : MediaSessionService() {
             .build()
         mediaSession = createdSession
         isSessionCreated = true
-        notificationManager = PlayerNotificationManager(context = applicationContext)
-            .also { manager -> manager.createNotificationChannel() }
+        val serviceController: ForegroundServiceController = MediaSessionForegroundController(service = this)
+        notificationManager = PlayerNotificationManager(
+            context = applicationContext,
+            serviceController = serviceController,
+        ).also { manager -> manager.createNotificationChannel() }
         isNotificationInitialized = true
         android.util.Log.d(TAG, "session created: id=$sessionId")
         val manager: PlayerNotificationManager? = notificationManager
         if (manager != null) {
             manager.attachToSession(mediaSession = createdSession)
-            val notification = manager.buildNotification(
-                song = null,
-                isPlaying = false,
-            )
-            startForeground(
-                manager.getNotificationId(),
-                notification,
-            )
         }
         startPlaybackStateSync(
             session = createdSession,
@@ -258,5 +255,37 @@ internal class PlaybackSessionCallback(
             }
         }
         return SessionResult.RESULT_SUCCESS
+    }
+}
+
+/**
+ * 前台服务控制实现
+ */
+private class MediaSessionForegroundController(
+    private val service: MediaSessionService,
+) : ForegroundServiceController {
+    override fun startForeground(
+        notificationId: Int,
+        notification: android.app.Notification,
+    ): Unit {
+        // AndroidX Java API 不支持命名参数，使用位置参数
+        ServiceCompat.startForeground(
+            service,
+            notificationId,
+            notification,
+            ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK,
+        )
+    }
+
+    override fun stopForeground(): Unit {
+        // AndroidX Java API 不支持命名参数，使用位置参数
+        ServiceCompat.stopForeground(
+            service,
+            ServiceCompat.STOP_FOREGROUND_REMOVE,
+        )
+    }
+
+    override fun stopSelf(): Unit {
+        service.stopSelf()
     }
 }

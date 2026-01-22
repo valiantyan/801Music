@@ -2,7 +2,7 @@ package com.valiantyan.music801.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.valiantyan.music801.data.repository.PlayerRepository
+import com.valiantyan.music801.player.PlayerController
 import com.valiantyan.music801.domain.model.PlaybackState
 import com.valiantyan.music801.domain.model.Song
 import kotlinx.coroutines.Job
@@ -15,12 +15,12 @@ import kotlinx.coroutines.launch
 /**
  * 播放器 ViewModel
  *
- * 管理播放控制与界面状态，订阅 [PlayerRepository] 的播放状态。
+ * 管理播放控制与界面状态，订阅 [PlayerController] 的播放状态。
  *
- * @param playerRepository 播放器数据仓库
+ * @param playerController 播放控制器
  */
 class PlayerViewModel(
-    private val playerRepository: PlayerRepository,
+    private val playerController: PlayerController,
 ) : ViewModel() {
     /**
      * UI 状态（可变）
@@ -45,14 +45,14 @@ class PlayerViewModel(
      * 开始播放
      */
     fun play(): Unit {
-        playerRepository.play()
+        playerController.play()
     }
 
     /**
      * 暂停播放
      */
     fun pause(): Unit {
-        playerRepository.pause()
+        playerController.pause()
     }
 
     /**
@@ -65,7 +65,7 @@ class PlayerViewModel(
         songs: List<Song>,
         startIndex: Int,
     ): Unit {
-        playerRepository.setQueue(songs = songs, startIndex = startIndex)
+        playerController.setQueue(songs = songs, startIndex = startIndex)
     }
 
     /**
@@ -74,21 +74,21 @@ class PlayerViewModel(
      * @param position 目标位置（毫秒）
      */
     fun seekTo(position: Long): Unit {
-        playerRepository.seekTo(position = position)
+        playerController.seekTo(position = position)
     }
 
     /**
      * 切换到下一首
      */
     fun skipToNext(): Unit {
-        playerRepository.skipToNext()
+        playerController.skipToNext()
     }
 
     /**
      * 切换到上一首
      */
     fun skipToPrevious(): Unit {
-        playerRepository.skipToPrevious()
+        playerController.skipToPrevious()
     }
 
     /**
@@ -97,7 +97,7 @@ class PlayerViewModel(
     private fun observePlaybackState(): Unit {
         playbackJob?.cancel()
         playbackJob = viewModelScope.launch {
-            playerRepository.playbackState.collect { state ->
+            playerController.playbackState.collect { state ->
                 updateUiState(state = state)
             }
         }
@@ -122,4 +122,5 @@ class PlayerViewModel(
             )
         }
     }
+
 }

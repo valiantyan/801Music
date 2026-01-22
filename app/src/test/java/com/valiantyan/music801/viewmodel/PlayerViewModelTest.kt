@@ -1,8 +1,8 @@
 package com.valiantyan.music801.viewmodel
 
-import com.valiantyan.music801.data.repository.PlayerRepository
 import com.valiantyan.music801.domain.model.PlaybackState
 import com.valiantyan.music801.domain.model.Song
+import com.valiantyan.music801.player.PlayerController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,13 +25,13 @@ import org.mockito.kotlin.whenever
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class PlayerViewModelTest {
-    private lateinit var repository: PlayerRepository
+    private lateinit var controller: PlayerController
     private lateinit var viewModel: PlayerViewModel
 
     @Before
     fun setup(): Unit {
         Dispatchers.setMain(Dispatchers.Unconfined)
-        repository = mock()
+        controller = mock()
     }
 
     @After
@@ -44,9 +44,9 @@ class PlayerViewModelTest {
         // Arrange
         val inputSong: Song = createSong(id = "/storage/music/song1.mp3", title = "Song 1")
         val inputStateFlow: MutableStateFlow<PlaybackState> = MutableStateFlow(PlaybackState())
-        whenever(repository.playbackState).thenReturn(inputStateFlow)
+        whenever(controller.playbackState).thenReturn(inputStateFlow)
         // Act
-        viewModel = PlayerViewModel(repository)
+        viewModel = PlayerViewModel(controller)
         inputStateFlow.value = PlaybackState(
             currentSong = inputSong,
             isPlaying = true,
@@ -69,8 +69,8 @@ class PlayerViewModelTest {
     fun `调用播放控制应委托仓库`() : Unit = runTest {
         // Arrange
         val inputStateFlow: MutableStateFlow<PlaybackState> = MutableStateFlow(PlaybackState())
-        whenever(repository.playbackState).thenReturn(inputStateFlow)
-        viewModel = PlayerViewModel(repository)
+        whenever(controller.playbackState).thenReturn(inputStateFlow)
+        viewModel = PlayerViewModel(controller)
         // Act
         viewModel.setQueue(
             songs = listOf(createSong(id = "/storage/music/song1.mp3", title = "Song 1")),
@@ -82,15 +82,15 @@ class PlayerViewModelTest {
         viewModel.skipToNext()
         viewModel.skipToPrevious()
         // Assert
-        verify(repository).setQueue(
+        verify(controller).setQueue(
             songs = listOf(createSong(id = "/storage/music/song1.mp3", title = "Song 1")),
             startIndex = 0,
         )
-        verify(repository).play()
-        verify(repository).seekTo(position = 1000L)
-        verify(repository).pause()
-        verify(repository).skipToNext()
-        verify(repository).skipToPrevious()
+        verify(controller).play()
+        verify(controller).seekTo(position = 1000L)
+        verify(controller).pause()
+        verify(controller).skipToNext()
+        verify(controller).skipToPrevious()
         assertFalse(viewModel.uiState.value.isLoading)
     }
 
@@ -99,8 +99,8 @@ class PlayerViewModelTest {
         // Arrange
         val inputSong: Song = createSong(id = "/storage/music/song1.mp3", title = "Song 1")
         val inputStateFlow: MutableStateFlow<PlaybackState> = MutableStateFlow(PlaybackState())
-        whenever(repository.playbackState).thenReturn(inputStateFlow)
-        viewModel = PlayerViewModel(repository)
+        whenever(controller.playbackState).thenReturn(inputStateFlow)
+        viewModel = PlayerViewModel(controller)
         // Act
         inputStateFlow.value = PlaybackState(
             currentSong = inputSong,

@@ -19,11 +19,13 @@ import androidx.navigation.testing.TestNavHostController
 import androidx.recyclerview.widget.RecyclerView
 import com.valiantyan.music801.R
 import com.valiantyan.music801.data.repository.AudioRepository
-import com.valiantyan.music801.data.repository.PlayerRepository
-import com.valiantyan.music801.di.PlayerRepositoryProvider
+import com.valiantyan.music801.di.PlayerControllerProvider
+import com.valiantyan.music801.domain.model.PlaybackState
 import com.valiantyan.music801.domain.model.Song
+import com.valiantyan.music801.player.PlayerController
 import com.valiantyan.music801.viewmodel.SongListUiState
 import com.valiantyan.music801.viewmodel.SongListViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -43,13 +45,14 @@ import org.robolectric.annotation.Config
 class SongListFragmentTest {
     private lateinit var repository: AudioRepository
     private lateinit var viewModelFactory: ViewModelProvider.Factory
-    private lateinit var playerRepository: PlayerRepository
+    private lateinit var playerController: PlayerController
 
     @Before
     fun setup() {
         repository = mock()
-        playerRepository = mock()
+        playerController = mock()
         whenever(repository.getAllSongs()).thenReturn(flowOf(emptyList()))
+        whenever(playerController.playbackState).thenReturn(MutableStateFlow(PlaybackState()))
         viewModelFactory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -145,16 +148,16 @@ class SongListFragmentTest {
             position = 0,
         )
         viewHolder.itemView.performClick()
-        verify(playerRepository).setQueue(
+        verify(playerController).setQueue(
             songs = songs,
             startIndex = 0,
         )
-        verify(playerRepository).play()
+        verify(playerController).play()
         assertEquals(R.id.playerFragment, navController.currentDestination?.id)
     }
 
     private fun launchFragment(): SongListFragment {
-        TestPlayerActivity.playerRepository = playerRepository
+        TestPlayerActivity.playerController = playerController
         val activityController = Robolectric.buildActivity(TestPlayerActivity::class.java)
         activityController.setup()
         val activity: FragmentActivity = activityController.get()
@@ -227,12 +230,12 @@ private class TestFragmentFactory(
     }
 }
 
-private class TestPlayerActivity : FragmentActivity(), PlayerRepositoryProvider {
-    override fun providePlayerRepository(): PlayerRepository {
-        return playerRepository
+private class TestPlayerActivity : FragmentActivity(), PlayerControllerProvider {
+    override fun providePlayerController(): PlayerController {
+        return playerController
     }
 
     companion object {
-        lateinit var playerRepository: PlayerRepository
+        lateinit var playerController: PlayerController
     }
 }

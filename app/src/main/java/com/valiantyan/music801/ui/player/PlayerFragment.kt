@@ -1,14 +1,10 @@
 package com.valiantyan.music801.ui.player
 
-import android.content.Context
-import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -16,11 +12,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.slider.Slider
 import com.valiantyan.music801.R
-import com.valiantyan.music801.data.repository.PlayerRepository
 import com.valiantyan.music801.databinding.FragmentPlayerBinding
-import com.valiantyan.music801.di.PlayerRepositoryProvider
 import com.valiantyan.music801.domain.model.Song
-import com.valiantyan.music801.service.MusicPlayerService
+import com.valiantyan.music801.di.PlayerControllerProvider
+import com.valiantyan.music801.player.PlayerController
 import com.valiantyan.music801.viewmodel.PlayerUiState
 import com.valiantyan.music801.viewmodel.PlayerViewModel
 import com.valiantyan.music801.viewmodel.PlayerViewModelFactory
@@ -82,8 +77,8 @@ class PlayerFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val factory: ViewModelProvider.Factory = viewModelFactoryForTest ?: run {
-            val repository: PlayerRepository = resolvePlayerRepository()
-            PlayerViewModelFactory(playerRepository = repository)
+            val controller: PlayerController = resolvePlayerController()
+            PlayerViewModelFactory(playerController = controller)
         }
         viewModel = ViewModelProvider(this, factory)[PlayerViewModel::class.java]
     }
@@ -190,23 +185,8 @@ class PlayerFragment : Fragment() {
         if (isPlaying) {
             viewModel.pause()
         } else {
-            startMediaSessionService()
             viewModel.play()
         }
-    }
-
-    /**
-     * 启动媒体会话服务以展示系统通知
-     */
-    private fun startMediaSessionService(): Unit {
-        val context: Context = requireContext().applicationContext
-        val intent: Intent = Intent(context, MusicPlayerService::class.java)
-        Log.d(TAG, "startMediaSessionService")
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            ContextCompat.startForegroundService(context, intent)
-            return
-        }
-        context.startService(intent)
     }
 
 
@@ -256,14 +236,14 @@ class PlayerFragment : Fragment() {
     }
 
     /**
-     * 获取播放器仓库
+     * 获取播放控制器
      */
-    private fun resolvePlayerRepository(): PlayerRepository {
-        val provider: PlayerRepositoryProvider? = activity as? PlayerRepositoryProvider
+    private fun resolvePlayerController(): PlayerController {
+        val provider: PlayerControllerProvider? = activity as? PlayerControllerProvider
         if (provider != null) {
-            return provider.providePlayerRepository()
+            return provider.providePlayerController()
         }
-        throw IllegalStateException("PlayerRepositoryProvider not found")
+        return com.valiantyan.music801.di.PlayerControllerHolder.getOrCreate(context = requireContext())
     }
 
 }
