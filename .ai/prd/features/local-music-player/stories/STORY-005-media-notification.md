@@ -217,7 +217,7 @@ val notification = NotificationCompat.Builder(context, CHANNEL_ID)
     - *Test Case*: 测试锁屏界面显示播放控制
     - *Test Case*: 测试锁屏控制按钮功能
 
-- [ ] **Task 14**: 集成测试和性能优化
+- [x] **Task 14**: 集成测试和性能优化
     - *Test Case*: 端到端测试 - 完整通知栏控制流程
     - *Test Case*: 性能测试 - 通知栏控制响应时间 < 200ms
     - *Test Case*: 边界测试 - 各种播放状态、错误情况处理
@@ -253,6 +253,8 @@ val notification = NotificationCompat.Builder(context, CHANNEL_ID)
 - [x] Task 12 测试：`./gradlew :app:testDebugUnitTest --tests "com.valiantyan.music801.util.PermissionHelperTest"` 通过。
 - [x] Task 13 完成：为 `MediaSession` 设置 `sessionActivity`，锁屏媒体面板可回到应用。
 - [x] Task 13 测试：`./gradlew :app:testDebugUnitTest --tests "com.valiantyan.music801.service.*"` 通过。
+- [x] Task 14 完成：新增媒体通知端到端集成测试与主题切换覆盖，优化播放错误同步避免重复更新。
+- [x] Task 14 测试：`./gradlew :app:testDebugUnitTest --tests "com.valiantyan.music801.service.*"` 通过。
 Bug 描述：点击歌曲播放后系统通知栏未显示媒体通知。
 问题原因：
 1. 歌曲列表播放入口未启动 `MusicPlayerService`，导致 MediaSession 与通知管理器未初始化。

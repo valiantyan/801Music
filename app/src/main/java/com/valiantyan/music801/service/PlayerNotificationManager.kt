@@ -10,6 +10,7 @@ import androidx.core.app.NotificationCompat
 import androidx.media3.common.Player
 import androidx.media3.ui.PlayerNotificationManager as Media3PlayerNotificationManager
 import androidx.media3.session.MediaSession
+import androidx.annotation.VisibleForTesting
 import com.valiantyan.music801.R
 import com.valiantyan.music801.domain.model.Song
 
@@ -280,5 +281,12 @@ class PlayerNotificationManager(
      */
     fun getNotificationId(): Int {
         return NOTIFICATION_ID
+    }
+    /**
+     * 仅用于测试验证当前歌曲同步
+     */
+    @VisibleForTesting
+    internal fun getCurrentSongIdForTesting(): String? {
+        return currentSongId
     }
 }

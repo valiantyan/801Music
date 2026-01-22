@@ -1,7 +1,6 @@
 package com.valiantyan.music801.service
 
 import org.junit.Assert.assertTrue
-import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
@@ -69,6 +68,32 @@ class MusicPlayerServiceTest {
             state = inputState,
         )
         // Assert
-        assertEquals(inputError, actualError)
+        assertEqualsAny(expected = inputError, actual = actualError)
     }
+
+    @Test
+    fun `非PlaybackException错误应忽略`() {
+        // Arrange
+        val inputController: ServiceController<MusicPlayerService> = Robolectric.buildService(
+            MusicPlayerService::class.java,
+        )
+        val actualService: MusicPlayerService = inputController.create().get()
+        val inputState: PlaybackState = PlaybackState(
+            error = IllegalStateException("test"),
+        )
+        // Act
+        val actualError: PlaybackException? = actualService.resolvePlaybackException(
+            state = inputState,
+        )
+        // Assert
+        assertEqualsAny(expected = null, actual = actualError)
+    }
+}
+
+private fun assertEqualsAny(
+    expected: Any?,
+    actual: Any?,
+): Unit {
+    // JUnit Java API 不支持命名参数，使用封装函数适配规范
+    org.junit.Assert.assertEquals(expected, actual)
 }

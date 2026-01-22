@@ -21,6 +21,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import androidx.annotation.VisibleForTesting
 
 /**
  * 媒体会话服务基础框架
@@ -37,6 +38,14 @@ class MusicPlayerService : MediaSessionService() {
     private var notificationManager: PlayerNotificationManager? = null
     private var lastIsPlaying: Boolean? = null
     private var lastSongId: String? = null
+    /**
+     * 缓存播放错误码，用于减少重复错误更新
+     */
+    private var lastPlaybackErrorCode: Int? = null
+    /**
+     * 缓存播放错误消息，用于减少重复错误更新
+     */
+    private var lastPlaybackErrorMessage: String? = null
     internal var isCreated: Boolean = false
     internal var isDestroyed: Boolean = false
     internal var isSessionCreated: Boolean = false
@@ -136,7 +145,9 @@ class MusicPlayerService : MediaSessionService() {
         playbackStateJob = serviceScope.launch {
             repository.playbackState.collectLatest { state ->
                 val error: PlaybackException? = resolvePlaybackException(state = state)
-                session.setPlaybackException(error)
+                if (shouldUpdatePlaybackError(error = error)) {
+                    session.setPlaybackException(error)
+                }
                 logPlaybackStateChange(state = state)
                 notificationManager?.updateCurrentSong(song = state.currentSong)
             }
@@ -166,6 +177,35 @@ class MusicPlayerService : MediaSessionService() {
             TAG,
             "playbackState: title=${state.currentSong?.title} isPlaying=$isPlaying",
         )
+    }
+    /**
+     * 判断播放错误是否变化，用于减少重复会话更新
+     */
+    private fun shouldUpdatePlaybackError(error: PlaybackException?): Boolean {
+        val newCode: Int? = error?.errorCode
+        val newMessage: String? = error?.message
+        val shouldUpdate: Boolean =
+            newCode != lastPlaybackErrorCode || newMessage != lastPlaybackErrorMessage
+        if (!shouldUpdate) {
+            return false
+        }
+        lastPlaybackErrorCode = newCode
+        lastPlaybackErrorMessage = newMessage
+        return true
+    }
+    /**
+     * 仅用于测试验证会话创建结果
+     */
+    @VisibleForTesting
+    internal fun getMediaSessionForTesting(): MediaSession? {
+        return mediaSession
+    }
+    /**
+     * 仅用于测试验证通知管理器状态
+     */
+    @VisibleForTesting
+    internal fun getNotificationManagerForTesting(): PlayerNotificationManager? {
+        return notificationManager
     }
 
 }
