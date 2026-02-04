@@ -22,10 +22,10 @@ import com.valiantyan.music801.data.datasource.MediaMetadataExtractor
 import com.valiantyan.music801.data.repository.AudioRepository
 import com.valiantyan.music801.databinding.FragmentSongListBinding
 import com.valiantyan.music801.di.AudioRepositoryProvider
-import com.valiantyan.music801.di.PlayerControllerHolder
 import com.valiantyan.music801.di.PlayerControllerProvider
 import com.valiantyan.music801.domain.model.Song
 import com.valiantyan.music801.player.PlayerController
+import com.valiantyan.music801.player.PlayerControllerRegistry
 import com.valiantyan.music801.viewmodel.SongListUiState
 import com.valiantyan.music801.viewmodel.SongListViewModel
 import com.valiantyan.music801.viewmodel.SongListViewModelFactory
@@ -320,7 +320,7 @@ class SongListFragment : Fragment() {
         if (provider != null) {
             return provider.providePlayerController()
         }
-        return PlayerControllerHolder.getOrCreate(context = requireContext())
+        return PlayerControllerRegistry.getOrCreate(context = requireContext())
     }
 
     /**

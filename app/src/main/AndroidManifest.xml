@@ -34,15 +34,6 @@
             </intent-filter>
         </activity>
 
-        <service
-            android:name=".service.MusicPlayerService"
-            android:exported="false"
-            android:foregroundServiceType="mediaPlayback">
-            <intent-filter>
-                <action android:name="androidx.media3.session.MediaSessionService" />
-            </intent-filter>
-        </service>
-        
         <!-- 测试专用的 Activity，仅在测试构建中使用 -->
         <activity
             android:name=".util.TestActivity"

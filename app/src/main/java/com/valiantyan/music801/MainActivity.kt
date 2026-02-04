@@ -11,13 +11,10 @@ import androidx.navigation.fragment.NavHostFragment
 import com.valiantyan.music801.data.datasource.AudioFileScanner
 import com.valiantyan.music801.data.datasource.MediaMetadataExtractor
 import com.valiantyan.music801.data.repository.AudioRepository
-import com.valiantyan.music801.data.repository.PlayerRepository
 import com.valiantyan.music801.di.AudioRepositoryProvider
-import com.valiantyan.music801.di.PlayerControllerHolder
 import com.valiantyan.music801.di.PlayerControllerProvider
-import com.valiantyan.music801.di.PlayerRepositoryHolder
-import com.valiantyan.music801.di.PlayerRepositoryProvider
 import com.valiantyan.music801.player.PlayerController
+import com.valiantyan.music801.player.PlayerControllerRegistry
 import com.valiantyan.music801.util.PermissionHelper
 
 /**
@@ -25,7 +22,7 @@ import com.valiantyan.music801.util.PermissionHelper
  *
  * 负责应用入口、权限请求和导航管理。
  */
-class MainActivity : AppCompatActivity(), AudioRepositoryProvider, PlayerRepositoryProvider, PlayerControllerProvider {
+class MainActivity : AppCompatActivity(), AudioRepositoryProvider, PlayerControllerProvider {
 
     /**
      * 权限助手
@@ -193,13 +190,6 @@ class MainActivity : AppCompatActivity(), AudioRepositoryProvider, PlayerReposit
     }
 
     /**
-     * 暴露统一的 [PlayerRepository] 供页面共享
-     */
-    override fun providePlayerRepository(): PlayerRepository {
-        return PlayerRepositoryHolder.getOrCreate(context = this)
-    }
-
-    /**
      * 暴露统一的 [PlayerController] 供页面共享
      */
     override fun providePlayerController(): PlayerController {
@@ -219,7 +209,7 @@ class MainActivity : AppCompatActivity(), AudioRepositoryProvider, PlayerReposit
      * 创建播放器仓库实例
      */
     private fun createPlayerController(): PlayerController {
-        return PlayerControllerHolder.getOrCreate(context = this)
+        return PlayerControllerRegistry.getOrCreate(context = this)
     }
 
     /**
@@ -247,7 +237,7 @@ class MainActivity : AppCompatActivity(), AudioRepositoryProvider, PlayerReposit
     override fun onDestroy() {
         super.onDestroy()
         if (isFinishing) {
-            PlayerControllerHolder.clear()
+            PlayerControllerRegistry.clear()
         }
     }
 }

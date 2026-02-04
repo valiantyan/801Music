@@ -16,6 +16,7 @@ import com.valiantyan.music801.databinding.FragmentPlayerBinding
 import com.valiantyan.music801.domain.model.Song
 import com.valiantyan.music801.di.PlayerControllerProvider
 import com.valiantyan.music801.player.PlayerController
+import com.valiantyan.music801.player.PlayerControllerRegistry
 import com.valiantyan.music801.viewmodel.PlayerUiState
 import com.valiantyan.music801.viewmodel.PlayerViewModel
 import com.valiantyan.music801.viewmodel.PlayerViewModelFactory
@@ -243,7 +244,7 @@ class PlayerFragment : Fragment() {
         if (provider != null) {
             return provider.providePlayerController()
         }
-        return com.valiantyan.music801.di.PlayerControllerHolder.getOrCreate(context = requireContext())
+        return PlayerControllerRegistry.getOrCreate(context = requireContext())
     }
 
 }

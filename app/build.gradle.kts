@@ -64,6 +64,8 @@ spotless {
 }
 
 dependencies {
+    implementation(project(":player-api"))
+    implementation(project(":player-impl"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -84,12 +86,6 @@ dependencies {
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
     testImplementation(libs.androidx.navigation.testing)
-
-    // Media3
-    implementation(libs.androidx.media3.exoplayer)
-    implementation(libs.androidx.media3.session)
-    implementation(libs.androidx.media3.ui)
-    implementation(libs.androidx.media3.common)
 
     // Testing
     testImplementation(libs.junit)

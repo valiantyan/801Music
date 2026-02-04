@@ -92,6 +92,13 @@ class PlayerViewModel(
     }
 
     /**
+     * 切换收藏状态
+     */
+    fun toggleFavorite(): Unit {
+        playerController.toggleFavorite()
+    }
+
+    /**
      * 订阅播放状态
      */
     private fun observePlaybackState(): Unit {
@@ -118,7 +125,7 @@ class PlayerViewModel(
                 queue = state.queue,
                 currentIndex = state.currentIndex,
                 isLoading = false,
-                error = null,
+                error = state.error?.message,
             )
         }
     }
