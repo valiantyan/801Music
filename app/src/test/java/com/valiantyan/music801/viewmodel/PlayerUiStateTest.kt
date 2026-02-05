@@ -24,6 +24,7 @@ class PlayerUiStateTest {
         assertEquals(0L, actualState.duration)
         assertEquals(expectedQueue, actualState.queue)
         assertEquals(-1, actualState.currentIndex)
+        assertFalse(actualState.isFavorite)
         assertFalse(actualState.isLoading)
         assertNull(actualState.error)
     }
@@ -51,6 +52,7 @@ class PlayerUiStateTest {
             duration = 180000L,
             queue = inputQueue,
             currentIndex = 0,
+            isFavorite = true,
             isLoading = true,
             error = "加载失败",
         )
@@ -61,6 +63,7 @@ class PlayerUiStateTest {
         assertEquals(180000L, actualState.duration)
         assertEquals(inputQueue, actualState.queue)
         assertEquals(0, actualState.currentIndex)
+        assertTrue(actualState.isFavorite)
         assertTrue(actualState.isLoading)
         assertEquals("加载失败", actualState.error)
     }

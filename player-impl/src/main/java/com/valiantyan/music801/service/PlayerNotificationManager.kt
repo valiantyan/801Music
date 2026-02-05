@@ -23,19 +23,58 @@ internal class PlayerNotificationManager(
     private val context: Context,
     private val serviceController: ForegroundServiceController? = null,
 ) {
+    /**
+     * 系统通知管理器，用于创建与更新通知
+     */
     private val notificationManager: NotificationManager =
         context.getSystemService(NotificationManager::class.java)
+    /**
+     * 最近一次生成的通知实例，便于复用
+     */
     internal var lastNotification: Notification? = null
+    /**
+     * 记录通知是否已投递，用于测试与状态判断
+     */
     internal var isNotificationPosted: Boolean = false
+    /**
+     * 标记是否已绑定 [MediaSession]，避免重复初始化
+     */
     internal var isManagerAttached: Boolean = false
+    /**
+     * 标记播放/暂停动作是否启用，便于测试校验
+     */
     internal var isPlayPauseActionEnabled: Boolean = false
+    /**
+     * 标记下一首动作是否启用，便于测试校验
+     */
     internal var isNextActionEnabled: Boolean = false
+    /**
+     * 标记上一首动作是否启用，便于测试校验
+     */
     internal var isPreviousActionEnabled: Boolean = false
+    /**
+     * 标记停止动作是否启用，便于测试校验
+     */
     internal var isStopActionEnabled: Boolean = false
+    /**
+     * 标记紧凑视图下一首动作是否启用，便于测试校验
+     */
     internal var isCompactNextActionEnabled: Boolean = false
+    /**
+     * 标记紧凑视图上一首动作是否启用，便于测试校验
+     */
     internal var isCompactPreviousActionEnabled: Boolean = false
+    /**
+     * Media3 通知管理器实例，负责与 [Player] 联动
+     */
     private var media3NotificationManager: Media3PlayerNotificationManager? = null
+    /**
+     * 记录最近一次通知 ID，用于减少重复日志
+     */
     private var lastNotificationId: Int? = null
+    /**
+     * 记录最近一次通知前台状态，用于减少重复日志
+     */
     private var lastNotificationOngoing: Boolean? = null
 
     /**
@@ -124,6 +163,9 @@ internal class PlayerNotificationManager(
         isManagerAttached = true
     }
 
+    /**
+     * 构建 Media3 通知管理器并配置动作按钮
+     */
     private fun buildMedia3Manager(): Media3PlayerNotificationManager {
         val adapter: Media3PlayerNotificationManager.MediaDescriptionAdapter =
             MediaDescriptionAdapterImpl()
@@ -154,6 +196,9 @@ internal class PlayerNotificationManager(
             }
     }
 
+    /**
+     * 监听通知投递与取消，用于驱动前台服务状态
+     */
     private inner class NotificationListenerImpl :
         Media3PlayerNotificationManager.NotificationListener {
         override fun onNotificationPosted(
@@ -187,6 +232,9 @@ internal class PlayerNotificationManager(
         }
     }
 
+    /**
+     * 避免重复日志刷屏，仅在通知状态变化时输出
+     */
     private fun shouldLogNotificationPosted(
         notificationId: Int,
         ongoing: Boolean,
@@ -201,6 +249,9 @@ internal class PlayerNotificationManager(
         return true
     }
 
+    /**
+     * 提供通知展示所需的标题与内容描述
+     */
     private inner class MediaDescriptionAdapterImpl :
         Media3PlayerNotificationManager.MediaDescriptionAdapter {
         override fun getCurrentContentTitle(player: Player): CharSequence {
@@ -241,6 +292,9 @@ internal class PlayerNotificationManager(
     }
 
     private companion object {
+        /**
+         * 日志标签
+         */
         private const val TAG: String = "MediaNotification"
         /**
          * 通知渠道 ID

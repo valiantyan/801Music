@@ -56,5 +56,5 @@ interface PlayerController {
     /**
      * 切换收藏状态
      */
-    fun toggleFavorite(): Unit
+    suspend fun toggleFavorite(): PlayerCommandResult
 }

@@ -10,6 +10,7 @@ package com.valiantyan.music801.domain.model
  * @param bufferedPosition 缓冲位置（毫秒）
  * @param playbackState 播放状态（对应播放器状态值）
  * @param error 播放错误信息
+ * @param isFavorite 当前歌曲是否收藏
  * @param queue 播放队列
  * @param currentIndex 当前播放索引
  */
@@ -21,6 +22,7 @@ data class PlaybackState(
     val bufferedPosition: Long = 0L,
     val playbackState: Int = 0,
     val error: Exception? = null,
+    val isFavorite: Boolean = false,
     val queue: List<Song> = emptyList(),
     val currentIndex: Int = -1,
 )

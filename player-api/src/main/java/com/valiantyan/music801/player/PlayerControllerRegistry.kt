@@ -9,6 +9,9 @@ import android.content.Context
  */
 object PlayerControllerRegistry {
     @Volatile
+    /**
+     * 缓存已注册的 [PlayerControllerFactory]，避免重复初始化
+     */
     private var factory: PlayerControllerFactory? = null
 
     /**

@@ -52,6 +52,7 @@ class PlayerViewModelTest {
             isPlaying = true,
             position = 1200L,
             duration = 180000L,
+            isFavorite = true,
             queue = listOf(inputSong),
             currentIndex = 0,
         )
@@ -63,6 +64,7 @@ class PlayerViewModelTest {
         assertEquals(1200L, actualState.position)
         assertEquals(180000L, actualState.duration)
         assertEquals(0, actualState.currentIndex)
+        assertTrue(actualState.isFavorite)
     }
 
     @Test
@@ -70,6 +72,9 @@ class PlayerViewModelTest {
         // Arrange
         val inputStateFlow: MutableStateFlow<PlaybackState> = MutableStateFlow(PlaybackState())
         whenever(controller.playbackState).thenReturn(inputStateFlow)
+        whenever(controller.toggleFavorite()).thenReturn(
+            com.valiantyan.music801.player.PlayerCommandResult(isSuccess = true),
+        )
         viewModel = PlayerViewModel(controller)
         // Act
         viewModel.setQueue(
@@ -81,6 +86,8 @@ class PlayerViewModelTest {
         viewModel.pause()
         viewModel.skipToNext()
         viewModel.skipToPrevious()
+        viewModel.toggleFavorite()
+        advanceUntilIdle()
         // Assert
         verify(controller).setQueue(
             songs = listOf(createSong(id = "/storage/music/song1.mp3", title = "Song 1")),
@@ -91,6 +98,7 @@ class PlayerViewModelTest {
         verify(controller).pause()
         verify(controller).skipToNext()
         verify(controller).skipToPrevious()
+        verify(controller).toggleFavorite()
         assertFalse(viewModel.uiState.value.isLoading)
     }
 
@@ -107,6 +115,7 @@ class PlayerViewModelTest {
             isPlaying = false,
             position = 0L,
             duration = 180000L,
+            isFavorite = false,
             queue = listOf(inputSong),
             currentIndex = 0,
         )

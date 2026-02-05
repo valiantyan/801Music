@@ -8,6 +8,9 @@ import com.valiantyan.music801.player.MediaControllerManager
  * 播放控制器单例管理
  */
 internal object PlayerControllerHolder {
+    /**
+     * 缓存单例 [PlayerController]，避免重复建立媒体会话连接
+     */
     private var controller: PlayerController? = null
 
     /**

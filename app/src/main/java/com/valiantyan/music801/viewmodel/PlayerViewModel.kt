@@ -92,10 +92,12 @@ class PlayerViewModel(
     }
 
     /**
-     * 切换收藏状态
+     * 通过 [viewModelScope] 调用 [PlayerController.toggleFavorite]，避免阻塞主线程
      */
     fun toggleFavorite(): Unit {
-        playerController.toggleFavorite()
+        viewModelScope.launch {
+            playerController.toggleFavorite()
+        }
     }
 
     /**
@@ -124,10 +126,10 @@ class PlayerViewModel(
                 duration = state.duration,
                 queue = state.queue,
                 currentIndex = state.currentIndex,
+                isFavorite = state.isFavorite,
                 isLoading = false,
                 error = state.error?.message,
             )
         }
     }
-
 }
