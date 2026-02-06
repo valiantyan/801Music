@@ -5,7 +5,7 @@ type: Spec
 epic_id: "FEAT-001"
 feature_title: "本地音乐播放器"
 target_version: "v1.1"
-status: "已批准"
+status: "已完成"
 priority: P0
 owner: "产品经理"
 tech_owner: "客户端负责人"
