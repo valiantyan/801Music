@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">music801</string>
-    
+
     <!-- 扫描进度界面 -->
     <string name="scanning_audio_files">正在扫描音频文件…</string>
     <string name="scanned_files_count">已扫描: %1$d 个文件</string>
@@ -9,13 +9,18 @@
     <string name="scan_completed">扫描完成</string>
     <string name="scan_error">扫描出错: %1$s</string>
     <string name="exit_app_tip">再按一次退出应用</string>
-    
+
     <!-- 歌曲列表 -->
     <string name="song_album_art">歌曲封面</string>
     <string name="song_list">歌曲列表</string>
     <string name="song_list_loading">歌曲列表加载中</string>
     <string name="song_list_empty">暂无歌曲</string>
     <string name="song_playing_indicator">正在播放</string>
+    <string name="song_list_title">你的音乐库</string>
+    <string name="song_list_subtitle">离线播放，随时开唱</string>
+    <string name="song_list_chip_all">全部</string>
+    <string name="song_list_chip_recent">最近播放</string>
+    <string name="song_list_chip_favorites">收藏</string>
 
     <!-- 播放控制界面 -->
     <string name="player_album_art">歌曲封面</string>
@@ -26,4 +31,8 @@
     <string name="player_previous">上一首</string>
     <string name="player_play_pause">播放或暂停</string>
     <string name="player_next">下一首</string>
+    <string name="player_now_playing">Now Playing</string>
+    <string name="player_chip_queue">播放队列</string>
+    <string name="player_chip_lyrics">歌词</string>
+    <string name="player_chip_device">设备</string>
 </resources>

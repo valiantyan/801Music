@@ -4,18 +4,106 @@
     android:id="@+id/songListRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:background="@drawable/bg_main_gradient"
+    android:padding="20dp">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/songListHeroCard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:cardBackgroundColor="@color/surface"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="4dp"
+        app:strokeColor="@color/outline"
+        app:strokeWidth="1dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/songListTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-black"
+                android:text="@string/song_list_title"
+                android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                android:textColor="@color/on_surface"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/songListSubtitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="@string/song_list_subtitle"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="@color/on_surface_variant"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/songListTitle" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/songListChips"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                app:chipSpacingHorizontal="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/songListSubtitle">
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/songListChipAll"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/song_list_chip_all"
+                    android:textColor="@color/on_primary_container"
+                    app:chipBackgroundColor="@color/primary_container"
+                    app:chipStrokeColor="@color/primary"
+                    app:chipStrokeWidth="1dp" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/songListChipRecent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/song_list_chip_recent"
+                    android:textColor="@color/on_surface"
+                    app:chipBackgroundColor="@color/surface_variant"
+                    app:chipStrokeColor="@color/outline"
+                    app:chipStrokeWidth="1dp" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/songListChipFavorites"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/song_list_chip_favorites"
+                    android:textColor="@color/on_surface"
+                    app:chipBackgroundColor="@color/surface_variant"
+                    app:chipStrokeColor="@color/outline"
+                    app:chipStrokeWidth="1dp" />
+            </com.google.android.material.chip.ChipGroup>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/songListRecyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginTop="16dp"
         android:clipToPadding="false"
         android:contentDescription="@string/song_list"
+        android:overScrollMode="never"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/songListHeroCard" />
 
     <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/songListLoading"
@@ -23,6 +111,8 @@
         android:layout_height="48dp"
         android:contentDescription="@string/song_list_loading"
         android:visibility="gone"
+        app:indicatorColor="@color/tertiary"
+        app:trackColor="@color/surface_variant"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -34,6 +124,7 @@
         android:layout_height="wrap_content"
         android:text="@string/song_list_empty"
         android:textAppearance="?attr/textAppearanceBodyMedium"
+        android:textColor="@color/on_surface_variant"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

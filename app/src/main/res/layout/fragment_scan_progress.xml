@@ -4,86 +4,111 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
+    android:background="@drawable/bg_main_gradient"
+    android:padding="20dp"
     tools:context=".ui.scan.ScanProgressFragment">
 
-    <!-- 标题 -->
-    <TextView
-        android:id="@+id/titleText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/scanning_audio_files"
-        android:textAppearance="?attr/textAppearanceHeadline5"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <!-- 进度条 -->
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyleHorizontal"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/scanProgressCard"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:max="100"
-        android:progress="0"
-        android:progressTint="?attr/colorPrimary"
+        app:cardBackgroundColor="@color/surface"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="4dp"
+        app:strokeColor="@color/outline"
+        app:strokeWidth="1dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/titleText" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <!-- 已扫描文件数 -->
-    <TextView
-        android:id="@+id/scannedCountText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/scanned_files_count"
-        android:textAppearance="?attr/textAppearanceBody1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/progressBar" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
 
-    <!-- 当前扫描路径 -->
-    <TextView
-        android:id="@+id/currentPathText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:ellipsize="middle"
-        android:maxLines="2"
-        android:text="@string/current_scanning_path"
-        android:textAppearance="?attr/textAppearanceBody2"
-        android:textColor="?attr/colorOnSurfaceVariant"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/scannedCountText" />
+            <!-- 标题 -->
+            <TextView
+                android:id="@+id/titleText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-black"
+                android:text="@string/scanning_audio_files"
+                android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                android:textColor="@color/on_surface"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- 错误信息 -->
-    <TextView
-        android:id="@+id/errorText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:background="?attr/colorErrorContainer"
-        android:padding="12dp"
-        android:textAppearance="?attr/textAppearanceBody2"
-        android:textColor="?attr/colorOnErrorContainer"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/currentPathText" />
+            <!-- 进度条 -->
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:indeterminateTint="@color/tertiary"
+                android:max="100"
+                android:progress="0"
+                android:progressTint="@color/tertiary"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/titleText" />
 
-    <!-- 取消按钮 -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/cancelButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="@string/cancel_scan"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/errorText" />
+            <!-- 已扫描文件数 -->
+            <TextView
+                android:id="@+id/scannedCountText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/scanned_files_count"
+                android:textAppearance="?attr/textAppearanceBodyLarge"
+                android:textColor="@color/on_surface"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/progressBar" />
 
+            <!-- 当前扫描路径 -->
+            <TextView
+                android:id="@+id/currentPathText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:ellipsize="middle"
+                android:maxLines="2"
+                android:text="@string/current_scanning_path"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="@color/on_surface_variant"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/scannedCountText" />
+
+            <!-- 错误信息 -->
+            <TextView
+                android:id="@+id/errorText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@color/error_container"
+                android:padding="12dp"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="@color/on_error_container"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/currentPathText" />
+
+            <!-- 取消按钮 -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/cancelButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="@string/cancel_scan"
+                app:backgroundTint="@color/tertiary"
+                app:cornerRadius="14dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/errorText" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
 </androidx.constraintlayout.widget.ConstraintLayout>
