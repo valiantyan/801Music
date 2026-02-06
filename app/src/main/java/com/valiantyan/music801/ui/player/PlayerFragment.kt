@@ -38,6 +38,7 @@ class PlayerFragment : Fragment() {
     private companion object {
         private const val TAG: String = "MediaNotification"
         private const val PROGRESS_UPDATE_INTERVAL_MS: Long = 1000L
+        private const val PLAYBACK_STATE_BUFFERING: Int = 2
     }
     /**
      * ViewBinding
@@ -155,7 +156,9 @@ class PlayerFragment : Fragment() {
         binding.playerSongTitle.text = titleText
         binding.playerSongArtist.text = artistText
         updateProgress(state = state)
-        updatePlayPauseIcon(isPlaying = state.isPlaying)
+        val isBufferingWithPlayIntent: Boolean = isBufferingWithPlayIntent(state = state)
+        updateBufferingIndicator(isVisible = isBufferingWithPlayIntent)
+        updatePlayPauseIcon(isPlaying = isPlaybackActiveForUi(state = state))
         syncProgressTicker(state = state)
     }
 
@@ -192,6 +195,31 @@ class PlayerFragment : Fragment() {
     }
 
     /**
+     * 更新缓冲外环可见性
+     */
+    private fun updateBufferingIndicator(isVisible: Boolean): Unit {
+        binding.playerBufferingIndicator.visibility = if (isVisible) {
+            View.VISIBLE
+        } else {
+            View.GONE
+        }
+    }
+
+    /**
+     * 基于播放意图和缓冲态计算 UI 是否应保持“播放中”视觉
+     */
+    private fun isPlaybackActiveForUi(state: PlayerUiState): Boolean {
+        return state.isPlaying || isBufferingWithPlayIntent(state = state)
+    }
+
+    /**
+     * 判断是否处于“有播放意图且正在缓冲”的状态
+     */
+    private fun isBufferingWithPlayIntent(state: PlayerUiState): Boolean {
+        return state.isPlayWhenReady && state.playbackState == PLAYBACK_STATE_BUFFERING
+    }
+
+    /**
      * 播放中使用本地定时器补间进度，避免状态流仅事件触发导致进度条静止
      */
     private fun syncProgressTicker(state: PlayerUiState): Unit {
@@ -222,9 +250,12 @@ class PlayerFragment : Fragment() {
      * 处理播放/暂停切换
      */
     private fun handlePlayPause(): Unit {
-        val isPlaying: Boolean = viewModel.uiState.value.isPlaying
-        Log.d(TAG, "playPause click: isPlaying=$isPlaying")
-        if (isPlaying) {
+        val state: PlayerUiState = viewModel.uiState.value
+        Log.d(
+            TAG,
+            "playPause click: isPlaying=${state.isPlaying}, isPlayWhenReady=${state.isPlayWhenReady}",
+        )
+        if (state.isPlayWhenReady) {
             viewModel.pause()
         } else {
             viewModel.play()

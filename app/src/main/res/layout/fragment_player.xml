@@ -191,16 +191,35 @@
             android:src="@android:drawable/ic_media_previous"
             android:tint="@color/on_surface" />
 
-        <ImageButton
-            android:id="@+id/playerPlayPause"
-            android:layout_width="76dp"
-            android:layout_height="76dp"
+        <FrameLayout
+            android:layout_width="84dp"
+            android:layout_height="84dp"
             android:layout_marginHorizontal="12dp"
-            android:background="@drawable/bg_control_button_primary"
-            android:contentDescription="@string/player_play_pause"
-            android:scaleType="center"
-            android:src="@android:drawable/ic_media_play"
-            android:tint="@color/on_primary" />
+            android:foregroundGravity="center">
+
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:id="@+id/playerBufferingIndicator"
+                android:layout_width="84dp"
+                android:layout_height="84dp"
+                android:indeterminate="true"
+                android:visibility="gone"
+                app:indicatorColor="@color/tertiary"
+                app:indicatorInset="4dp"
+                app:indicatorSize="76dp"
+                app:trackColor="@color/surface_variant"
+                app:trackThickness="3dp" />
+
+            <ImageButton
+                android:id="@+id/playerPlayPause"
+                android:layout_width="76dp"
+                android:layout_height="76dp"
+                android:layout_gravity="center"
+                android:background="@drawable/bg_control_button_primary"
+                android:contentDescription="@string/player_play_pause"
+                android:scaleType="center"
+                android:src="@android:drawable/ic_media_play"
+                android:tint="@color/on_primary" />
+        </FrameLayout>
 
         <ImageButton
             android:id="@+id/playerNext"

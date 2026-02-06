@@ -33,6 +33,9 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.TIRAMISU])
 class PlayerFragmentTest {
+    private companion object {
+        private const val PLAYBACK_STATE_BUFFERING: Int = 2
+    }
     private lateinit var controller: PlayerController
     private lateinit var viewModelFactory: ViewModelProvider.Factory
     private lateinit var playbackStateFlow: MutableStateFlow<PlaybackState>
@@ -61,10 +64,52 @@ class PlayerFragmentTest {
     @Test
     fun `播放中点击暂停应调用暂停`() {
         val fragment: PlayerFragment = launchFragment()
-        playbackStateFlow.value = PlaybackState(isPlaying = true)
+        playbackStateFlow.value = PlaybackState(
+            isPlaying = true,
+            isPlayWhenReady = true,
+        )
         idleMainLooper()
         fragment.requireView().findViewById<View>(R.id.playerPlayPause).performClick()
         verify(controller).pause()
+    }
+
+    @Test
+    fun `缓冲中且播放意图为播放时点击应调用暂停`() {
+        val fragment: PlayerFragment = launchFragment()
+        playbackStateFlow.value = PlaybackState(
+            isPlaying = false,
+            isPlayWhenReady = true,
+            playbackState = PLAYBACK_STATE_BUFFERING,
+        )
+        idleMainLooper()
+        fragment.requireView().findViewById<View>(R.id.playerPlayPause).performClick()
+        verify(controller).pause()
+    }
+
+    @Test
+    fun `缓冲中且播放意图为播放时应展示外环加载`() {
+        val fragment: PlayerFragment = launchFragment()
+        playbackStateFlow.value = PlaybackState(
+            isPlaying = false,
+            isPlayWhenReady = true,
+            playbackState = PLAYBACK_STATE_BUFFERING,
+        )
+        idleMainLooper()
+        val indicator: View = fragment.requireView().findViewById(R.id.playerBufferingIndicator)
+        assertEquals(View.VISIBLE, indicator.visibility)
+    }
+
+    @Test
+    fun `非缓冲状态应隐藏外环加载`() {
+        val fragment: PlayerFragment = launchFragment()
+        playbackStateFlow.value = PlaybackState(
+            isPlaying = true,
+            isPlayWhenReady = true,
+            playbackState = 3,
+        )
+        idleMainLooper()
+        val indicator: View = fragment.requireView().findViewById(R.id.playerBufferingIndicator)
+        assertEquals(View.GONE, indicator.visibility)
     }
 
     @Test

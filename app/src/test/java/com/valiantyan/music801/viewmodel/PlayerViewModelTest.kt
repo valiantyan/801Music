@@ -50,8 +50,10 @@ class PlayerViewModelTest {
         inputStateFlow.value = PlaybackState(
             currentSong = inputSong,
             isPlaying = true,
+            isPlayWhenReady = true,
             position = 1200L,
             duration = 180000L,
+            playbackState = 3,
             isFavorite = true,
             queue = listOf(inputSong),
             currentIndex = 0,
@@ -61,8 +63,10 @@ class PlayerViewModelTest {
         // Assert
         assertEquals(inputSong, actualState.currentSong)
         assertTrue(actualState.isPlaying)
+        assertTrue(actualState.isPlayWhenReady)
         assertEquals(1200L, actualState.position)
         assertEquals(180000L, actualState.duration)
+        assertEquals(3, actualState.playbackState)
         assertEquals(0, actualState.currentIndex)
         assertTrue(actualState.isFavorite)
     }

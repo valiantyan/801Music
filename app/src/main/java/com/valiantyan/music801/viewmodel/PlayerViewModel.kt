@@ -122,8 +122,10 @@ class PlayerViewModel(
             currentState.copy(
                 currentSong = state.currentSong,
                 isPlaying = state.isPlaying,
+                isPlayWhenReady = state.isPlayWhenReady,
                 position = state.position,
                 duration = state.duration,
+                playbackState = state.playbackState,
                 queue = state.queue,
                 currentIndex = state.currentIndex,
                 isFavorite = state.isFavorite,

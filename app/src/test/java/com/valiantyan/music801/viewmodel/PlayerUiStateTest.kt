@@ -20,8 +20,10 @@ class PlayerUiStateTest {
         // Assert
         assertNull(actualState.currentSong)
         assertFalse(actualState.isPlaying)
+        assertFalse(actualState.isPlayWhenReady)
         assertEquals(0L, actualState.position)
         assertEquals(0L, actualState.duration)
+        assertEquals(0, actualState.playbackState)
         assertEquals(expectedQueue, actualState.queue)
         assertEquals(-1, actualState.currentIndex)
         assertFalse(actualState.isFavorite)
@@ -48,8 +50,10 @@ class PlayerUiStateTest {
         val actualState: PlayerUiState = PlayerUiState(
             currentSong = inputSong,
             isPlaying = true,
+            isPlayWhenReady = true,
             position = 1200L,
             duration = 180000L,
+            playbackState = 3,
             queue = inputQueue,
             currentIndex = 0,
             isFavorite = true,
@@ -59,8 +63,10 @@ class PlayerUiStateTest {
         // Assert
         assertEquals(inputSong, actualState.currentSong)
         assertTrue(actualState.isPlaying)
+        assertTrue(actualState.isPlayWhenReady)
         assertEquals(1200L, actualState.position)
         assertEquals(180000L, actualState.duration)
+        assertEquals(3, actualState.playbackState)
         assertEquals(inputQueue, actualState.queue)
         assertEquals(0, actualState.currentIndex)
         assertTrue(actualState.isFavorite)

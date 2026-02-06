@@ -424,6 +424,7 @@ internal class MediaControllerManager(
         return PlaybackState(
             currentSong = resolveCurrentSong(index = index),
             isPlaying = player.isPlaying,
+            isPlayWhenReady = player.playWhenReady,
             position = position,
             duration = duration,
             bufferedPosition = player.bufferedPosition.coerceAtLeast(0L),
