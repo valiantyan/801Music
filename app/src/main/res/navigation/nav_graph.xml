@@ -2,7 +2,7 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/scanProgressFragment">
+    app:startDestination="@id/songListFragment">
 
     <fragment
         android:id="@+id/scanProgressFragment"
@@ -18,8 +18,20 @@
         android:name="com.valiantyan.music801.ui.songlist.SongListFragment"
         android:label="song_list">
         <action
+            android:id="@+id/action_songListFragment_to_scanDirectorySelectionFragment"
+            app:destination="@id/scanDirectorySelectionFragment" />
+        <action
             android:id="@+id/action_songListFragment_to_playerFragment"
             app:destination="@id/playerFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/scanDirectorySelectionFragment"
+        android:name="com.valiantyan.music801.ui.scan.ScanDirectorySelectionFragment"
+        android:label="scan_directory_selection">
+        <action
+            android:id="@+id/action_scanDirectorySelectionFragment_to_scanProgressFragment"
+            app:destination="@id/scanProgressFragment" />
     </fragment>
 
     <fragment

@@ -13,6 +13,8 @@ import androidx.fragment.app.add
 import androidx.fragment.app.commitNow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.Navigation
+import androidx.navigation.testing.TestNavHostController
 import com.valiantyan.music801.R
 import com.valiantyan.music801.data.repository.AudioRepository
 import com.valiantyan.music801.viewmodel.ScanUiState
@@ -54,7 +56,7 @@ class ScanProgressFragmentTest {
     fun setup() {
         Dispatchers.setMain(mainDispatcher)
         repository = mock()
-        whenever(repository.scanAudioFiles(any(), any())).thenReturn(emptyFlow())
+        whenever(repository.scanAndSync(any(), any())).thenReturn(emptyFlow())
         viewModelFactory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -98,6 +100,8 @@ class ScanProgressFragmentTest {
     @Test
     fun `取消扫描后应显示错误并禁用按钮`() {
         val fragment: ScanProgressFragment = launchFragment()
+        val navController: TestNavHostController = createNavController(fragment = fragment)
+        Navigation.setViewNavController(fragment.requireView(), navController)
         idleMainLooper()
         runOnUiThread(fragment = fragment) {
             invokeUpdateUi(
@@ -139,6 +143,7 @@ class ScanProgressFragmentTest {
         assertFalse(cancelButton.isEnabled)
         assertEquals(View.VISIBLE, errorText.visibility)
         assertEquals(expectedError, errorText.text.toString())
+        assertEquals(R.id.songListFragment, navController.currentDestination?.id)
     }
 
     private fun launchFragment(): ScanProgressFragment {
@@ -193,6 +198,13 @@ class ScanProgressFragmentTest {
         val activity: FragmentActivity = fragment.requireActivity()
         activity.runOnUiThread(action)
         idleMainLooper()
+    }
+
+    private fun createNavController(fragment: ScanProgressFragment): TestNavHostController {
+        val navController = TestNavHostController(fragment.requireContext())
+        navController.setGraph(R.navigation.nav_graph)
+        navController.setCurrentDestination(R.id.scanProgressFragment)
+        return navController
     }
 }
 

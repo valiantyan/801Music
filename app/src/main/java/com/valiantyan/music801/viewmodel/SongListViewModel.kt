@@ -3,8 +3,6 @@ package com.valiantyan.music801.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.valiantyan.music801.data.repository.AudioRepository
-import com.valiantyan.music801.domain.model.InitialScanDecision
-import com.valiantyan.music801.domain.model.ScanMode
 import com.valiantyan.music801.domain.model.Song
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -42,7 +40,6 @@ class SongListViewModel(
 
     init {
         loadSongs()
-        triggerInitialScanIfNeeded()
     }
 
     /**
@@ -59,24 +56,6 @@ class SongListViewModel(
                 .collect { songs ->
                     setSongsState(songs = songs)
                 }
-        }
-    }
-
-    /**
-     * 触发首扫流程
-     */
-    private fun triggerInitialScanIfNeeded() {
-        viewModelScope.launch {
-            val decision: InitialScanDecision = audioRepository.ensureInitialScanIfNeeded()
-            if (decision == InitialScanDecision.RUN_INITIAL_SCAN) {
-                audioRepository.scanAndSync(scanMode = ScanMode.FULL_INITIAL)
-                    .catch { exception ->
-                        setErrorState(message = exception.message ?: "首次扫描失败")
-                    }
-                    .collect { _ ->
-                        // 扫描进度由列表数据流驱动，不需要额外处理
-                    }
-            }
         }
     }
 

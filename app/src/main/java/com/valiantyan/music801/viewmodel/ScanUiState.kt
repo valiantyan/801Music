@@ -28,5 +28,5 @@ data class ScanUiState(
      * 扫描是否已完成
      */
     val isCompleted: Boolean
-        get() = !isScanning && error == null && scannedCount > 0
+        get() = !isScanning && error == null && totalCount != null
 }

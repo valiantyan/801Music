@@ -5,4 +5,5 @@ package com.valiantyan.music801.domain.model
  */
 enum class ScanMode {
     FULL_INITIAL,
+    MANUAL_FULL,
 }

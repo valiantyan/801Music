@@ -3,6 +3,9 @@ package com.valiantyan.music801.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.valiantyan.music801.data.repository.AudioRepository
+import com.valiantyan.music801.domain.model.ScanMode
+import com.valiantyan.music801.domain.model.ScanProgress
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -44,31 +47,35 @@ class ScanViewModel(
      * @param rootPath 要扫描的根目录路径
      */
     fun startScan(rootPath: String) {
+        startScan(
+            scanMode = ScanMode.FULL_INITIAL,
+            selectedDirectories = listOf(rootPath),
+        )
+    }
+
+    /**
+     * 按指定模式和目录启动扫描
+     *
+     * @param scanMode 扫描模式
+     * @param selectedDirectories 参与扫描的目录列表
+     */
+    fun startScan(
+        scanMode: ScanMode,
+        selectedDirectories: List<String>,
+    ) {
+        if (selectedDirectories.isEmpty()) {
+            _uiState.value = ScanUiState(error = "未选择扫描目录")
+            return
+        }
         cancelScan()
         _uiState.value = ScanUiState()
         scanJob = viewModelScope.launch {
-            audioRepository.scanAudioFiles(rootPath) { song ->
-                // 保留扩展入口，便于后续在扫描中同步其它状态
-            }
-                .catch { exception ->
-                    _uiState.update { currentState ->
-                        currentState.copy(
-                            isScanning = false,
-                            error = exception.message ?: "扫描过程中发生未知错误",
-                        )
-                    }
-                }
-                .collect { progress ->
-                    _uiState.update { currentState ->
-                        currentState.copy(
-                            isScanning = progress.isScanning,
-                            scannedCount = progress.scannedCount,
-                            totalCount = progress.totalCount,
-                            currentPath = progress.currentPath,
-                            error = null, // 清除之前的错误（如果有）
-                        )
-                    }
-                }
+            collectScanProgress(
+                progressFlow = audioRepository.scanAndSync(
+                    scanMode = scanMode,
+                    selectedDirectories = selectedDirectories,
+                ),
+            )
         }
     }
 
@@ -97,5 +104,33 @@ class ScanViewModel(
         _uiState.update { currentState ->
             currentState.copy(error = null)
         }
+    }
+
+    /**
+     * 收集扫描进度并更新 UI 状态
+     *
+     * @param progressFlow 扫描进度流
+     */
+    private suspend fun collectScanProgress(progressFlow: Flow<ScanProgress>) {
+        progressFlow
+            .catch { exception ->
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        isScanning = false,
+                        error = exception.message ?: "扫描过程中发生未知错误",
+                    )
+                }
+            }
+            .collect { progress ->
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        isScanning = progress.isScanning,
+                        scannedCount = progress.scannedCount,
+                        totalCount = progress.totalCount,
+                        currentPath = progress.currentPath,
+                        error = null,
+                    )
+                }
+            }
     }
 }

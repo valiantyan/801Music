@@ -169,6 +169,17 @@ class SongListFragmentTest {
         assertEquals(R.id.playerFragment, navController.currentDestination?.id)
     }
 
+    @Test
+    fun `点击扫描新音频后应跳转目录选择页`() {
+        val fragment: SongListFragment = launchFragment()
+        val navController: TestNavHostController = createNavController(fragment = fragment)
+        Navigation.setViewNavController(fragment.requireView(), navController)
+        idleMainLooper()
+        val scanButton: View = fragment.requireView().findViewById(R.id.scanNewAudioButton)
+        scanButton.performClick()
+        assertEquals(R.id.scanDirectorySelectionFragment, navController.currentDestination?.id)
+    }
+
     private fun launchFragment(): SongListFragment {
         TestPlayerActivity.playerController = playerController
         val activityController = Robolectric.buildActivity(TestPlayerActivity::class.java)

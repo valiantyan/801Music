@@ -9,10 +9,13 @@ import com.valiantyan.music801.data.datasource.MediaMetadataExtractor
 import com.valiantyan.music801.data.datasource.MetadataRetriever
 import com.valiantyan.music801.data.local.AudioDatabase
 import com.valiantyan.music801.data.repository.AudioRepository
+import com.valiantyan.music801.domain.model.ScanMode
 import com.valiantyan.music801.domain.model.ScanProgress
 import com.valiantyan.music801.domain.model.Song
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -126,6 +129,35 @@ class AudioScanIntegrationTest {
         val actualSongs: List<Song> = repository.observeSongs().first { songs: List<Song> -> songs.isNotEmpty() }
         assertEquals(1000, actualSongs.size)
         assertTrue(durationMs < 30000L)
+    }
+
+    @Test
+    fun `手动扫描取消后应保持原有数据不变`(): Unit = runBlocking {
+        val context: Context = getContext()
+        val initialDir: File = createRootDir(context = context, name = "scan_manual_cancel_initial")
+        val initialFile: File = createAudioFile(parent = initialDir, fileName = "existing.mp3")
+        val manualDir: File = createRootDir(context = context, name = "scan_manual_cancel_manual")
+        createAudioFiles(parent = manualDir, count = 400)
+        val repository: AudioRepository = createRepository(failPaths = emptySet())
+        repository.scanAudioFiles(rootPath = initialDir.absolutePath).toList()
+        val songsBeforeManualScan: List<Song> = repository.observeSongs().first()
+        var hasManualProgress: Boolean = false
+        val scanJob = launch {
+            repository.scanAndSync(
+                scanMode = ScanMode.MANUAL_FULL,
+                selectedDirectories = listOf(manualDir.absolutePath),
+            ).collect { progress: ScanProgress ->
+                if (progress.scannedCount >= 50 && progress.isScanning) {
+                    hasManualProgress = true
+                    this@launch.cancel()
+                }
+            }
+        }
+        scanJob.join()
+        val songsAfterManualCancel: List<Song> = repository.observeSongs().first()
+        assertTrue(hasManualProgress)
+        assertEquals(songsBeforeManualScan.size, songsAfterManualCancel.size)
+        assertTrue(songsAfterManualCancel.any { song: Song -> song.filePath == initialFile.absolutePath })
     }
 
     private fun getContext(): Context = ApplicationProvider.getApplicationContext()

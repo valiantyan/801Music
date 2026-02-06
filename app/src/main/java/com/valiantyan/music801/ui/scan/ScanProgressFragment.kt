@@ -1,7 +1,6 @@
 package com.valiantyan.music801.ui.scan
 
 import android.os.Bundle
-import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,6 +20,7 @@ import com.valiantyan.music801.data.local.AudioDatabase
 import com.valiantyan.music801.data.repository.AudioRepository
 import com.valiantyan.music801.databinding.FragmentScanProgressBinding
 import com.valiantyan.music801.di.AudioRepositoryProvider
+import com.valiantyan.music801.domain.model.ScanMode
 import com.valiantyan.music801.viewmodel.ScanUiState
 import com.valiantyan.music801.viewmodel.ScanViewModel
 import com.valiantyan.music801.viewmodel.ScanViewModelFactory
@@ -38,7 +38,12 @@ import kotlinx.coroutines.launch
  * - 确保扫描任务在配置变更时不中断（使用 ViewModelScope）
  */
 class ScanProgressFragment : Fragment() {
-
+    /**
+     * 默认扫描目录兜底路径
+     */
+    private companion object {
+        private const val FALLBACK_ROOT_PATH: String = "/storage/emulated/0"
+    }
     /**
      * ViewBinding
      */
@@ -115,20 +120,9 @@ class ScanProgressFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupUI()
         observeViewModel()
-        // 如果 ViewModel 中没有扫描任务，且没有错误，则开始扫描
-        // 注意：实际扫描路径应该从外部传入或从配置中读取
-        // 这里暂时使用默认路径，后续会完善
-        // 配置变更后，ViewModel 会保持状态，所以这里只在首次创建时启动扫描
         if (savedInstanceState == null) {
-            if (!viewModel.uiState.value.isScanning &&
-                !viewModel.uiState.value.isCompleted &&
-                viewModel.uiState.value.error == null
-            ) {
-                startScan()
-            }
+            startScanIfNeeded()
         }
-        // 如果 savedInstanceState != null，说明是配置变更恢复，不需要重新启动扫描
-        // ViewModel 会自动保持扫描状态，UI 会通过 observeViewModel() 自动更新
     }
 
     /**
@@ -137,7 +131,24 @@ class ScanProgressFragment : Fragment() {
     private fun setupUI() {
         binding.cancelButton.setOnClickListener {
             viewModel.cancelScan()
+            navigateBackToSongList()
         }
+    }
+
+    /**
+     * 首次进入页面时启动扫描
+     */
+    private fun startScanIfNeeded() {
+        val state: ScanUiState = viewModel.uiState.value
+        if (state.isScanning || state.isCompleted || state.error != null) {
+            return
+        }
+        val scanMode: ScanMode = ScanNavigationArgs.parseScanMode(arguments)
+        val selectedDirectories: List<String> = resolveSelectedDirectories()
+        viewModel.startScan(
+            scanMode = scanMode,
+            selectedDirectories = selectedDirectories,
+        )
     }
 
     /**
@@ -185,22 +196,6 @@ class ScanProgressFragment : Fragment() {
     }
 
     /**
-     * 开始扫描
-     *
-     * 注意：实际扫描路径应该从外部传入或从配置中读取。
-     * 这里暂时使用默认路径，后续会完善。
-     */
-    private fun startScan() {
-        val defaultPath: String = Environment.getExternalStorageDirectory().absolutePath
-        val rootPath: String = if (defaultPath.isNotBlank()) {
-            defaultPath
-        } else {
-            "/storage/emulated/0"
-        }
-        viewModel.startScan(rootPath = rootPath)
-    }
-
-    /**
      * 清理视图绑定引用
      */
     override fun onDestroyView() {
@@ -215,16 +210,34 @@ class ScanProgressFragment : Fragment() {
         if (!state.isCompleted || hasNavigated) {
             return
         }
+        navigateBackToSongList()
+    }
+
+    /**
+     * 解析目录参数，缺失时使用兜底根目录
+     */
+    private fun resolveSelectedDirectories(): List<String> {
+        val selectedDirectories: List<String> = ScanNavigationArgs.parseSelectedDirectories(arguments)
+        if (selectedDirectories.isNotEmpty()) {
+            return selectedDirectories
+        }
+        return listOf(FALLBACK_ROOT_PATH)
+    }
+
+    /**
+     * 返回歌曲列表并清理扫描返回栈
+     */
+    private fun navigateBackToSongList() {
         val navController: NavController = findNavController()
-        if (navController.currentDestination?.id != R.id.scanProgressFragment) {
+        if (hasNavigated || navController.currentDestination?.id != R.id.scanProgressFragment) {
             return
         }
-        // 清除扫描页返回栈，避免返回键回到扫描页
         val navOptions: NavOptions = NavOptions.Builder()
             .setPopUpTo(
-                destinationId = R.id.scanProgressFragment,
-                inclusive = true,
+                destinationId = R.id.songListFragment,
+                inclusive = false,
             )
+            .setLaunchSingleTop(true)
             .build()
         hasNavigated = true
         navController.navigate(

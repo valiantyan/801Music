@@ -146,6 +146,7 @@ class SongListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
+        setupScanNewAudioEntry()
         observeViewModel()
         observePlaybackState()
         setupBackPressHandler()
@@ -189,6 +190,15 @@ class SongListFragment : Fragment() {
         binding.songListRecyclerView.adapter = adapter
         binding.songListRecyclerView.setHasFixedSize(true)
         restoreListState()
+    }
+
+    /**
+     * 绑定手动扫描入口
+     */
+    private fun setupScanNewAudioEntry() {
+        binding.scanNewAudioButton.setOnClickListener {
+            navigateToDirectorySelection()
+        }
     }
 
     /**
@@ -262,6 +272,20 @@ class SongListFragment : Fragment() {
      */
     private fun handleSongLongClick(song: Song) {
         // TODO: To be implemented in Story STORY-003
+    }
+
+    /**
+     * 跳转目录选择页
+     */
+    private fun navigateToDirectorySelection() {
+        val navController = findNavController()
+        if (navController.currentDestination?.id != R.id.songListFragment) {
+            return
+        }
+        navController.navigate(
+            resId = R.id.action_songListFragment_to_scanDirectorySelectionFragment,
+            args = null,
+        )
     }
 
     /**

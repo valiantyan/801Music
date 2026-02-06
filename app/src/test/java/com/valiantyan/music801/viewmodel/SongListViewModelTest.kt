@@ -1,7 +1,6 @@
 package com.valiantyan.music801.viewmodel
 
 import com.valiantyan.music801.data.repository.AudioRepository
-import com.valiantyan.music801.domain.model.InitialScanDecision
 import com.valiantyan.music801.domain.model.Song
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -49,7 +48,6 @@ class SongListViewModelTest {
         // Arrange
         val inputSongs: List<Song> = emptyList()
         whenever(repository.observeSongs()).thenReturn(flowOf(inputSongs))
-        whenever(repository.ensureInitialScanIfNeeded()).thenReturn(InitialScanDecision.SKIP_ALREADY_HAS_DATA)
         // Act
         viewModel = SongListViewModel(repository)
         advanceUntilIdle()
@@ -72,7 +70,6 @@ class SongListViewModelTest {
         )
         val inputSongs: List<Song> = listOf(inputSong)
         whenever(repository.observeSongs()).thenReturn(flowOf(inputSongs))
-        whenever(repository.ensureInitialScanIfNeeded()).thenReturn(InitialScanDecision.SKIP_ALREADY_HAS_DATA)
         // Act
         viewModel = SongListViewModel(repository)
         advanceUntilIdle()
@@ -92,7 +89,6 @@ class SongListViewModelTest {
             throw IllegalStateException(inputMessage)
         }
         whenever(repository.observeSongs()).thenReturn(errorFlow)
-        whenever(repository.ensureInitialScanIfNeeded()).thenReturn(InitialScanDecision.SKIP_ALREADY_HAS_DATA)
         // Act
         viewModel = SongListViewModel(repository)
         advanceUntilIdle()

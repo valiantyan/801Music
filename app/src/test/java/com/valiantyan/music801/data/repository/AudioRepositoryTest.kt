@@ -8,12 +8,17 @@ import com.valiantyan.music801.domain.model.InitialScanDecision
 import com.valiantyan.music801.domain.model.ScanMode
 import com.valiantyan.music801.domain.model.ScanProgress
 import com.valiantyan.music801.domain.model.Song
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -23,6 +28,7 @@ import org.mockito.kotlin.KArgumentCaptor
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -109,6 +115,109 @@ class AudioRepositoryTest {
         val actualEntities: List<SongEntity> = captor.firstValue
         assertEquals(1, actualEntities.size)
         assertEquals(song.id, actualEntities.first().id)
+    }
+
+    @Test
+    fun `手动扫描仅应执行用户选择目录`() = runTest {
+        val inputDirectories: List<String> = listOf(
+            "/storage/emulated/0/Music",
+            "/storage/emulated/0/Podcasts",
+        )
+        whenever(mockScanner.scanDirectory(eq(inputDirectories[0]), any())).thenReturn(
+            flowOf(
+                ScanProgress(
+                    scannedCount = 0,
+                    totalCount = null,
+                    currentPath = inputDirectories[0],
+                    isScanning = true,
+                ),
+                ScanProgress(
+                    scannedCount = 1,
+                    totalCount = 1,
+                    currentPath = null,
+                    isScanning = false,
+                ),
+            ),
+        )
+        whenever(mockScanner.scanDirectory(eq(inputDirectories[1]), any())).thenReturn(
+            flowOf(
+                ScanProgress(
+                    scannedCount = 0,
+                    totalCount = null,
+                    currentPath = inputDirectories[1],
+                    isScanning = true,
+                ),
+                ScanProgress(
+                    scannedCount = 1,
+                    totalCount = 1,
+                    currentPath = null,
+                    isScanning = false,
+                ),
+            ),
+        )
+        whenever(mockSyncDao.findById(id = 1)).thenReturn(null)
+        repository.scanAndSync(
+            scanMode = ScanMode.MANUAL_FULL,
+            selectedDirectories = inputDirectories,
+        ).collect { _ -> }
+        verify(mockScanner, times(1)).scanDirectory(eq(inputDirectories[0]), any())
+        verify(mockScanner, times(1)).scanDirectory(eq(inputDirectories[1]), any())
+    }
+
+    @Test
+    fun `手动扫描取消时不应写入歌曲`() = runTest {
+        val localDispatcher = StandardTestDispatcher(testScheduler)
+        val localRepository: AudioRepository = AudioRepository(
+            audioFileScanner = mockScanner,
+            songDao = mockSongDao,
+            librarySyncStateDao = mockSyncDao,
+            ioDispatcher = localDispatcher,
+            rootPathProvider = { ROOT_PATH },
+            nowProvider = { FIXED_TIME },
+        )
+        val inputSong: Song = Song(
+            id = "/storage/cancel-song.mp3",
+            title = "Cancel Song",
+            artist = "Artist",
+            album = null,
+            duration = 1000L,
+            filePath = "/storage/cancel-song.mp3",
+            fileSize = 2048L,
+            dateAdded = 100L,
+            albumArtPath = null,
+        )
+        var capturedCallback: ((Song) -> Unit)? = null
+        whenever(mockScanner.scanDirectory(eq(ROOT_PATH), any())).thenAnswer { invocation ->
+            capturedCallback = invocation.getArgument(1)
+            flow {
+                capturedCallback?.invoke(inputSong)
+                emit(
+                    ScanProgress(
+                        scannedCount = 1,
+                        totalCount = null,
+                        currentPath = ROOT_PATH,
+                        isScanning = true,
+                    ),
+                )
+                delay(10_000)
+                emit(
+                    ScanProgress(
+                        scannedCount = 1,
+                        totalCount = 1,
+                        currentPath = null,
+                        isScanning = false,
+                    ),
+                )
+            }
+        }
+        whenever(mockSyncDao.findById(id = 1)).thenReturn(null)
+        val collectJob = launch {
+            localRepository.scanAndSync(scanMode = ScanMode.MANUAL_FULL).collect { _ -> }
+        }
+        advanceUntilIdle()
+        collectJob.cancel()
+        advanceUntilIdle()
+        verify(mockSongDao, never()).upsertAll(any())
     }
 
     private companion object {

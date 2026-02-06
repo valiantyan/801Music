@@ -14,13 +14,21 @@
     <string name="song_album_art">歌曲封面</string>
     <string name="song_list">歌曲列表</string>
     <string name="song_list_loading">歌曲列表加载中</string>
-    <string name="song_list_empty">暂无歌曲</string>
+    <string name="song_list_empty">暂无音频</string>
     <string name="song_playing_indicator">正在播放</string>
     <string name="song_list_title">你的音乐库</string>
     <string name="song_list_subtitle">离线播放，随时开唱</string>
     <string name="song_list_chip_all">全部</string>
     <string name="song_list_chip_recent">最近播放</string>
     <string name="song_list_chip_favorites">收藏</string>
+    <string name="scan_new_audio">扫描新音频</string>
+    <string name="scan_directory_selection_title">选择扫描目录</string>
+    <string name="scan_directory_selection_subtitle">仅扫描你选中的目录，支持递归子目录</string>
+    <string name="scan_directory_empty">未发现可扫描目录</string>
+    <string name="select_all_directories">全选</string>
+    <string name="clear_all_directories">取消全选</string>
+    <string name="selected_directories_count">已选目录：%1$d</string>
+    <string name="start_manual_scan">开始扫描</string>
 
     <!-- 播放控制界面 -->
     <string name="player_album_art">歌曲封面</string>

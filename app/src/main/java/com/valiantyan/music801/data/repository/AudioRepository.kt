@@ -89,7 +89,7 @@ class AudioRepository(
         onSongFound: (Song) -> Unit = {},
     ): Flow<ScanProgress> {
         return scanAndSyncInternal(
-            rootPath = rootPath,
+            rootPaths = listOf(rootPath),
             scanMode = ScanMode.FULL_INITIAL,
             onSongFound = onSongFound,
         )
@@ -99,9 +99,25 @@ class AudioRepository(
      * 执行扫描并同步到数据库
      */
     fun scanAndSync(scanMode: ScanMode): Flow<ScanProgress> {
-        val rootPath: String = resolveRootPath()
+        return scanAndSync(
+            scanMode = scanMode,
+            selectedDirectories = listOf(resolveRootPath()),
+        )
+    }
+
+    /**
+     * 按指定目录执行扫描并同步到数据库
+     *
+     * @param scanMode 扫描模式
+     * @param selectedDirectories 待扫描目录
+     * @return 扫描进度流
+     */
+    fun scanAndSync(
+        scanMode: ScanMode,
+        selectedDirectories: List<String>,
+    ): Flow<ScanProgress> {
         return scanAndSyncInternal(
-            rootPath = rootPath,
+            rootPaths = selectedDirectories,
             scanMode = scanMode,
             onSongFound = {},
         )
@@ -111,13 +127,16 @@ class AudioRepository(
      * 执行扫描并写入数据库
      */
     private fun scanAndSyncInternal(
-        rootPath: String,
+        rootPaths: List<String>,
         scanMode: ScanMode,
         onSongFound: (Song) -> Unit,
     ): Flow<ScanProgress> {
         return flow {
             val scannedAt: Long = nowProvider()
             val pendingSongs: MutableList<SongEntity> = mutableListOf()
+            val sanitizedRootPaths: List<String> = rootPaths.filter { path: String ->
+                path.isNotBlank()
+            }
             updateSyncState(
                 status = ScanStatus.RUNNING,
                 scanMode = scanMode,
@@ -125,22 +144,17 @@ class AudioRepository(
                 lastError = null,
             )
             try {
-                logger.info("开始扫描入库: mode=$scanMode rootPath=$rootPath")
-                audioFileScanner.scanDirectory(
-                    rootPath = rootPath,
-                    onSongFound = { song: Song ->
-                        onSongFound(song)
-                        pendingSongs.add(
-                            song.toEntity(
-                                modifiedAt = song.dateAdded,
-                                scannedAt = scannedAt,
-                            ),
-                        )
+                logger.info("开始扫描入库: mode=$scanMode rootPaths=$sanitizedRootPaths")
+                scanSelectedDirectories(
+                    rootPaths = sanitizedRootPaths,
+                    scannedAt = scannedAt,
+                    pendingSongs = pendingSongs,
+                    canFlushDuringScan = canFlushDuringScan(scanMode = scanMode),
+                    onSongFound = onSongFound,
+                    onProgress = { progress: ScanProgress ->
+                        emit(progress)
                     },
-                ).collect { progress: ScanProgress ->
-                    flushIfNeeded(pendingSongs = pendingSongs)
-                    emit(progress)
-                }
+                )
                 flushRemaining(pendingSongs = pendingSongs)
                 updateSyncState(
                     status = ScanStatus.SUCCESS,
@@ -148,7 +162,7 @@ class AudioRepository(
                     scannedAt = scannedAt,
                     lastError = null,
                 )
-                logger.info("扫描入库完成: mode=$scanMode rootPath=$rootPath")
+                logger.info("扫描入库完成: mode=$scanMode rootPaths=$sanitizedRootPaths")
             } catch (e: CancellationException) {
                 updateSyncState(
                     status = ScanStatus.CANCELED,
@@ -156,7 +170,7 @@ class AudioRepository(
                     scannedAt = scannedAt,
                     lastError = "扫描已取消",
                 )
-                logger.log(Level.WARNING, "扫描被取消: rootPath=$rootPath", e)
+                logger.log(Level.WARNING, "扫描被取消: rootPaths=$sanitizedRootPaths", e)
                 throw e
             } catch (e: IllegalStateException) {
                 updateSyncState(
@@ -165,8 +179,8 @@ class AudioRepository(
                     scannedAt = scannedAt,
                     lastError = e.message,
                 )
-                logger.log(Level.SEVERE, "扫描失败: rootPath=$rootPath", e)
-                throw IllegalStateException("扫描失败: rootPath=$rootPath", e)
+                logger.log(Level.SEVERE, "扫描失败: rootPaths=$sanitizedRootPaths", e)
+                throw IllegalStateException("扫描失败: rootPaths=$sanitizedRootPaths", e)
             } catch (e: Exception) {
                 updateSyncState(
                     status = ScanStatus.FAILED,
@@ -174,10 +188,117 @@ class AudioRepository(
                     scannedAt = scannedAt,
                     lastError = e.message,
                 )
-                logger.log(Level.SEVERE, "扫描失败: rootPath=$rootPath", e)
-                throw IllegalStateException("扫描失败: rootPath=$rootPath", e)
+                logger.log(Level.SEVERE, "扫描失败: rootPaths=$sanitizedRootPaths", e)
+                throw IllegalStateException("扫描失败: rootPaths=$sanitizedRootPaths", e)
             }
         }.flowOn(ioDispatcher)
+    }
+
+    /**
+     * 顺序扫描目录并汇总进度
+     *
+     * @param rootPaths 待扫描目录
+     * @param scannedAt 本轮扫描时间戳
+     * @param pendingSongs 待写入歌曲缓存
+     * @param canFlushDuringScan 是否允许扫描中批量落库
+     * @param onSongFound 歌曲回调
+     * @param onProgress 进度回调
+     */
+    private suspend fun scanSelectedDirectories(
+        rootPaths: List<String>,
+        scannedAt: Long,
+        pendingSongs: MutableList<SongEntity>,
+        canFlushDuringScan: Boolean,
+        onSongFound: (Song) -> Unit,
+        onProgress: suspend (ScanProgress) -> Unit,
+    ) {
+        if (rootPaths.isEmpty()) {
+            onProgress(
+                ScanProgress(
+                    scannedCount = 0,
+                    totalCount = 0,
+                    currentPath = null,
+                    isScanning = false,
+                ),
+            )
+            return
+        }
+        var scannedCountTotal: Int = 0
+        rootPaths.forEachIndexed { index: Int, rootPath: String ->
+            val isLastDirectory: Boolean = index == rootPaths.lastIndex
+            val baseScannedCount: Int = scannedCountTotal
+            var currentDirectoryScannedCount: Int = 0
+            audioFileScanner.scanDirectory(
+                rootPath = rootPath,
+                onSongFound = { song: Song ->
+                    onSongFound(song)
+                    pendingSongs.add(
+                        song.toEntity(
+                            modifiedAt = song.dateAdded,
+                            scannedAt = scannedAt,
+                        ),
+                    )
+                },
+            ).collect { progress: ScanProgress ->
+                currentDirectoryScannedCount = progress.scannedCount
+                if (canFlushDuringScan) {
+                    flushIfNeeded(pendingSongs = pendingSongs)
+                }
+                onProgress(
+                    mergeProgress(
+                        baseScannedCount = baseScannedCount,
+                        directoryProgress = progress,
+                        isLastDirectory = isLastDirectory,
+                    ),
+                )
+            }
+            scannedCountTotal = baseScannedCount + currentDirectoryScannedCount
+        }
+    }
+
+    /**
+     * 将单目录进度映射为多目录汇总进度
+     *
+     * @param baseScannedCount 该目录开始前已扫描数量
+     * @param directoryProgress 当前目录扫描进度
+     * @param isLastDirectory 是否为最后一个目录
+     * @return 汇总进度
+     */
+    private fun mergeProgress(
+        baseScannedCount: Int,
+        directoryProgress: ScanProgress,
+        isLastDirectory: Boolean,
+    ): ScanProgress {
+        val aggregatedCount: Int = baseScannedCount + directoryProgress.scannedCount
+        if (directoryProgress.isScanning) {
+            return directoryProgress.copy(
+                scannedCount = aggregatedCount,
+                totalCount = null,
+                isScanning = true,
+            )
+        }
+        if (directoryProgress.totalCount == null) {
+            return ScanProgress(
+                scannedCount = aggregatedCount,
+                totalCount = null,
+                currentPath = null,
+                isScanning = !isLastDirectory,
+            )
+        }
+        if (!isLastDirectory) {
+            return ScanProgress(
+                scannedCount = aggregatedCount,
+                totalCount = null,
+                currentPath = null,
+                isScanning = true,
+            )
+        }
+        return ScanProgress(
+            scannedCount = aggregatedCount,
+            totalCount = aggregatedCount,
+            currentPath = null,
+            isScanning = false,
+        )
     }
 
     /**
@@ -229,13 +350,27 @@ class AudioRepository(
         scannedAt: Long,
         previous: Long?,
     ): Long? {
-        if (scanMode != ScanMode.FULL_INITIAL) {
+        if (!isFullScanMode(scanMode = scanMode)) {
             return previous
         }
         if (status == ScanStatus.SUCCESS) {
             return scannedAt
         }
         return previous
+    }
+
+    /**
+     * 判断是否为全量扫描模式
+     */
+    private fun isFullScanMode(scanMode: ScanMode): Boolean {
+        return scanMode == ScanMode.FULL_INITIAL || scanMode == ScanMode.MANUAL_FULL
+    }
+
+    /**
+     * 判断扫描中是否允许提前落库
+     */
+    private fun canFlushDuringScan(scanMode: ScanMode): Boolean {
+        return scanMode == ScanMode.FULL_INITIAL
     }
 
     /**
