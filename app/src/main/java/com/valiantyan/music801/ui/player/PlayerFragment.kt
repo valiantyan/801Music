@@ -21,6 +21,9 @@ import com.valiantyan.music801.viewmodel.PlayerUiState
 import com.valiantyan.music801.viewmodel.PlayerViewModel
 import com.valiantyan.music801.viewmodel.PlayerViewModelFactory
 import java.util.Locale
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 /**
@@ -34,6 +37,7 @@ class PlayerFragment : Fragment() {
      */
     private companion object {
         private const val TAG: String = "MediaNotification"
+        private const val PROGRESS_UPDATE_INTERVAL_MS: Long = 1000L
     }
     /**
      * ViewBinding
@@ -55,6 +59,14 @@ class PlayerFragment : Fragment() {
      * 测试用 ViewModelFactory（仅用于测试注入）
      */
     internal var viewModelFactoryForTest: ViewModelProvider.Factory? = null
+    /**
+     * 播放中 UI 进度补间任务
+     */
+    private var progressTickerJob: Job? = null
+    /**
+     * 用户是否正在手动拖拽进度条
+     */
+    private var isUserSeeking: Boolean = false
 
     /**
      * 创建播放器视图
@@ -108,10 +120,11 @@ class PlayerFragment : Fragment() {
         }
         binding.playerProgress.addOnSliderTouchListener(object : Slider.OnSliderTouchListener {
             override fun onStartTrackingTouch(slider: Slider) {
-                // 拖拽开始无需额外处理
+                isUserSeeking = true
             }
 
             override fun onStopTrackingTouch(slider: Slider) {
+                isUserSeeking = false
                 handleSeek(position = slider.value.toLong())
             }
         })
@@ -143,6 +156,7 @@ class PlayerFragment : Fragment() {
         binding.playerSongArtist.text = artistText
         updateProgress(state = state)
         updatePlayPauseIcon(isPlaying = state.isPlaying)
+        syncProgressTicker(state = state)
     }
 
     /**
@@ -175,6 +189,33 @@ class PlayerFragment : Fragment() {
             android.R.drawable.ic_media_play
         }
         binding.playerPlayPause.setImageResource(iconResId)
+    }
+
+    /**
+     * 播放中使用本地定时器补间进度，避免状态流仅事件触发导致进度条静止
+     */
+    private fun syncProgressTicker(state: PlayerUiState): Unit {
+        if (!state.isPlaying) {
+            progressTickerJob?.cancel()
+            progressTickerJob = null
+            return
+        }
+        if (progressTickerJob?.isActive == true) {
+            return
+        }
+        progressTickerJob = viewLifecycleOwner.lifecycleScope.launch {
+            while (isActive) {
+                delay(PROGRESS_UPDATE_INTERVAL_MS)
+                if (isUserSeeking) {
+                    continue
+                }
+                val duration: Long = binding.playerProgress.valueTo.toLong().coerceAtLeast(0L)
+                val currentPosition: Long = binding.playerProgress.value.toLong().coerceAtLeast(0L)
+                val nextPosition: Long = (currentPosition + PROGRESS_UPDATE_INTERVAL_MS).coerceAtMost(duration)
+                binding.playerProgress.value = nextPosition.toFloat()
+                binding.playerPosition.text = formatTime(milliseconds = nextPosition)
+            }
+        }
     }
 
     /**
@@ -217,6 +258,8 @@ class PlayerFragment : Fragment() {
      * 清理视图绑定引用
      */
     override fun onDestroyView() {
+        progressTickerJob?.cancel()
+        progressTickerJob = null
         super.onDestroyView()
         _binding = null
     }
