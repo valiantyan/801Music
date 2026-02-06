@@ -1,10 +1,10 @@
 # 音频扫描与本地媒体库持久化改造方案（Room 版，大厂实践）
 
 ## 目标摘要
-- 将“每次启动全量扫描”改为“首启/无库扫描 + 后续读库秒开 + 增量同步”。
+- 将“每次启动全量扫描”改为“首启/无库自动全量扫描 + 后续读库秒开 + 手动扫描（全量/增量）”。
 - 扫描结果持久化到 Room，启动优先读库。
 - 无数据时自动扫描；有数据时展示列表并支持手动“扫描新音频”。
-- 新下载音频可通过后台增量同步或手动按钮进入数据库。
+- 新下载音频通过“扫描新音频”入口进入数据库。
 
 ## 现状与问题（基于当前代码）
 - 当前导航起点是扫描页：`app/src/main/res/navigation/nav_graph.xml`
@@ -14,11 +14,12 @@
 
 ## 总体改造策略
 - 数据源分层：`MediaStore/文件系统 -> 同步器 -> Room -> UI`。
-- 启动策略：先 `Room` 回显，再按策略触发增量同步。
+- 启动策略：先 `Room` 回显；仅首启或库空自动全量扫描；库非空不自动扫描。
 - 扫描策略：
   - `首启或库空`：自动全量扫描。
-  - `库非空`：后台增量同步，不阻塞首屏。
-  - `用户手动`：按钮触发“扫描新音频”。
+  - `库非空`：默认不自动扫描，避免启动期 CPU/电量抖动。
+  - `用户手动`：按钮触发“扫描新音频”，支持手动全量或手动增量。
+  - `手动全量`：扫描前展示 `sdcard` 目录列表，支持多选与全选，按所选目录递归扫描。
 - 同步策略：
   - Upsert 新增/变更音频。
   - 清理已删除音频（软删除或硬删除，默认硬删除）。
@@ -44,7 +45,7 @@
   - `lastSyncToken: Long`（可用 MediaStore `DATE_MODIFIED` 最大值）
   - `lastScanStatus: String`（`SUCCESS/FAILED/RUNNING`）
   - `lastError: String?`
-- 用途：判断是否首扫、是否需要自动增量、故障可观测。
+- 用途：判断是否首扫、维护手动增量同步状态、故障可观测。
 
 ### DAO 接口
 - `SongDao`
@@ -73,13 +74,12 @@
 
 ### `ScanMode`
 - `FULL_INITIAL`
-- `INCREMENTAL_AUTO`
-- `MANUAL`
+- `MANUAL_FULL`
+- `MANUAL_INCREMENTAL`
 
 ### `ScanDecision`
 - `SKIP_ALREADY_HAS_DATA`
 - `RUN_INITIAL_SCAN`
-- `RUN_INCREMENTAL_SYNC`
 
 ## 同步器组件（新增）
 - `AudioLibrarySyncService`（非 Android Service，纯业务类）
@@ -102,7 +102,7 @@
   - 先订阅 `observeSongs()`，立即展示本地数据。
   - 并发触发 `ensureInitialScanIfNeeded()`：
     - 若库空：自动扫描（可跳转扫描页或嵌入页内进度）。
-    - 若有库：可选触发 `INCREMENTAL_AUTO`（后台，不阻塞列表）。
+    - 若有库：不自动触发增量扫描，展示手动扫描入口。
 - 新增 UI 状态字段：
   - `isSyncing`, `lastSyncAt`, `showScanEntry`, `emptyReason`
 
@@ -111,11 +111,18 @@
   - 文案：“暂无音频”
   - 按钮：“扫描新音频”
 - 非空时在顶部菜单或卡片提供“扫描新音频”入口。
-- 手动点击触发 `MANUAL` 扫描，同步进度可用现有扫描页承载。
+- 手动点击触发扫描模式选择：
+  - `MANUAL_FULL`：先进入目录选择页，再进入扫描进度页。
+  - `MANUAL_INCREMENTAL`：直接进入扫描进度页。
+
+### `ScanDirectorySelectionFragment`（新增）
+- 用于手动全量扫描前的目录选择。
+- 展示 `sdcard` 一级目录列表，支持多选、全选、取消全选。
+- 扫描执行时对所选目录递归扫描。
 
 ### `ScanProgressFragment` 改造
 - 不再默认作为启动入口。
-- 接收 `ScanMode` 参数。
+- 接收 `ScanMode` 与可选 `selectedDirectories` 参数。
 - 扫描完成后返回列表页并刷新。
 
 ## 权限与异常策略
@@ -135,7 +142,7 @@
 ### 单元测试
 - `AudioRepository`
   - 库空时 `ensureInitialScanIfNeeded` 返回 `RUN_INITIAL_SCAN`
-  - 库非空时返回 `SKIP` 或 `RUN_INCREMENTAL_SYNC`
+  - 库非空时返回 `SKIP_ALREADY_HAS_DATA`
   - `scanAndSync` 成功后 Room 有数据且状态更新
 - `AudioLibrarySyncService`
   - 全量 upsert 正确
@@ -145,13 +152,18 @@
   - 启动优先显示库数据
   - 无数据触发自动扫描状态
   - 手动扫描入口状态正确
+- `ScanDirectorySelectionViewModel`（如引入）
+  - 目录多选/全选状态正确
+  - 选择结果可正确传递给扫描参数
 
 ### 集成测试（Robolectric）
 - 首次启动无数据：
   - 进入列表页空态后自动扫描，完成后显示列表
 - 二次启动有数据：
   - 不进入强制扫描流程，直接显示列表
-- 新增音频后手动扫描：
+- 新增音频后手动全量扫描：
+  - 目录选择后新音频出现
+- 新增音频后手动增量扫描：
   - 新音频出现
 - 权限拒绝：
   - 不扫描，显示授权引导
@@ -168,8 +180,8 @@
 
 ## 分阶段落地（降低风险）
 1. Phase 1：接入 Room，扫描结果落库，启动改为读库优先。  
-2. Phase 2：导航起点改为列表页，空态+手动扫描入口上线。  
-3. Phase 3：增量同步（MediaStore token）与删除对账。  
+2. Phase 2：导航起点改为列表页，空态+手动扫描入口+目录选择页上线。  
+3. Phase 3：手动增量同步（MediaStore token）与删除对账。  
 4. Phase 4：性能优化与埋点（扫描耗时、入库数量、失败率）。
 
 ## 关键接口/类型变更清单
@@ -183,6 +195,6 @@
 
 ## 假设与默认值
 - 默认使用 Room 作为唯一本地真源，内存仅做 UI 层缓存。
-- 默认支持“自动首扫 + 手动重扫”，自动增量同步在库非空时后台触发。
+- 默认支持“自动首扫 + 手动重扫”，库非空时不自动增量。
 - 默认扫描来源优先 `MediaStore`（更稳、更省电、更符合 Android 大厂实践）。
 - 默认删除策略为硬删除（文件不存在即从库移除）。

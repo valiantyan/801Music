@@ -2,7 +2,7 @@
 title: "Feature (特性) PRD: 本地音乐播放器 (Local Music Player)"
 version: 1.0.0
 feature_id: "FEAT-001"
-last_updated: 2025-01-27
+last_updated: 2026-02-06
 jira_id: ""
 owner: "产品经理"
 status: "已批准"
