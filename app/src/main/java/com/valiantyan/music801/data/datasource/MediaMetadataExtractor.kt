@@ -24,7 +24,12 @@ class MediaMetadataExtractor(
      * @param dateAdded 添加时间（时间戳，毫秒）
      * @return Song 对象，如果提取失败则返回 null
      */
-    fun extractMetadata(filePath: String, fileSize: Long, dateAdded: Long): Song? {
+    fun extractMetadata(
+        filePath: String,
+        fileSize: Long,
+        dateAdded: Long,
+        mediaStoreId: Long?,
+    ): Song? {
         val retriever = metadataRetrieverFactory()
         return try {
             retriever.setDataSource(filePath)
@@ -40,8 +45,9 @@ class MediaMetadataExtractor(
             val durationStr = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
             val duration = durationStr?.toLongOrNull() ?: 0L
             val albumArtPath: String? = null
+            val resolvedId: String = mediaStoreId?.toString() ?: filePath
             Song(
-                id = filePath, // 使用文件路径作为唯一标识
+                id = resolvedId, // 优先使用 MediaStore ID，否则使用文件路径
                 title = title,
                 artist = artist,
                 album = album,

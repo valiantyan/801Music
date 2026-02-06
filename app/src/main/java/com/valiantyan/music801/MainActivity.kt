@@ -8,6 +8,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
+import com.valiantyan.music801.data.datasource.AndroidMediaStoreIdResolver
 import com.valiantyan.music801.data.datasource.AudioFileScanner
 import com.valiantyan.music801.data.datasource.MediaMetadataExtractor
 import com.valiantyan.music801.data.local.AudioDatabase
@@ -202,7 +203,12 @@ class MainActivity : AppCompatActivity(), AudioRepositoryProvider, PlayerControl
      */
     private fun createAudioRepository(): AudioRepository {
         val metadataExtractor: MediaMetadataExtractor = MediaMetadataExtractor()
-        val audioFileScanner: AudioFileScanner = AudioFileScanner(metadataExtractor = metadataExtractor)
+        val mediaStoreIdResolver: AndroidMediaStoreIdResolver =
+            AndroidMediaStoreIdResolver(contentResolver = contentResolver)
+        val audioFileScanner: AudioFileScanner = AudioFileScanner(
+            metadataExtractor = metadataExtractor,
+            mediaStoreIdResolver = mediaStoreIdResolver,
+        )
         val database: AudioDatabase = AudioDatabase.getInstance(context = applicationContext)
         return AudioRepository(
             audioFileScanner = audioFileScanner,

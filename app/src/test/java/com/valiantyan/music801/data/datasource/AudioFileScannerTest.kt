@@ -13,6 +13,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -72,6 +73,7 @@ class AudioFileScannerTest {
                 eq(audioFile1.absolutePath),
                 eq(audioFile1.length()),
                 eq(audioFile1.lastModified()),
+                anyOrNull(),
             ),
         ).thenReturn(song1)
 
@@ -80,6 +82,7 @@ class AudioFileScannerTest {
                 eq(audioFile2.absolutePath),
                 eq(audioFile2.length()),
                 eq(audioFile2.lastModified()),
+                anyOrNull(),
             ),
         ).thenReturn(song2)
 
@@ -156,6 +159,7 @@ class AudioFileScannerTest {
                 eq(file1.absolutePath),
                 eq(file1.length()),
                 eq(file1.lastModified()),
+                anyOrNull(),
             ),
         ).thenReturn(song1)
 
@@ -164,6 +168,7 @@ class AudioFileScannerTest {
                 eq(file2.absolutePath),
                 eq(file2.length()),
                 eq(file2.lastModified()),
+                anyOrNull(),
             ),
         ).thenReturn(song2)
 
@@ -172,6 +177,7 @@ class AudioFileScannerTest {
                 eq(file3.absolutePath),
                 eq(file3.length()),
                 eq(file3.lastModified()),
+                anyOrNull(),
             ),
         ).thenReturn(song3)
 
@@ -234,7 +240,7 @@ class AudioFileScannerTest {
             albumArtPath = null,
         )
 
-        whenever(mockMetadataExtractor.extractMetadata(any(), any(), any()))
+        whenever(mockMetadataExtractor.extractMetadata(any(), any(), any(), anyOrNull()))
             .thenReturn(song1, song2, song3)
 
         // When: 扫描目录并收集进度更新
@@ -324,7 +330,7 @@ class AudioFileScannerTest {
             albumArtPath = null,
         )
 
-        whenever(mockMetadataExtractor.extractMetadata(any(), any(), any()))
+        whenever(mockMetadataExtractor.extractMetadata(any(), any(), any(), anyOrNull()))
             .thenReturn(song1, song2)
 
         // When: 扫描目录并收集进度更新
@@ -375,6 +381,7 @@ class AudioFileScannerTest {
                     eq(file.absolutePath),
                     eq(file.length()),
                     eq(file.lastModified()),
+                    anyOrNull(),
                 ),
             ).thenReturn(song)
         }
@@ -445,6 +452,7 @@ class AudioFileScannerTest {
                     eq(file.absolutePath),
                     eq(file.length()),
                     eq(file.lastModified()),
+                    anyOrNull(),
                 ),
             ).thenReturn(song)
         }
@@ -507,6 +515,7 @@ class AudioFileScannerTest {
                     eq(file.absolutePath),
                     eq(file.length()),
                     eq(file.lastModified()),
+                    anyOrNull(),
                 ),
             ).thenReturn(song)
         }

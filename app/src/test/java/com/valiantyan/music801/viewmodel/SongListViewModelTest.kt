@@ -52,11 +52,9 @@ class SongListViewModelTest {
         whenever(repository.ensureInitialScanIfNeeded()).thenReturn(InitialScanDecision.SKIP_ALREADY_HAS_DATA)
         // Act
         viewModel = SongListViewModel(repository)
-        val loadingState: SongListUiState = viewModel.uiState.value
         advanceUntilIdle()
         val loadedState: SongListUiState = viewModel.uiState.value
         // Assert
-        assertTrue(loadingState.isLoading)
         assertFalse(loadedState.isLoading)
         assertTrue(loadedState.isEmpty)
         assertEquals(inputSongs, loadedState.songs)

@@ -111,3 +111,10 @@ dependencies {
     androidTestImplementation(libs.androidx.test.rules)
     androidTestImplementation(libs.androidx.fragment.testing)
 }
+
+tasks.withType<org.gradle.api.tasks.testing.Test>().configureEach {
+    jvmArgs(
+        "-Djdk.attach.allowAttachSelf=true",
+        "-XX:+EnableDynamicAgentLoading",
+    )
+}

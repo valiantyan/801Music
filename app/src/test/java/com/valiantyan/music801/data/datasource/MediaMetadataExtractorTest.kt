@@ -44,7 +44,7 @@ class MediaMetadataExtractorTest {
             .thenReturn("180000") // 3分钟，单位：毫秒
 
         // When
-        val song = extractor.extractMetadata(filePath, fileSize, dateAdded)
+        val song = extractor.extractMetadata(filePath, fileSize, dateAdded, mediaStoreId = null)
 
         // Then
         assertNotNull("应该成功提取元数据", song)
@@ -73,7 +73,7 @@ class MediaMetadataExtractorTest {
         whenever(mockRetriever.extractMetadata(any())).thenReturn(null)
 
         // When
-        val song = extractor.extractMetadata(filePath, fileSize, dateAdded)
+        val song = extractor.extractMetadata(filePath, fileSize, dateAdded, mediaStoreId = null)
 
         // Then
         assertNotNull("即使元数据缺失也应该返回 Song 对象", song)
@@ -101,7 +101,7 @@ class MediaMetadataExtractorTest {
             .thenReturn("120000") // 2分钟
 
         // When
-        val song = extractor.extractMetadata(filePath, fileSize, dateAdded)
+        val song = extractor.extractMetadata(filePath, fileSize, dateAdded, mediaStoreId = null)
 
         // Then
         assertNotNull("应该返回 Song 对象", song)
@@ -120,20 +120,20 @@ class MediaMetadataExtractorTest {
 
         // Mock 返回空字符串
         whenever(mockRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE))
-            .thenReturn("")
+            .thenReturn(" ")
         whenever(mockRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST))
-            .thenReturn("   ") // 空白字符
+            .thenReturn(" ")
         whenever(mockRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM))
-            .thenReturn("")
+            .thenReturn(" ")
         whenever(mockRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION))
-            .thenReturn("")
+            .thenReturn(" ")
 
         // When
-        val song = extractor.extractMetadata(filePath, fileSize, dateAdded)
+        val song = extractor.extractMetadata(filePath, fileSize, dateAdded, mediaStoreId = null)
 
         // Then
         assertNotNull("应该返回 Song 对象", song)
-        assertEquals("标题应该使用文件名", "Empty Metadata", song?.title)
+        assertEquals("标题应该使用文件名（去除扩展名）", "Empty Metadata", song?.title)
         assertEquals("艺术家应该有默认值", "未知艺术家", song?.artist)
         assertNull("专辑应该为 null", song?.album)
         assertEquals("时长应该为 0", 0L, song?.duration)
@@ -149,7 +149,7 @@ class MediaMetadataExtractorTest {
         whenever(mockRetriever.extractMetadata(any())).thenReturn(null)
 
         // When
-        val song = extractor.extractMetadata(filePath, fileSize, dateAdded)
+        val song = extractor.extractMetadata(filePath, fileSize, dateAdded, mediaStoreId = null)
 
         // Then
         assertNotNull("MP3 格式应该能提取元数据", song)
@@ -166,7 +166,7 @@ class MediaMetadataExtractorTest {
         whenever(mockRetriever.extractMetadata(any())).thenReturn(null)
 
         // When
-        val song = extractor.extractMetadata(filePath, fileSize, dateAdded)
+        val song = extractor.extractMetadata(filePath, fileSize, dateAdded, mediaStoreId = null)
 
         // Then
         assertNotNull("AAC 格式应该能提取元数据", song)
@@ -183,7 +183,7 @@ class MediaMetadataExtractorTest {
         whenever(mockRetriever.extractMetadata(any())).thenReturn(null)
 
         // When
-        val song = extractor.extractMetadata(filePath, fileSize, dateAdded)
+        val song = extractor.extractMetadata(filePath, fileSize, dateAdded, mediaStoreId = null)
 
         // Then
         assertNotNull("FLAC 格式应该能提取元数据", song)
@@ -202,7 +202,7 @@ class MediaMetadataExtractorTest {
             .whenever(mockRetriever).setDataSource(filePath)
 
         // When
-        val song = extractor.extractMetadata(filePath, fileSize, dateAdded)
+        val song = extractor.extractMetadata(filePath, fileSize, dateAdded, mediaStoreId = null)
 
         // Then
         assertNull("文件不存在时应该返回 null", song)
@@ -220,11 +220,29 @@ class MediaMetadataExtractorTest {
         whenever(mockRetriever.extractMetadata(any())).thenReturn(null)
 
         // When
-        val song = extractor.extractMetadata(filePath, fileSize, dateAdded)
+        val song = extractor.extractMetadata(filePath, fileSize, dateAdded, mediaStoreId = null)
 
         // Then
         assertNotNull("应该返回 Song 对象", song)
         assertEquals("id 应该等于文件路径", filePath, song?.id)
+    }
+
+    @Test
+    fun `提供 MediaStore ID 时应优先使用`() {
+        // Given
+        val filePath = "/storage/emulated/0/Music/song.mp3"
+        val fileSize = 1024000L
+        val dateAdded = System.currentTimeMillis()
+        val mediaStoreId: Long = 123L
+
+        whenever(mockRetriever.extractMetadata(any())).thenReturn(null)
+
+        // When
+        val song = extractor.extractMetadata(filePath, fileSize, dateAdded, mediaStoreId = mediaStoreId)
+
+        // Then
+        assertNotNull("应该返回 Song 对象", song)
+        assertEquals("id 应该等于 MediaStore ID", "123", song?.id)
     }
 
     @Test
@@ -237,7 +255,7 @@ class MediaMetadataExtractorTest {
         whenever(mockRetriever.extractMetadata(any())).thenReturn(null)
 
         // When
-        val song = extractor.extractMetadata(filePath, fileSize, dateAdded)
+        val song = extractor.extractMetadata(filePath, fileSize, dateAdded, mediaStoreId = null)
 
         // Then
         assertNotNull("应该能处理特殊字符", song)
@@ -261,7 +279,7 @@ class MediaMetadataExtractorTest {
             .thenReturn("invalid") // 无效的时长字符串
 
         // When
-        val song = extractor.extractMetadata(filePath, fileSize, dateAdded)
+        val song = extractor.extractMetadata(filePath, fileSize, dateAdded, mediaStoreId = null)
 
         // Then
         assertNotNull("应该返回 Song 对象", song)
@@ -279,7 +297,7 @@ class MediaMetadataExtractorTest {
             .thenReturn("Test Song")
 
         // When
-        val song = extractor.extractMetadata(filePath, fileSize, dateAdded)
+        val song = extractor.extractMetadata(filePath, fileSize, dateAdded, mediaStoreId = null)
 
         // Then
         assertNotNull("应该返回 Song 对象", song)

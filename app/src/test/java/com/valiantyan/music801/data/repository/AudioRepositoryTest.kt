@@ -23,6 +23,7 @@ import org.mockito.kotlin.KArgumentCaptor
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -104,7 +105,7 @@ class AudioRepositoryTest {
         repository.scanAndSync(scanMode = ScanMode.FULL_INITIAL).collect { _ -> }
         val captor: KArgumentCaptor<List<SongEntity>> = argumentCaptor()
         verify(mockSongDao).upsertAll(captor.capture())
-        verify(mockSyncDao).upsert(state = any())
+        verify(mockSyncDao, times(2)).upsert(state = any())
         val actualEntities: List<SongEntity> = captor.firstValue
         assertEquals(1, actualEntities.size)
         assertEquals(song.id, actualEntities.first().id)

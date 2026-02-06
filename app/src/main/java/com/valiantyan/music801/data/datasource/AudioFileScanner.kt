@@ -22,6 +22,7 @@ import java.util.logging.Logger
  */
 class AudioFileScanner(
     private val metadataExtractor: MediaMetadataExtractor,
+    private val mediaStoreIdResolver: MediaStoreIdResolver = NoOpMediaStoreIdResolver(),
 ) {
     /**
      * 扫描日志记录器
@@ -203,10 +204,12 @@ class AudioFileScanner(
      * @return 提取到的 [Song]，失败时返回 null
      */
     private fun extractSong(file: File): Song? {
+        val mediaStoreId: Long? = mediaStoreIdResolver.resolveId(filePath = file.absolutePath)
         return metadataExtractor.extractMetadata(
             filePath = file.absolutePath,
             fileSize = file.length(),
             dateAdded = file.lastModified(),
+            mediaStoreId = mediaStoreId,
         )
     }
 

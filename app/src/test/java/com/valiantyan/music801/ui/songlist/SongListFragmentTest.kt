@@ -18,17 +18,23 @@ import androidx.navigation.Navigation
 import androidx.navigation.testing.TestNavHostController
 import androidx.recyclerview.widget.RecyclerView
 import com.valiantyan.music801.R
+import com.valiantyan.music801.data.datasource.AudioFileScanner
+import com.valiantyan.music801.data.datasource.MediaMetadataExtractor
+import com.valiantyan.music801.data.local.dao.LibrarySyncStateDao
+import com.valiantyan.music801.data.local.dao.SongDao
+import com.valiantyan.music801.data.local.entity.LibrarySyncStateEntity
+import com.valiantyan.music801.data.local.entity.ScanStatus
+import com.valiantyan.music801.data.local.entity.SongEntity
 import com.valiantyan.music801.data.repository.AudioRepository
 import com.valiantyan.music801.di.PlayerControllerProvider
-import com.valiantyan.music801.domain.model.InitialScanDecision
 import com.valiantyan.music801.domain.model.PlaybackState
 import com.valiantyan.music801.domain.model.Song
 import com.valiantyan.music801.player.PlayerController
 import com.valiantyan.music801.viewmodel.SongListUiState
 import com.valiantyan.music801.viewmodel.SongListViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -36,7 +42,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows
@@ -46,24 +51,29 @@ import org.robolectric.annotation.Config
 @Config(sdk = [Build.VERSION_CODES.TIRAMISU])
 class SongListFragmentTest {
     private lateinit var repository: AudioRepository
+    private lateinit var fakeSongDao: FakeSongDao
     private lateinit var viewModelFactory: ViewModelProvider.Factory
     private lateinit var playerController: PlayerController
 
     @Before
     fun setup() {
-        repository = mock()
+        fakeSongDao = FakeSongDao()
+        val fakeSyncDao: FakeLibrarySyncStateDao = FakeLibrarySyncStateDao()
+        repository = AudioRepository(
+            audioFileScanner = AudioFileScanner(metadataExtractor = MediaMetadataExtractor()),
+            songDao = fakeSongDao,
+            librarySyncStateDao = fakeSyncDao,
+        )
         playerController = mock()
-        whenever(repository.observeSongs()).thenReturn(flowOf(emptyList()))
-        runBlocking {
-            whenever(repository.ensureInitialScanIfNeeded()).thenReturn(InitialScanDecision.SKIP_ALREADY_HAS_DATA)
-        }
-        whenever(playerController.playbackState).thenReturn(MutableStateFlow(PlaybackState()))
+        fakeSongDao.updateSongs(emptyList())
+        fakeSongDao.updateCount(count = 1)
         viewModelFactory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return SongListViewModel(audioRepository = repository) as T
             }
         }
+        org.mockito.kotlin.whenever(playerController.playbackState).thenReturn(MutableStateFlow(PlaybackState()))
     }
 
     @Test
@@ -103,11 +113,10 @@ class SongListFragmentTest {
     @Test
     fun `端到端列表展示应显示歌曲`() {
         val songs: List<Song> = createSongs(count = 3)
-        whenever(repository.observeSongs()).thenReturn(flowOf(songs))
+        fakeSongDao.updateSongs(songs = songs)
         val fragment: SongListFragment = launchFragment()
         idleMainLooper()
-        val recyclerView: androidx.recyclerview.widget.RecyclerView =
-            fragment.requireView().findViewById(R.id.songListRecyclerView)
+        val recyclerView: RecyclerView = fragment.requireView().findViewById(R.id.songListRecyclerView)
         val adapter: SongListAdapter = recyclerView.adapter as SongListAdapter
         assertEquals(3, adapter.itemCount)
     }
@@ -115,11 +124,10 @@ class SongListFragmentTest {
     @Test
     fun `保存并恢复列表状态后位置保持`() {
         val songs: List<Song> = createSongs(count = 30)
-        whenever(repository.observeSongs()).thenReturn(flowOf(songs))
+        fakeSongDao.updateSongs(songs = songs)
         val fragment: SongListFragment = launchFragment()
         idleMainLooper()
-        val recyclerView: androidx.recyclerview.widget.RecyclerView =
-            fragment.requireView().findViewById(R.id.songListRecyclerView)
+        val recyclerView: RecyclerView = fragment.requireView().findViewById(R.id.songListRecyclerView)
         recyclerView.scrollToPosition(20)
         idleMainLooper()
         val stateBundle: Bundle = Bundle()
@@ -136,7 +144,7 @@ class SongListFragmentTest {
     @Test
     fun `点击歌曲后应设置队列并导航到播放页`() {
         val songs: List<Song> = createSongs(count = 2)
-        whenever(repository.observeSongs()).thenReturn(flowOf(songs))
+        fakeSongDao.updateSongs(songs = songs)
         val fragment: SongListFragment = launchFragment()
         val navController: TestNavHostController = createNavController(fragment = fragment)
         Navigation.setViewNavController(fragment.requireView(), navController)
@@ -242,5 +250,57 @@ private class TestPlayerActivity : FragmentActivity(), PlayerControllerProvider 
 
     companion object {
         lateinit var playerController: PlayerController
+    }
+}
+
+private class FakeSongDao : SongDao {
+    private val songFlow: MutableStateFlow<List<SongEntity>> = MutableStateFlow(emptyList())
+    private var songCount: Int = 1
+
+    override fun observeSongs(): Flow<List<SongEntity>> {
+        return songFlow
+    }
+
+    override suspend fun countSongs(): Int {
+        return songCount
+    }
+
+    override suspend fun upsertAll(songs: List<SongEntity>) {
+        songFlow.value = songs
+        songCount = songs.size
+    }
+
+    fun updateSongs(songs: List<Song>) {
+        songFlow.value = songs.map { song: Song ->
+            SongEntity(
+                id = song.id,
+                title = song.title,
+                artist = song.artist,
+                album = song.album,
+                duration = song.duration,
+                filePath = song.filePath,
+                fileSize = song.fileSize,
+                dateAdded = song.dateAdded,
+                albumArtPath = song.albumArtPath,
+                modifiedAt = song.dateAdded,
+                scannedAt = song.dateAdded,
+            )
+        }
+    }
+
+    fun updateCount(count: Int) {
+        songCount = count
+    }
+}
+
+private class FakeLibrarySyncStateDao : LibrarySyncStateDao {
+    private var state: LibrarySyncStateEntity? = null
+
+    override suspend fun findById(id: Int): LibrarySyncStateEntity? {
+        return state
+    }
+
+    override suspend fun upsert(state: LibrarySyncStateEntity) {
+        this.state = state
     }
 }
