@@ -2,13 +2,16 @@ package com.valiantyan.music801.data
 
 import android.content.Context
 import android.os.SystemClock
+import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.valiantyan.music801.data.datasource.AudioFileScanner
 import com.valiantyan.music801.data.datasource.MediaMetadataExtractor
 import com.valiantyan.music801.data.datasource.MetadataRetriever
+import com.valiantyan.music801.data.local.AudioDatabase
 import com.valiantyan.music801.data.repository.AudioRepository
 import com.valiantyan.music801.domain.model.ScanProgress
 import com.valiantyan.music801.domain.model.Song
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -34,7 +37,7 @@ class AudioScanIntegrationTest {
         createNonAudioFile(parent = rootDir, fileName = "readme.txt")
         val repository: AudioRepository = createRepository(failPaths = emptySet())
         val progressUpdates: List<ScanProgress> = repository.scanAudioFiles(rootPath = rootDir.absolutePath).toList()
-        val actualSongs: List<Song> = repository.songs.value
+        val actualSongs: List<Song> = repository.observeSongs().first { songs: List<Song> -> songs.isNotEmpty() }
         assertEquals(3, actualSongs.size)
         assertTrue(progressUpdates.isNotEmpty())
         val lastProgress: ScanProgress = progressUpdates.last()
@@ -57,7 +60,7 @@ class AudioScanIntegrationTest {
         val failPaths: Set<String> = setOf(corruptedFile.absolutePath)
         val repository: AudioRepository = createRepository(failPaths = failPaths)
         val progressUpdates: List<ScanProgress> = repository.scanAudioFiles(rootPath = rootDir.absolutePath).toList()
-        val actualSongs: List<Song> = repository.songs.value
+        val actualSongs: List<Song> = repository.observeSongs().first { songs: List<Song> -> songs.isNotEmpty() }
         val expectedPaths: MutableSet<String> = mutableSetOf()
         expectedPaths.add(okFile1.absolutePath)
         expectedPaths.add(okFile2.absolutePath)
@@ -72,7 +75,7 @@ class AudioScanIntegrationTest {
         val rootDir: File = createRootDir(context = context, name = "scan_empty")
         val repository: AudioRepository = createRepository(failPaths = emptySet())
         val progressUpdates: List<ScanProgress> = repository.scanAudioFiles(rootPath = rootDir.absolutePath).toList()
-        val actualSongs: List<Song> = repository.songs.value
+        val actualSongs: List<Song> = repository.observeSongs().first()
         assertTrue(actualSongs.isEmpty())
         assertEquals(0, progressUpdates.last().scannedCount)
         assertFalse(progressUpdates.last().isScanning)
@@ -102,7 +105,7 @@ class AudioScanIntegrationTest {
         try {
             val repository: AudioRepository = createRepository(failPaths = emptySet())
             val progressUpdates: List<ScanProgress> = repository.scanAudioFiles(rootPath = rootDir.absolutePath).toList()
-            val actualSongs: List<Song> = repository.songs.value
+            val actualSongs: List<Song> = repository.observeSongs().first { songs: List<Song> -> songs.isNotEmpty() }
             assertTrue(progressUpdates.isNotEmpty())
             assertTrue(actualSongs.isNotEmpty())
         } finally {
@@ -120,7 +123,7 @@ class AudioScanIntegrationTest {
         repository.scanAudioFiles(rootPath = rootDir.absolutePath).toList()
         val endTimeMs: Long = SystemClock.elapsedRealtime()
         val durationMs: Long = endTimeMs - startTimeMs
-        val actualSongs: List<Song> = repository.songs.value
+        val actualSongs: List<Song> = repository.observeSongs().first { songs: List<Song> -> songs.isNotEmpty() }
         assertEquals(1000, actualSongs.size)
         assertTrue(durationMs < 30000L)
     }
@@ -130,7 +133,15 @@ class AudioScanIntegrationTest {
     private fun createRepository(failPaths: Set<String>): AudioRepository {
         val metadataExtractor: MediaMetadataExtractor = createMetadataExtractor(failPaths = failPaths)
         val scanner: AudioFileScanner = AudioFileScanner(metadataExtractor)
-        return AudioRepository(scanner)
+        val database: AudioDatabase = Room.inMemoryDatabaseBuilder(
+            getContext(),
+            AudioDatabase::class.java,
+        ).allowMainThreadQueries().build()
+        return AudioRepository(
+            audioFileScanner = scanner,
+            songDao = database.songDao(),
+            librarySyncStateDao = database.librarySyncStateDao(),
+        )
     }
 
     private fun createMetadataExtractor(failPaths: Set<String>): MediaMetadataExtractor {

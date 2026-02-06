@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.valiantyan.music801.R
 import com.valiantyan.music801.data.repository.AudioRepository
 import com.valiantyan.music801.di.PlayerControllerProvider
+import com.valiantyan.music801.domain.model.InitialScanDecision
 import com.valiantyan.music801.domain.model.PlaybackState
 import com.valiantyan.music801.domain.model.Song
 import com.valiantyan.music801.player.PlayerController
@@ -27,6 +28,7 @@ import com.valiantyan.music801.viewmodel.SongListUiState
 import com.valiantyan.music801.viewmodel.SongListViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -51,7 +53,10 @@ class SongListFragmentTest {
     fun setup() {
         repository = mock()
         playerController = mock()
-        whenever(repository.getAllSongs()).thenReturn(flowOf(emptyList()))
+        whenever(repository.observeSongs()).thenReturn(flowOf(emptyList()))
+        runBlocking {
+            whenever(repository.ensureInitialScanIfNeeded()).thenReturn(InitialScanDecision.SKIP_ALREADY_HAS_DATA)
+        }
         whenever(playerController.playbackState).thenReturn(MutableStateFlow(PlaybackState()))
         viewModelFactory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
@@ -98,7 +103,7 @@ class SongListFragmentTest {
     @Test
     fun `端到端列表展示应显示歌曲`() {
         val songs: List<Song> = createSongs(count = 3)
-        whenever(repository.getAllSongs()).thenReturn(flowOf(songs))
+        whenever(repository.observeSongs()).thenReturn(flowOf(songs))
         val fragment: SongListFragment = launchFragment()
         idleMainLooper()
         val recyclerView: androidx.recyclerview.widget.RecyclerView =
@@ -110,7 +115,7 @@ class SongListFragmentTest {
     @Test
     fun `保存并恢复列表状态后位置保持`() {
         val songs: List<Song> = createSongs(count = 30)
-        whenever(repository.getAllSongs()).thenReturn(flowOf(songs))
+        whenever(repository.observeSongs()).thenReturn(flowOf(songs))
         val fragment: SongListFragment = launchFragment()
         idleMainLooper()
         val recyclerView: androidx.recyclerview.widget.RecyclerView =
@@ -131,7 +136,7 @@ class SongListFragmentTest {
     @Test
     fun `点击歌曲后应设置队列并导航到播放页`() {
         val songs: List<Song> = createSongs(count = 2)
-        whenever(repository.getAllSongs()).thenReturn(flowOf(songs))
+        whenever(repository.observeSongs()).thenReturn(flowOf(songs))
         val fragment: SongListFragment = launchFragment()
         val navController: TestNavHostController = createNavController(fragment = fragment)
         Navigation.setViewNavController(fragment.requireView(), navController)

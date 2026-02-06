@@ -338,7 +338,7 @@ data class ScanProgress(
   - 创建了 `AudioRepository.kt` 音频数据仓库（位于 `data/repository/AudioRepository.kt`）
     - 封装 AudioFileScanner 的扫描逻辑，提供统一的扫描接口
     - 管理扫描结果缓存（使用 MutableStateFlow 在内存中缓存）
-    - 暴露 Flow<List<Song>> 供其他模块订阅（通过 getAllSongs 方法）
+    - 暴露 Flow<List<Song>> 供其他模块订阅（通过 observeSongs 方法）
     - 提供 scanAudioFiles 方法，封装扫描流程并更新缓存
     - 提供 clearCache 方法，支持清空缓存
   - 编写了完整的单元测试：
@@ -350,7 +350,7 @@ data class ScanProgress(
   - 设计要点：
     - Repository 作为单一数据源，封装数据访问逻辑
     - 使用 StateFlow 管理缓存，支持响应式更新
-    - 扫描时自动更新缓存，其他模块可通过 getAllSongs 订阅
+    - 扫描时自动更新缓存，其他模块可通过 observeSongs 订阅
   - 所有测试用例已通过验证（0 failures, 0 errors）
 
 - [x] **2025-01-27**: Task 7 已完成 ✅

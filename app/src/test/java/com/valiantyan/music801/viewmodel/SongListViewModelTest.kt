@@ -1,12 +1,14 @@
 package com.valiantyan.music801.viewmodel
 
 import com.valiantyan.music801.data.repository.AudioRepository
+import com.valiantyan.music801.domain.model.InitialScanDecision
 import com.valiantyan.music801.domain.model.Song
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -29,7 +31,7 @@ import org.mockito.kotlin.whenever
 class SongListViewModelTest {
     private lateinit var repository: AudioRepository
     private lateinit var viewModel: SongListViewModel
-    private val testDispatcher = StandardTestDispatcher()
+    private val testDispatcher: CoroutineDispatcher = Dispatchers.Unconfined
 
     @Before
     fun setup() {
@@ -43,10 +45,11 @@ class SongListViewModelTest {
     }
 
     @Test
-    fun `初始化时进入加载状态并完成加载`() = runTest(testDispatcher) {
+    fun `初始化时进入加载状态并完成加载`() = runTest {
         // Arrange
         val inputSongs: List<Song> = emptyList()
-        whenever(repository.getAllSongs()).thenReturn(flowOf(inputSongs))
+        whenever(repository.observeSongs()).thenReturn(flowOf(inputSongs))
+        whenever(repository.ensureInitialScanIfNeeded()).thenReturn(InitialScanDecision.SKIP_ALREADY_HAS_DATA)
         // Act
         viewModel = SongListViewModel(repository)
         val loadingState: SongListUiState = viewModel.uiState.value
@@ -58,11 +61,11 @@ class SongListViewModelTest {
         assertTrue(loadedState.isEmpty)
         assertEquals(inputSongs, loadedState.songs)
         assertNull(loadedState.error)
-        verify(repository).getAllSongs()
+        verify(repository).observeSongs()
     }
 
     @Test
-    fun `获取歌曲列表后更新为空与加载状态`() = runTest(testDispatcher) {
+    fun `获取歌曲列表后更新为空与加载状态`() = runTest {
         // Arrange
         val inputSong: Song = createSong(
             id = "/storage/music/song1.mp3",
@@ -70,7 +73,8 @@ class SongListViewModelTest {
             artist = "Artist 1",
         )
         val inputSongs: List<Song> = listOf(inputSong)
-        whenever(repository.getAllSongs()).thenReturn(flowOf(inputSongs))
+        whenever(repository.observeSongs()).thenReturn(flowOf(inputSongs))
+        whenever(repository.ensureInitialScanIfNeeded()).thenReturn(InitialScanDecision.SKIP_ALREADY_HAS_DATA)
         // Act
         viewModel = SongListViewModel(repository)
         advanceUntilIdle()
@@ -83,14 +87,14 @@ class SongListViewModelTest {
     }
 
     @Test
-    fun `加载失败时进入错误状态`() = runTest(testDispatcher) {
+    fun `加载失败时进入错误状态`() = runTest {
         // Arrange
-        val inputMessage = "加载失败"
-        whenever(repository.getAllSongs()).thenReturn(
-            flow {
-                throw IllegalStateException(inputMessage)
-            },
-        )
+        val inputMessage: String = "加载失败"
+        val errorFlow: Flow<List<Song>> = flow {
+            throw IllegalStateException(inputMessage)
+        }
+        whenever(repository.observeSongs()).thenReturn(errorFlow)
+        whenever(repository.ensureInitialScanIfNeeded()).thenReturn(InitialScanDecision.SKIP_ALREADY_HAS_DATA)
         // Act
         viewModel = SongListViewModel(repository)
         advanceUntilIdle()

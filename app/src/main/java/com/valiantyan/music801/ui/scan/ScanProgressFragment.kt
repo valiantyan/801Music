@@ -16,6 +16,7 @@ import androidx.navigation.fragment.findNavController
 import com.valiantyan.music801.R
 import com.valiantyan.music801.data.datasource.AudioFileScanner
 import com.valiantyan.music801.data.datasource.MediaMetadataExtractor
+import com.valiantyan.music801.data.local.AudioDatabase
 import com.valiantyan.music801.data.repository.AudioRepository
 import com.valiantyan.music801.databinding.FragmentScanProgressBinding
 import com.valiantyan.music801.di.AudioRepositoryProvider
@@ -89,7 +90,12 @@ class ScanProgressFragment : Fragment() {
             val audioRepository: AudioRepository = repositoryProvider?.provideAudioRepository() ?: run {
                 val metadataExtractor: MediaMetadataExtractor = MediaMetadataExtractor()
                 val audioFileScanner: AudioFileScanner = AudioFileScanner(metadataExtractor = metadataExtractor)
-                AudioRepository(audioFileScanner = audioFileScanner)
+                val database: AudioDatabase = AudioDatabase.getInstance(context = requireContext().applicationContext)
+                AudioRepository(
+                    audioFileScanner = audioFileScanner,
+                    songDao = database.songDao(),
+                    librarySyncStateDao = database.librarySyncStateDao(),
+                )
             }
             ScanViewModelFactory(audioRepository = audioRepository)
         }
